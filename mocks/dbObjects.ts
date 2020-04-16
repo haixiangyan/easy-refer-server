@@ -1,3 +1,4 @@
+import consola from 'consola'
 import dayjs from 'dayjs'
 import UserModel from '@/models/UserModel'
 import JobModel from '@/models/JobModel'
@@ -91,5 +92,5 @@ export const initMockDB = async () => {
 
   memoryResume.referId = 'refer-2'
 
-  console.log('成功将假数据存入数据库')
+  consola.success('成功将假数据存入数据库')
 }

@@ -1,4 +1,5 @@
 import {Sequelize} from 'sequelize-typescript'
+import consola from 'consola'
 import UserModel from '@/models/UserModel'
 import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
@@ -27,8 +28,8 @@ const initDB = () => {
 
   // Test connection
   sequelize.authenticate()
-    .then(() => console.log('成功连接数据库'))
-    .catch((error) => console.log('无法连接数据库: ', error))
+    .then(() => consola.success('成功连接数据库'))
+    .catch((error) => consola.error('无法连接数据库: ', error))
 
   return sequelize
 }

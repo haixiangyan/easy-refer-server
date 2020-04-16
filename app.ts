@@ -13,10 +13,6 @@ import ResumesRouter from '@/routes/resumes'
 import UploadRouter from '@/routes/upload'
 import UsersRouter from '@/routes/users'
 
-// 数据库
-// import db from './models/db'
-// import {initMockDB} from './mocks/dbObjects'
-
 const jsonParser = bodyParser.json()
 
 const app = express()
