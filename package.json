@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "ts-node bin/www.ts"
+    "start": "cross-env NODE_ENV=development nodemon bin/www.ts --watch bin"
   },
   "dependencies": {
     "body-parser": "^1.19.0",
     "cookie-parser": "^1.4.5",
+    "cross-env": "^7.0.2",
     "dayjs": "^1.8.24",
     "debug": "^4.1.1",
     "dotenv": "^8.2.0",
@@ -34,6 +35,7 @@
     "mockjs": "^1.1.0",
     "nodemon": "^2.0.3",
     "ts-node": "^8.8.2",
+    "tsconfig-paths": "^3.9.0",
     "typescript": "^3.8.3"
   }
 }

@@ -28,6 +28,15 @@
       "jest"
     ]
   },
+  "include": [
+    "bin",
+    "mocks",
+    "models",
+    "public",
+    "routes",
+    "utils",
+    "app.ts"
+  ],
   "exclude": [
     "node_modules",
     "dist"
