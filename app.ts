@@ -6,12 +6,12 @@ import logger from 'morgan'
 import bodyParser from 'body-parser'
 
 // 路由
-import JobsRouter from './routes/jobs'
-import RefersRouter from './routes/refers'
-import AuthRouter from './routes/auth'
-import ResumesRouter from './routes/resumes'
-import UploadRouter from './routes/upload'
-import UsersRouter from './routes/users'
+import JobsRouter from '@/routes/jobs'
+import RefersRouter from '@/routes/refers'
+import AuthRouter from '@/routes/auth'
+import ResumesRouter from '@/routes/resumes'
+import UploadRouter from '@/routes/upload'
+import UsersRouter from '@/routes/users'
 
 // 数据库
 // import db from './models/db'

@@ -11,9 +11,9 @@ import {
   Model,
   ForeignKey
 } from 'sequelize-typescript'
-import JobModel from './JobModel'
-import ReferModel from './ReferModel'
-import ResumeModel from './ResumeModel'
+import JobModel from '@/models/JobModel'
+import ReferModel from '@/models/ReferModel'
+import ResumeModel from '@/models/ResumeModel'
 
 @Table({tableName: 'users'})
 class UserModel extends Model<UserModel> {

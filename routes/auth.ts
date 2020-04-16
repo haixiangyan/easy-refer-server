@@ -1,7 +1,7 @@
 import express from 'express'
 import Mock from 'mockjs'
 import {User, Job, Resume} from '@/mocks/objects'
-import UserModel from '../models/UserModel'
+import UserModel from '@/models/UserModel'
 import {generateJWT} from '@/utils/auth'
 
 // '/auth'

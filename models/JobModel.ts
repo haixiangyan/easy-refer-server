@@ -1,7 +1,7 @@
 import {DataTypes} from 'sequelize'
-import UserModel from './UserModel'
-import ReferModel from './ReferModel'
 import {AllowNull, BelongsTo, Column, ForeignKey, HasMany, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
+import UserModel from '@/models/UserModel'
+import ReferModel from '@/models/ReferModel'
 
 @Table({tableName: 'jobs'})
 class JobModel extends Model<JobModel> {

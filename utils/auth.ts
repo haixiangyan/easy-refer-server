@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import {parseEnv} from './config'
+import {parseEnv} from '@/utils/config'
 
 parseEnv()
 

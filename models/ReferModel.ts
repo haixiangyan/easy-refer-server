@@ -11,9 +11,9 @@ import {
   Table,
   Unique
 } from 'sequelize-typescript'
-import ResumeModel from './ResumeModel'
-import JobModel from './JobModel'
-import UserModel from './UserModel'
+import ResumeModel from '@/models/ResumeModel'
+import JobModel from '@/models/JobModel'
+import UserModel from '@/models/UserModel'
 
 @Table({tableName: 'refers'})
 class ReferModel extends Model<ReferModel> {

@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
-import UserModel from '../models/UserModel'
-import JobModel from '../models/JobModel'
-import ReferModel from '../models/ReferModel'
-import ResumeModel from '../models/ResumeModel'
+import UserModel from '@/models/UserModel'
+import JobModel from '@/models/JobModel'
+import ReferModel from '@/models/ReferModel'
+import ResumeModel from '@/models/ResumeModel'
 
 export const users = [
   {

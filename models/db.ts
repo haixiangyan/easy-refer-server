@@ -1,9 +1,9 @@
 import {Sequelize} from 'sequelize-typescript'
-import UserModel from './UserModel'
-import JobModel from './JobModel'
-import ReferModel from './ReferModel'
-import ResumeModel from './ResumeModel'
-import {parseEnv} from '~/utils/config'
+import UserModel from '@/models/UserModel'
+import JobModel from '@/models/JobModel'
+import ReferModel from '@/models/ReferModel'
+import ResumeModel from '@/models/ResumeModel'
+import {parseEnv} from '@/utils/config'
 
 // 创建连接实例
 const initDB = () => {
