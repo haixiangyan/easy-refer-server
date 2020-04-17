@@ -3,6 +3,8 @@ import db from '@/models/db'
 import app from '@/app'
 import {users, jobs, resumes, initMockDB} from '../../../mocks/dbObjects'
 import {generateJWT} from '../../../utils/auth'
+import dayjs = require('dayjs')
+import {DATETIME_FORMAT} from '../../../constants/format'
 
 const loginRoute = '/api/auth/login'
 const userRoute = '/api/auth/user'
@@ -53,17 +55,31 @@ describe('auth', () => {
 
   describe('/user', () => {
     it('成功获取 user1', async () => {
-      const userInfo = {
-        info: {...user1},
-        job: {...job1},
-        resume: {...resume1}
-      }
-      const jwtToken = generateJWT('user1')
-      const response = await request(app)
+      const jwtToken = generateJWT('user-1')
+      const {body: user} = await request(app)
         .get(userRoute)
         .set('Authorization', jwtToken)
 
-      console.log(response.body)
+      // 去掉 updatedAt 和 createdAt 字段
+      delete user.updatedAt
+      delete user.createdAt
+      delete user.job.updatedAt
+      delete user.job.createdAt
+      delete user.resumeList[0].updatedAt
+      delete user.resumeList[0].createdAt
+
+      const expectedUser = {
+        ...user1,
+        job: {...job1},
+        resumeList: [{...resume1}]
+      }
+
+      expect(dayjs(user.job.deadline).format(DATETIME_FORMAT)).toEqual(dayjs(expectedUser.job.deadline).format(DATETIME_FORMAT))
+
+      delete user.job.deadline
+      delete expectedUser.job.deadline
+
+      expect(user).toStrictEqual(expectedUser)
     })
   })
 })

@@ -1,8 +1,11 @@
 import express from 'express'
 import Mock from 'mockjs'
-import {Job, Resume, User} from '@/mocks/objects'
+import {User} from '@/mocks/objects'
 import {generateJWT} from '@/utils/auth'
 import passport from '@/plugins/passport'
+import UserModel from '@/models/UserModel'
+import JobModel from '@/models/JobModel'
+import ResumeModel from '@/models/ResumeModel'
 
 // '/auth'
 const AuthRouter = express.Router()
@@ -32,12 +35,16 @@ AuthRouter.post('/register', (req, res) => {
 })
 
 // 获取个人信息
-AuthRouter.get('/user', (req, res) => {
-  res.json(Mock.mock({
-    info: User,
-    job: Job,
-    resume: Resume
-  }))
+AuthRouter.get('/user', passport.authenticate('jwt', {session: false}), async (req, res) => {
+  const {userId} = req.user as TJwtRequest
+
+  const user = await UserModel.findByPk(userId, {
+    include: [JobModel, ResumeModel]
+  })
+
+  if (!user) throw new Error('该用户不存在')
+
+  res.json(user)
 })
 
 export default AuthRouter

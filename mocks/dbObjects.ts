@@ -43,6 +43,7 @@ export const jobs = [
     expiration: 5,
     referTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
+    refererId: 'user-1'
   }
 ]
 
@@ -99,6 +100,7 @@ export const initMockDB = async () => {
   await ReferModel.create(refer2)
 
   memoryResume.referId = 'refer-2'
+  await memoryResume.save()
 
   consola.success('成功将假数据存入数据库')
 }
