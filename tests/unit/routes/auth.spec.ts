@@ -8,6 +8,9 @@ describe('auth', () => {
     await db.sync({force: true})
     await initMockDB()
   })
+  afterAll(async () => {
+    await db.close()
+  })
   describe('/login', () => {
     it('成功登录', async () => {
       const res: request.Response = await request(app)
