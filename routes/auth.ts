@@ -1,36 +1,29 @@
 import express from 'express'
 import Mock from 'mockjs'
-import {User, Job, Resume} from '@/mocks/objects'
-import UserModel from '@/models/UserModel'
+import {Job, Resume, User} from '@/mocks/objects'
 import {generateJWT} from '@/utils/auth'
+import passport from '@/plugins/passport'
 
 // '/auth'
 const AuthRouter = express.Router()
 
 // 登录
-AuthRouter.post('/login', async (req, res) => {
-  const {email, password} = req.body
-  const user = await UserModel.findOne({
-    where: {email}
-  })
+AuthRouter.post('/login', (req, res) => {
+  passport.authenticate('local', {session: false}, (err, user, info) => {
+    if (err || !user) {
+      return res.status(401).json({
+        message: info.message
+      })
+    }
 
-  if (!user) {
-    res.status(401)
-    return res.json({
-      message: '用户不存在'
+    req.login(user, {session: false}, (err) => {
+      if (err) res.send(err)
+
+      const token = generateJWT(user.userId)
+
+      return res.json({user, token})
     })
-  }
-
-  if (user.password !== password) {
-    res.status(401)
-    return res.json({
-      message: '密码不正确'
-    })
-  }
-
-  return res.json(Mock.mock({
-    token: generateJWT(user.userId)
-  }))
+  })(req, res)
 })
 
 // 注册

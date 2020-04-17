@@ -8,7 +8,7 @@ export const generateJWT = (userId: string) => {
 
   if (!JWT_SECRET) throw new Error('环境变量 JWT_SECRET 不存在')
 
-  return jwt.sign({
+  return 'Bearer ' + jwt.sign({
     userId
   }, JWT_SECRET, {
     algorithm: 'HS256',
