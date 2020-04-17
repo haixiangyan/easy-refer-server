@@ -54,7 +54,7 @@ describe('auth', () => {
   })
 
   describe('/user', () => {
-    it('成功获取 user1', async () => {
+    it('成功获取 user-1', async () => {
       const jwtToken = generateJWT('user-1')
       const {body: user} = await request(app)
         .get(userRoute)
@@ -80,6 +80,24 @@ describe('auth', () => {
       delete expectedUser.job.deadline
 
       expect(user).toStrictEqual(expectedUser)
+    })
+    it('没有 token 不能获取 user-1', async () => {
+      const {status, body, text} = await request(app)
+        .get(userRoute)
+
+      expect(status).toEqual(401)
+      expect(body).toStrictEqual({})
+      expect(text).toEqual('Unauthorized')
+    })
+    it('不存在该用户', async () => {
+      const jwtToken = generateJWT('user-999')
+      const {status, body} = await request(app)
+        .get(userRoute)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(404)
+      expect(body).toHaveProperty('message')
+      expect(body.message).toEqual('该用户不存在')
     })
   })
 })

@@ -20,7 +20,10 @@ AuthRouter.post('/login', (req, res) => {
     }
 
     req.login(user, {session: false}, (err) => {
-      if (err) res.send(err)
+      if (err) {
+        res.status(500)
+        return res.json({message: '登录时发生错误'})
+      }
 
       const token = generateJWT(user.userId)
 
@@ -42,9 +45,12 @@ AuthRouter.get('/user', passport.authenticate('jwt', {session: false}), async (r
     include: [JobModel, ResumeModel]
   })
 
-  if (!user) throw new Error('该用户不存在')
-
-  res.json(user)
+  if (!user) {
+    res.status(404)
+    res.json({message: '该用户不存在'})
+  } else {
+    res.json(user)
+  }
 })
 
 export default AuthRouter
