@@ -10,7 +10,7 @@ import {parseEnv} from '@/utils/config'
 const initDB = () => {
   const {DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASSWORD} = process.env
 
-  if (!DB_HOST || !DB_PORT || !DB_NAME || !DB_USER || !DB_PASSWORD) {
+  if (!DB_HOST || !DB_PORT || !DB_NAME || !DB_USER) {
     throw new Error('环境变量不存在')
   }
 
