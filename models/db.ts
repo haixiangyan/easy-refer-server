@@ -23,7 +23,10 @@ const initDB = () => {
     password: DB_PASSWORD,
     storage: ':memory:',
     models: [UserModel, JobModel, ReferModel, ResumeModel],
-    logging: msg => console.log(msg)
+    logging: msg => console.log(msg),
+    define: {
+      charset: 'utf8'
+    }
   })
 
   // Test connection
