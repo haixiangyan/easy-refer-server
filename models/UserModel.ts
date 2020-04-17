@@ -21,7 +21,7 @@ class UserModel extends Model<UserModel> {
   @Unique
   @AllowNull(false)
   @PrimaryKey
-  @Column(DataTypes.UUID)
+  @Column(DataTypes.STRING)
   public userId!: string
 
   @Column(DataTypes.STRING)
@@ -55,7 +55,7 @@ class UserModel extends Model<UserModel> {
 
   // 外键
   @ForeignKey(() => JobModel)
-  @Column(DataTypes.UUID)
+  @Column(DataTypes.STRING)
   public readonly jobId!: string | null
 
   // 关系

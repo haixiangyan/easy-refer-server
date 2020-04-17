@@ -1,0 +1,16 @@
+language: node_js
+
+node_js:
+  - node
+
+cache:
+  yarn: true
+
+services:
+  - mysql
+
+before_script:
+  - mysql -e 'create database test;'
+
+after_success:
+  - yarn run coveralls

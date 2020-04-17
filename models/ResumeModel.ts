@@ -9,7 +9,7 @@ class ResumeModel extends Model<ResumeModel> {
   @Unique
   @AllowNull(false)
   @PrimaryKey
-  @Column(DataTypes.UUID)
+  @Column(DataTypes.STRING)
   public resumeId!: string
 
   @Column(DataTypes.STRING)

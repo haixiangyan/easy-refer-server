@@ -9,7 +9,7 @@ class JobModel extends Model<JobModel> {
   @Unique
   @AllowNull(false)
   @PrimaryKey
-  @Column(DataTypes.UUID)
+  @Column(DataTypes.STRING)
   public jobId!: string
 
   @Column(DataTypes.STRING)
