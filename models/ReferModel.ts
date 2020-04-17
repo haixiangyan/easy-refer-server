@@ -21,7 +21,7 @@ class ReferModel extends Model<ReferModel> {
   @Unique
   @AllowNull(false)
   @PrimaryKey
-  @Column(DataTypes.UUID)
+  @Column(DataTypes.STRING)
   public referId!: string
 
   @Column(DataTypes.STRING)
