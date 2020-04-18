@@ -69,13 +69,6 @@ export const refers = [
 
 export const resumes = [
   {
-    resumeId: 'resume-1',
-    name: '张三的简历.pdf',
-    url: 'https://user-1.pdf',
-    refereeId: 'user-1',
-    referId: null
-  },
-  {
     resumeId: 'resume-2',
     name: '李四的简历.pdf',
     url: 'https://user-2.pdf',
@@ -92,8 +85,7 @@ export const initMockDB = async () => {
   const [job1] = jobs
   await JobModel.create(job1)
 
-  const [resume1, resume2] = resumes
-  await ResumeModel.create(resume1)
+  const [resume2] = resumes
   const memoryResume = await ResumeModel.create(resume2)
 
   const [refer2] = refers

@@ -70,7 +70,7 @@ describe('auth', () => {
 
       expect(job.jobId).toEqual(job1.jobId)
 
-      expect(resume).not.toBeNull()
+      expect(resume).toBeNull()
 
       expect(info.myReferTotal).toEqual(0)
       expect(info.approvedMyReferCount).toEqual(0)
