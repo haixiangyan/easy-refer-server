@@ -109,11 +109,12 @@ describe('auth', () => {
   })
 
   describe('/register', () => {
-    const registrationForm = {
-      email: 'user3@mail.com',
-      password: user1.password
-    }
     it('用户注册成功', async () => {
+      const registrationForm = {
+        email: 'user3@mail.com',
+        password: '123456'
+      }
+
       const {body: responseUser} = await request(app)
         .post(registerRoute)
         .send(registrationForm)
@@ -128,9 +129,17 @@ describe('auth', () => {
       if (insertedUser) {
         expect(insertedUser.email).toEqual(registrationForm.email)
         expect(bcrypt.compareSync(registrationForm.password, insertedUser.password)).toBe(true)
+
+        // 删除新建的用户
+        await insertedUser.destroy()
       }
     })
     it('已存在的用户不能注册', async () => {
+      const registrationForm = {
+        email: user1.email,
+        password: user1.password
+      }
+
       let userCount = await UserModel.count({
         where: {email: registrationForm.email}
       })
@@ -139,7 +148,7 @@ describe('auth', () => {
 
       const {status, body} = await request(app)
         .post(registerRoute)
-        .send({...registrationForm, email: 'user1@mail.com'})
+        .send(registrationForm)
 
       userCount = await UserModel.count({
         where: {email: registrationForm.email}
