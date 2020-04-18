@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import bcrypt from 'bcrypt'
 import {parseEnv} from '@/utils/config'
 
 parseEnv()
@@ -14,4 +15,12 @@ export const generateJWT = (userId: string) => {
     algorithm: 'HS256',
     expiresIn: '1m'
   })
+}
+
+export const encryptPassword = (plainTextPassword: string) => {
+  const {SALT_ROUNDS} = process.env
+
+  if (!SALT_ROUNDS) throw new Error('环境亦是 SALT_ROUNDS 不存在')
+
+  return bcrypt.hashSync(plainTextPassword, parseInt(SALT_ROUNDS))
 }

@@ -1,4 +1,5 @@
 import request from 'supertest'
+import bcrypt from 'bcrypt'
 import db from '@/models/db'
 import app from '@/app'
 import {initMockDB, jobs, resumes, users} from '../../../mocks/dbObjects'
@@ -113,7 +114,7 @@ describe('auth', () => {
       password: user1.password
     }
     it('用户注册成功', async () => {
-      const {body: user} = await request(app)
+      const {body: responseUser} = await request(app)
         .post(registerRoute)
         .send(registrationForm)
 
@@ -122,9 +123,12 @@ describe('auth', () => {
       })
 
       expect(insertedUser).not.toBeNull()
-      expect(user.email).toEqual(registrationForm.email)
-      expect(insertedUser!.email).toEqual(registrationForm.email)
-      expect(insertedUser!.password).toEqual(registrationForm.password)
+      expect(responseUser.email).toEqual(registrationForm.email)
+
+      if (insertedUser) {
+        expect(insertedUser.email).toEqual(registrationForm.email)
+        expect(bcrypt.compareSync(registrationForm.password, insertedUser.password)).toBe(true)
+      }
     })
     it('已存在的用户不能注册', async () => {
       let userCount = await UserModel.count({

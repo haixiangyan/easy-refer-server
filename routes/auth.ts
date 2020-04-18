@@ -1,5 +1,5 @@
 import express from 'express'
-import {generateJWT} from '@/utils/auth'
+import {encryptPassword, generateJWT} from '@/utils/auth'
 import passport from '@/plugins/passport'
 import UserModel from '@/models/UserModel'
 import JobModel from '@/models/JobModel'
@@ -46,12 +46,10 @@ AuthRouter.post('/register', async (req, res) => {
     })
   }
 
-  const userId = uuidv4()
-  // TODO: 需要加密密码
-  const encryptedPassword = password
-
   const user = await UserModel.create({
-    userId, email, password: encryptedPassword
+    userId: uuidv4(),
+    email,
+    password: encryptPassword(password)
   })
 
   res.json(user)
