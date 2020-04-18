@@ -1,11 +1,10 @@
 import express from 'express'
-import Mock from 'mockjs'
-import {User} from '@/mocks/objects'
 import {generateJWT} from '@/utils/auth'
 import passport from '@/plugins/passport'
 import UserModel from '@/models/UserModel'
 import JobModel from '@/models/JobModel'
 import ResumeModel from '@/models/ResumeModel'
+import {v4 as uuidv4} from 'uuid'
 
 // '/auth'
 const AuthRouter = express.Router()
@@ -33,8 +32,29 @@ AuthRouter.post('/login', (req, res) => {
 })
 
 // 注册
-AuthRouter.post('/register', (req, res) => {
-  res.json(Mock.mock(User))
+AuthRouter.post('/register', async (req, res) => {
+  const {email, password} = req.body
+
+  const existedUserCount = await UserModel.count({
+    where: {email}
+  })
+
+  if (existedUserCount !== 0) {
+    res.status(403)
+    return res.json({
+      message: '该用户已存在'
+    })
+  }
+
+  const userId = uuidv4()
+  // TODO: 需要加密密码
+  const encryptedPassword = password
+
+  const user = await UserModel.create({
+    userId, email, password: encryptedPassword
+  })
+
+  res.json(user)
 })
 
 // 获取个人信息

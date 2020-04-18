@@ -1,12 +1,14 @@
 import request from 'supertest'
 import db from '@/models/db'
 import app from '@/app'
-import {users, jobs, resumes, initMockDB} from '../../../mocks/dbObjects'
+import {initMockDB, jobs, resumes, users} from '../../../mocks/dbObjects'
 import {generateJWT} from '../../../utils/auth'
-import dayjs = require('dayjs')
 import {DATETIME_FORMAT} from '../../../constants/format'
+import UserModel from '../../../models/UserModel'
+import dayjs = require('dayjs')
 
 const loginRoute = '/api/auth/login'
+const registerRoute = '/api/auth/register'
 const userRoute = '/api/auth/user'
 
 const [user1] = users
@@ -21,31 +23,35 @@ describe('auth', () => {
   afterAll(async () => await db.close())
 
   describe('/login', () => {
+    const loginForm = {
+      email: user1.email,
+      password: user1.password
+    }
     it('成功登录', async () => {
       const response = await request(app)
         .post(loginRoute)
-        .send(user1)
+        .send(loginForm)
 
       expect(response.status).toEqual(200)
       expect(response.body).toHaveProperty('token')
     })
     it('用户不存在，登录失败', async () => {
-      const invalidUser = {...user1, email: 'invalid-user@mail.com'}
+      const invalidLoginForm = {...loginForm, email: 'invalid-user@mail.com'}
 
       const response = await request(app)
         .post(loginRoute)
-        .send(invalidUser)
+        .send(invalidLoginForm)
 
       expect(response.status).toEqual(401)
       expect(response.body).toHaveProperty('message')
       expect(response.body.message).toEqual('用户不存在')
     })
     it('密码不正确，登录失败', async () => {
-      const invalidUser = {...user1, password: '123'}
+      const invalidLoginForm = {...loginForm, password: '123'}
 
       const response = await request(app)
         .post(loginRoute)
-        .send(invalidUser)
+        .send(invalidLoginForm)
 
       expect(response.status).toEqual(401)
       expect(response.body).toHaveProperty('message')
@@ -98,6 +104,47 @@ describe('auth', () => {
       expect(status).toEqual(404)
       expect(body).toHaveProperty('message')
       expect(body.message).toEqual('该用户不存在')
+    })
+  })
+
+  describe('/register', () => {
+    const registrationForm = {
+      email: 'user3@mail.com',
+      password: user1.password
+    }
+    it('用户注册成功', async () => {
+      const {body: user} = await request(app)
+        .post(registerRoute)
+        .send(registrationForm)
+
+      const insertedUser = await UserModel.findOne({
+        where: {email: registrationForm.email}
+      })
+
+      expect(insertedUser).not.toBeNull()
+      expect(user.email).toEqual(registrationForm.email)
+      expect(insertedUser!.email).toEqual(registrationForm.email)
+      expect(insertedUser!.password).toEqual(registrationForm.password)
+    })
+    it('已存在的用户不能注册', async () => {
+      let userCount = await UserModel.count({
+        where: {email: registrationForm.email}
+      })
+
+      expect(userCount).toEqual(1)
+
+      const {status, body} = await request(app)
+        .post(registerRoute)
+        .send({...registrationForm, email: 'user1@mail.com'})
+
+      userCount = await UserModel.count({
+        where: {email: registrationForm.email}
+      })
+
+      expect(userCount).toEqual(1)
+      expect(status).toEqual(403)
+      expect(body).toHaveProperty('message')
+      expect(body.message).toEqual('该用户已存在')
     })
   })
 })
