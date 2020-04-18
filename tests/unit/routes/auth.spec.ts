@@ -10,7 +10,7 @@ const loginRoute = '/api/auth/login'
 const registerRoute = '/api/auth/register'
 const userRoute = '/api/auth/user'
 
-const [user1] = users
+const [user1, user2] = users
 const [job1] = jobs
 
 describe('auth', () => {
@@ -60,16 +60,41 @@ describe('auth', () => {
   describe('/user', () => {
     it('成功获取 user-1', async () => {
       const jwtToken = generateJWT('user-1')
-      const {body: user} = await request(app)
+      const {body} = await request(app)
         .get(userRoute)
         .set('Authorization', jwtToken)
+      const {info, job, resume} = body
 
-      expect(user.userId).toEqual(user1.userId)
-      expect(user.email).toEqual(user1.email)
+      expect(info.userId).toEqual(user1.userId)
+      expect(info.email).toEqual(user1.email)
 
-      expect(user.job.jobId).toEqual(job1.jobId)
+      expect(job.jobId).toEqual(job1.jobId)
 
-      expect(user.resumeList.length).toEqual(1)
+      expect(resume).not.toBeNull()
+
+      expect(info.myReferTotal).toEqual(0)
+      expect(info.approvedMyReferCount).toEqual(0)
+      expect(info.otherReferTotal).toEqual(1)
+      expect(info.approvedOtherReferCount).toEqual(0)
+    })
+    it ('成功获取 user-2', async () => {
+      const jwtToken = generateJWT('user-2')
+      const {body} = await request(app)
+        .get(userRoute)
+        .set('Authorization', jwtToken)
+      const {info, job, resume} = body
+
+      expect(info.userId).toEqual(user2.userId)
+      expect(info.email).toEqual(user2.email)
+
+      expect(job).toBeNull()
+
+      expect(resume).not.toBeNull()
+
+      expect(info.myReferTotal).toEqual(1)
+      expect(info.approvedMyReferCount).toEqual(0)
+      expect(info.otherReferTotal).toEqual(0)
+      expect(info.approvedOtherReferCount).toEqual(0)
     })
     it('没有 token 不能获取 user-1', async () => {
       const {status, body, text} = await request(app)

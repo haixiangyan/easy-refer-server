@@ -3,8 +3,9 @@ import {encryptPassword, generateJWT} from '@/utils/auth'
 import passport from '@/plugins/passport'
 import UserModel from '@/models/UserModel'
 import JobModel from '@/models/JobModel'
-import ResumeModel from '@/models/ResumeModel'
 import {v4 as uuidv4} from 'uuid'
+import ReferModel from '@/models/ReferModel'
+import ResumeModel from '@/models/ResumeModel'
 
 // '/auth'
 const AuthRouter = express.Router()
@@ -65,10 +66,37 @@ AuthRouter.get('/user', passport.authenticate('jwt', {session: false}), async (r
 
   if (!user) {
     res.status(404)
-    res.json({message: '该用户不存在'})
-  } else {
-    res.json(user)
+    return res.json({message: '该用户不存在'})
   }
+
+  // 统计已处理自己的 refer
+  const myReferTotal = await ReferModel.count({
+    where: {refereeId: userId}
+  })
+  const approvedMyReferCount = await ReferModel.count({
+    where: {refereeId: userId, status: 'approved'}
+  })
+  const otherReferTotal = await ReferModel.count({
+    where: {refererId: userId}
+  })
+  const approvedOtherReferCount = await ReferModel.count({
+    where: {refererId: userId, status: 'approved'}
+  })
+
+  const {job, resumeList, ...userInfo}: any = user.toJSON()
+  const info: TUser = {
+    ...userInfo,
+    myReferTotal,
+    approvedMyReferCount,
+    otherReferTotal,
+    approvedOtherReferCount
+  }
+
+  res.json({
+    info,
+    job,
+    resume: resumeList.length > 0 ? resumeList[0] : null,
+  })
 })
 
 export default AuthRouter

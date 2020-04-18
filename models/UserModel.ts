@@ -17,6 +17,12 @@ import ResumeModel from '@/models/ResumeModel'
 
 @Table({tableName: 'users'})
 class UserModel extends Model<UserModel> {
+  // 普通字段
+  public myReferTotal = 0
+  public approvedMyReferCount = 0
+  public otherReferTotal = 0
+  public approvedOtherReferCount = 0
+
   // 字段
   @Unique
   @AllowNull(false)
@@ -62,8 +68,11 @@ class UserModel extends Model<UserModel> {
   @HasOne(() => JobModel)
   public readonly job?: JobModel
 
-  @HasMany(() => ReferModel)
-  public readonly referList?: ReferModel[]
+  @HasMany(() => ReferModel, 'refereeId')
+  public readonly myReferList?: ReferModel[]
+
+  @HasMany(() => ReferModel, 'refererId')
+  public readonly otherReferList?: ReferModel[]
 
   @HasMany(() => ResumeModel)
   public readonly resumeList?: ResumeModel[]
