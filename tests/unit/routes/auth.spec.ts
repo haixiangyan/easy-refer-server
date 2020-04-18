@@ -2,11 +2,9 @@ import request from 'supertest'
 import bcrypt from 'bcrypt'
 import db from '@/models/db'
 import app from '@/app'
-import {initMockDB, jobs, resumes, users} from '../../../mocks/dbObjects'
+import {initMockDB, jobs, users} from '../../../mocks/dbObjects'
 import {generateJWT} from '../../../utils/auth'
-import {DATETIME_FORMAT} from '../../../constants/format'
 import UserModel from '../../../models/UserModel'
-import dayjs = require('dayjs')
 
 const loginRoute = '/api/auth/login'
 const registerRoute = '/api/auth/register'
@@ -14,7 +12,6 @@ const userRoute = '/api/auth/user'
 
 const [user1] = users
 const [job1] = jobs
-const [resume1] = resumes
 
 describe('auth', () => {
   beforeAll(async () => {
@@ -67,26 +64,12 @@ describe('auth', () => {
         .get(userRoute)
         .set('Authorization', jwtToken)
 
-      // 去掉 updatedAt 和 createdAt 字段
-      delete user.updatedAt
-      delete user.createdAt
-      delete user.job.updatedAt
-      delete user.job.createdAt
-      delete user.resumeList[0].updatedAt
-      delete user.resumeList[0].createdAt
+      expect(user.userId).toEqual(user1.userId)
+      expect(user.email).toEqual(user1.email)
 
-      const expectedUser = {
-        ...user1,
-        job: {...job1},
-        resumeList: [{...resume1}]
-      }
+      expect(user.job.jobId).toEqual(job1.jobId)
 
-      expect(dayjs(user.job.deadline).format(DATETIME_FORMAT)).toEqual(dayjs(expectedUser.job.deadline).format(DATETIME_FORMAT))
-
-      delete user.job.deadline
-      delete expectedUser.job.deadline
-
-      expect(user).toStrictEqual(expectedUser)
+      expect(user.resumeList.length).toEqual(1)
     })
     it('没有 token 不能获取 user-1', async () => {
       const {status, body, text} = await request(app)
