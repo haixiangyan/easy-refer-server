@@ -23,7 +23,7 @@ const initDB = () => {
     password: DB_PASSWORD,
     storage: ':memory:',
     models: [UserModel, JobModel, ReferModel, ResumeModel],
-    logging: msg => console.log(msg),
+    logging: false,
     define: {
       charset: 'utf8'
     }

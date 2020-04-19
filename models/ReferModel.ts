@@ -75,10 +75,10 @@ class ReferModel extends Model<ReferModel> {
   @BelongsTo(() => JobModel)
   public readonly job?: JobModel
 
-  @BelongsTo(() => UserModel)
+  @BelongsTo(() => UserModel, 'userId')
   public readonly referer?: UserModel
 
-  @BelongsTo(() => UserModel)
+  @BelongsTo(() => UserModel, 'userId')
   public readonly referee?: UserModel
 }
 

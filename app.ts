@@ -3,7 +3,8 @@ import express, {ErrorRequestHandler} from 'express'
 import path from 'path'
 import cookieParser from 'cookie-parser'
 import logger from 'morgan'
-import bodyParser from 'body-parser'
+
+import {parseEnv} from '@/utils/config'
 
 // 路由
 import JobsRouter from '@/routes/jobs'
@@ -13,9 +14,9 @@ import ResumesRouter from '@/routes/resumes'
 import UploadRouter from '@/routes/upload'
 import UsersRouter from '@/routes/users'
 
-const jsonParser = bodyParser.json()
-
 const app = express()
+
+parseEnv()
 
 app.use(logger('dev'))
 app.use(express.json())
@@ -23,7 +24,7 @@ app.use(express.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use('/api/auth', jsonParser, AuthRouter)
+app.use('/api/auth', AuthRouter)
 app.use('/api/jobs', JobsRouter)
 app.use('/api/refers', RefersRouter)
 app.use('/api/resumes', ResumesRouter)

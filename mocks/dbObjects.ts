@@ -16,7 +16,7 @@ export const users = [
     leetCodeUrl: 'https://leetcode.com',
     thirdPersonIntro: '这是张三，很完美的第三人称介绍',
     phone: '94934567',
-    avatar: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
+    avatarUrl: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
     jobId: 'job-1'
   },
   {
@@ -29,7 +29,7 @@ export const users = [
     leetCodeUrl: 'https://leetcode.com',
     thirdPersonIntro: '这是李四，很完美的第三人称介绍',
     phone: '94934567',
-    avatar: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
+    avatarUrl: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
     jobId: null
   }
 ]
@@ -43,6 +43,7 @@ export const jobs = [
     expiration: 5,
     referTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
+    refererId: 'user-1'
   }
 ]
 
@@ -73,24 +74,43 @@ export const resumes = [
     url: 'https://user-2.pdf',
     refereeId: 'user-2',
     referId: null
-  }
+  },
+  {
+    resumeId: 'resume-21',
+    name: '李四的简历.pdf',
+    url: 'https://user-2.pdf',
+    refereeId: 'user-2',
+    referId: null
+  },
+  {
+    resumeId: 'resume-22',
+    name: '李四的简历.pdf',
+    url: 'https://user-2.pdf',
+    refereeId: 'user-2',
+    referId: null
+  },
+  {
+    resumeId: 'resume-23',
+    name: '李四的简历.pdf',
+    url: 'https://user-2.pdf',
+    refereeId: 'user-2',
+    referId: null
+  },
 ]
 
 export const initMockDB = async () => {
-  const [user1, user2] = users
-  await UserModel.create(user1)
-  await UserModel.create(user2)
+  await UserModel.bulkCreate(users)
 
-  const [job1] = jobs
-  await JobModel.create(job1)
+  await JobModel.bulkCreate(jobs)
 
-  const [resume2] = resumes
+  const [resume2, ...restResumes] = resumes
   const memoryResume = await ResumeModel.create(resume2)
+  await ResumeModel.bulkCreate(restResumes)
 
-  const [refer2] = refers
-  await ReferModel.create(refer2)
+  await ReferModel.bulkCreate(refers)
 
   memoryResume.referId = 'refer-2'
+  await memoryResume.save()
 
   consola.success('成功将假数据存入数据库')
 }

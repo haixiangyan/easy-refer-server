@@ -3,7 +3,7 @@
   "ignore": [".git", "node_modules/**/node_modules"],
   "verbose": false,
   "execMap": {
-    "ts": "ts-node -r tsconfig-paths/register"
+    "ts": "ts-node -r tsconfig-paths/register --files"
   },
   "watch": ["bin/www.ts"],
   "ext": "ts"
