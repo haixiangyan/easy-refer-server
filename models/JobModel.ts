@@ -32,7 +32,7 @@ class JobModel extends Model<JobModel> {
 
   // 外键
   @ForeignKey(() => UserModel)
-  public readonly refererId!: string | null
+  public refererId!: string | null
 
   // 关系
   @BelongsTo(() => UserModel)

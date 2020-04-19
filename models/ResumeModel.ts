@@ -20,7 +20,7 @@ class ResumeModel extends Model<ResumeModel> {
 
   // 外键
   @ForeignKey(() => UserModel)
-  public readonly refereeId!: string | null
+  public refereeId!: string | null
 
   @ForeignKey(() => ReferModel)
   public referId!: string | null

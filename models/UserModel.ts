@@ -63,8 +63,7 @@ class UserModel extends Model<UserModel> {
 
   // 外键
   @ForeignKey(() => JobModel)
-  @Column(DataTypes.STRING)
-  public readonly jobId!: string | null
+  public jobId!: string | null
 
   // 关系
   @HasOne(() => JobModel)
