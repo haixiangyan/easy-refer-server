@@ -13,14 +13,14 @@ const userRoute = '/api/auth/user'
 const [user1, user2] = users
 const [job1] = jobs
 
-describe('auth', () => {
+describe('/auth', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
   })
   afterAll(async () => await db.close())
 
-  describe('/login', () => {
+  describe('post /login', () => {
     const loginForm = {
       email: user1.email,
       password: user1.password
@@ -57,7 +57,7 @@ describe('auth', () => {
     })
   })
 
-  describe('/user', () => {
+  describe('get /user', () => {
     it('成功获取 user-1', async () => {
       const jwtToken = generateJWT('user-1')
       const {body} = await request(app)
@@ -116,10 +116,10 @@ describe('auth', () => {
     })
   })
 
-  describe('/register', () => {
+  describe('post /register', () => {
     it('用户注册成功', async () => {
       const registrationForm = {
-        email: 'user3@mail.com',
+        email: 'user99@mail.com',
         password: '123456'
       }
 

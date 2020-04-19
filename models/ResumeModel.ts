@@ -13,14 +13,14 @@ class ResumeModel extends Model<ResumeModel> {
   public resumeId!: string
 
   @Column(DataTypes.STRING)
-  public name!: string | null
+  public name!: string
 
   @Column(DataTypes.STRING)
-  public url!: string | null
+  public url!: string
 
   // 外键
   @ForeignKey(() => UserModel)
-  public readonly refereeId!: string | null
+  public refereeId!: string | null
 
   @ForeignKey(() => ReferModel)
   public referId!: string | null

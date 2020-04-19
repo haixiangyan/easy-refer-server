@@ -6,13 +6,13 @@ import {initMockDB} from '../../../mocks/dbObjects'
 
 const updateUserRoute = '/api/users'
 
-describe('users', () => {
+describe('/users', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
   })
   afterAll(async () => await db.close())
-  describe('put /users', () => {
+  describe('put /', () => {
     const userForm: TUserForm = {
       email: 'user1@mail.com',
       name: '修改了的张三',

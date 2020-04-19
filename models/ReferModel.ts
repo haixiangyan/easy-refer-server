@@ -57,16 +57,16 @@ class ReferModel extends Model<ReferModel> {
 
   // 外键
   @ForeignKey(() => ResumeModel)
-  public readonly resumeId!: string | null
+  public resumeId!: string | null
 
   @ForeignKey(() => JobModel)
-  public readonly jobId!: string
+  public jobId!: string
 
   @ForeignKey(() => UserModel)
-  public readonly refererId!: string
+  public refererId!: string
 
   @ForeignKey(() => UserModel)
-  public readonly refereeId!: string
+  public refereeId!: string
 
   // 关系
   @HasOne(() => ResumeModel)

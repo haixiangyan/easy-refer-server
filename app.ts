@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.use('/api/auth', AuthRouter)
 app.use('/api/jobs', JobsRouter)
 app.use('/api/refers', RefersRouter)
-app.use('/api/resumes', ResumesRouter)
+app.use('/api/resumes', passport.authenticate('jwt', {session: false}), ResumesRouter)
 app.use('/api/upload', UploadRouter)
 app.use('/api/users', passport.authenticate('jwt', {session: false}), UsersRouter)
 

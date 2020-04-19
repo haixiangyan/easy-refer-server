@@ -85,12 +85,6 @@ function onError(error: HttpError) {
  */
 
 async function onListening() {
-  const addr = server.address()
-  const bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr!.port
-  consola.info('监听端口：' + bind)
-
   try {
     const dev = process.env.NODE_ENV === 'development'
 
@@ -99,4 +93,10 @@ async function onListening() {
   } catch (error) {
     consola.error(error)
   }
+
+  const addr = server.address()
+  const bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr!.port
+  consola.info('监听端口：' + bind)
 }
