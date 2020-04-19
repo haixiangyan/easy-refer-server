@@ -1,10 +1,10 @@
 import request from 'supertest'
 import bcrypt from 'bcrypt'
-import db from '@/models/db'
 import app from '@/app'
 import {initMockDB, jobs, users} from '../../../mocks/dbObjects'
 import {generateJWT} from '../../../utils/auth'
 import UserModel from '../../../models/UserModel'
+import db from '../../../models/db'
 
 const loginRoute = '/api/auth/login'
 const registerRoute = '/api/auth/register'

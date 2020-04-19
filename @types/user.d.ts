@@ -1,6 +1,5 @@
 type TUser = {
   userId: string
-  jobId: string
   email: string
   name: string
   experience: number
@@ -8,7 +7,6 @@ type TUser = {
   phone: string
   leetCodeUrl: string
   thirdPersonIntro: string
-  resumeId: string
   avatarUrl: string
   finishedRefers: number,
   totalRefers: number,
@@ -24,6 +22,5 @@ type TUserForm = TMapper & {
   phone: string
   leetCodeUrl: string
   thirdPersonIntro: string
-  resumeId: string
   avatarUrl: string
 }

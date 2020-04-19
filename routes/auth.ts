@@ -58,7 +58,7 @@ AuthRouter.post('/register', async (req, res) => {
 
 // 获取个人信息
 AuthRouter.get('/user', passport.authenticate('jwt', {session: false}), async (req, res) => {
-  const {userId} = req.user as TJwtRequest
+  const {userId} = req.user as TJWTUser
 
   const user = await UserModel.findByPk(userId, {
     include: [JobModel, {
@@ -96,8 +96,6 @@ AuthRouter.get('/user', passport.authenticate('jwt', {session: false}), async (r
     otherReferTotal,
     approvedOtherReferCount
   }
-
-  console.log(userId, resumeList.length)
 
   res.json({
     info,

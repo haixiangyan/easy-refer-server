@@ -17,6 +17,8 @@ import ResumeModel from '@/models/ResumeModel'
 
 @Table({tableName: 'users'})
 class UserModel extends Model<UserModel> {
+  [key: string]: any
+
   // 普通字段
   public myReferTotal = 0
   public approvedMyReferCount = 0
