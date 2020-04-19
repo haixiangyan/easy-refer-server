@@ -74,22 +74,40 @@ export const resumes = [
     url: 'https://user-2.pdf',
     refereeId: 'user-2',
     referId: null
-  }
+  },
+  {
+    resumeId: 'resume-21',
+    name: '李四的简历.pdf',
+    url: 'https://user-2.pdf',
+    refereeId: 'user-2',
+    referId: null
+  },
+  {
+    resumeId: 'resume-22',
+    name: '李四的简历.pdf',
+    url: 'https://user-2.pdf',
+    refereeId: 'user-2',
+    referId: null
+  },
+  {
+    resumeId: 'resume-23',
+    name: '李四的简历.pdf',
+    url: 'https://user-2.pdf',
+    refereeId: 'user-2',
+    referId: null
+  },
 ]
 
 export const initMockDB = async () => {
-  const [user1, user2] = users
-  await UserModel.create(user1)
-  await UserModel.create(user2)
+  await UserModel.bulkCreate(users)
 
-  const [job1] = jobs
-  await JobModel.create(job1)
+  await JobModel.bulkCreate(jobs)
 
-  const [resume2] = resumes
+  const [resume2, ...restResumes] = resumes
   const memoryResume = await ResumeModel.create(resume2)
+  await ResumeModel.bulkCreate(restResumes)
 
-  const [refer2] = refers
-  await ReferModel.create(refer2)
+  await ReferModel.bulkCreate(refers)
 
   memoryResume.referId = 'refer-2'
   await memoryResume.save()

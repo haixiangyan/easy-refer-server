@@ -61,10 +61,12 @@ AuthRouter.get('/user', passport.authenticate('jwt', {session: false}), async (r
   const {userId} = req.user as TJwtRequest
 
   const user = await UserModel.findByPk(userId, {
-    include: [JobModel, ResumeModel],
-    order: [
-      [{model: ResumeModel, as: 'resumeList'}, 'createdAt', 'DESC']
-    ]
+    include: [JobModel, {
+      model: ResumeModel,
+      as: 'resumeList',
+      limit: 1,
+      order: [['createdAt', 'DESC']]
+    }],
   })
 
   if (!user) {
@@ -94,6 +96,8 @@ AuthRouter.get('/user', passport.authenticate('jwt', {session: false}), async (r
     otherReferTotal,
     approvedOtherReferCount
   }
+
+  console.log(userId, resumeList.length)
 
   res.json({
     info,
