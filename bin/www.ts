@@ -89,7 +89,7 @@ async function onListening() {
   const bind = typeof addr === 'string'
     ? 'pipe ' + addr
     : 'port ' + addr!.port
-  consola.info('Listening on ' + bind)
+  consola.info('监听端口：' + bind)
 
   try {
     const dev = process.env.NODE_ENV === 'development'
