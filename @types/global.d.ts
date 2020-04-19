@@ -1,3 +1,3 @@
-type TJwtRequest = {
+type TJWTUser = {
   userId: string
 }

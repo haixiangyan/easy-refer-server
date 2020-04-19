@@ -5,7 +5,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon bin/www.ts --watch bin",
     "test": "jest",
-    "dev-test": "NODE_ENV=dev-test jest --no-cache",
+    "dev-test": "NODE_ENV=dev-test jest --no-cache --maxWorkers=1",
     "coveralls": "coveralls < coverage/lcov.info"
   },
   "dependencies": {
