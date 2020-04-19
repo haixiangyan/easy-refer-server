@@ -18,6 +18,15 @@ ResumesRouter.get('/:resumeId', async (req, res) => {
     return res.json({message: '简历不存在'})
   }
 
+  if (!await canAccessResume(userId, resumeId)) {
+    res.status(403)
+    return res.json({message: '无权访问该简历'})
+  }
+
+  res.json(resume)
+})
+
+const canAccessResume = async (userId: string, resumeId: string) => {
   // 该简历是否属于该用户
   const hasResume = await ResumeModel.count({
     where: {resumeId, refereeId: userId},
@@ -33,12 +42,7 @@ ResumesRouter.get('/:resumeId', async (req, res) => {
     }]
   })
 
-  if (hasResume === 0 && viewRefer === 0) {
-    res.status(403)
-    return res.json({message: '无权访问该简历'})
-  }
-
-  res.json(resume)
-})
+  return hasResume !== 0 || viewRefer !== 0
+}
 
 export default ResumesRouter
