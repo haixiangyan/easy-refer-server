@@ -119,7 +119,7 @@ describe('/auth', () => {
   describe('post /register', () => {
     it('用户注册成功', async () => {
       const registrationForm = {
-        email: 'user3@mail.com',
+        email: 'user99@mail.com',
         password: '123456'
       }
 

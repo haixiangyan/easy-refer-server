@@ -31,6 +31,19 @@ export const users = [
     phone: '94934567',
     avatarUrl: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
     jobId: null
+  },
+  {
+    userId: 'user-3',
+    password: '234567',
+    email: 'user3@mail.com',
+    experience: 2,
+    name: '王五',
+    intro: '我是王五，这是一份个人介绍',
+    leetCodeUrl: 'https://leetcode.com',
+    thirdPersonIntro: '这是王五，很完美的第三人称介绍',
+    phone: '94934567',
+    avatarUrl: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
+    jobId: null
   }
 ]
 
@@ -94,6 +107,13 @@ export const resumes = [
     name: '李四的简历.pdf',
     url: 'https://user-2.pdf',
     refereeId: 'user-2',
+    referId: null
+  },
+  {
+    resumeId: 'resume-3',
+    name: '李四的简历.pdf',
+    url: 'https://user-3.pdf',
+    refereeId: 'user-3',
     referId: null
   },
 ]
