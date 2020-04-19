@@ -22,6 +22,8 @@ UsersRouter.put('/', async (req, res) => {
     updatedUser[key] = value
   })
 
+  await updatedUser.save()
+
   res.json(updatedUser)
 })
 
