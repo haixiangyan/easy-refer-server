@@ -61,7 +61,10 @@ AuthRouter.get('/user', passport.authenticate('jwt', {session: false}), async (r
   const {userId} = req.user as TJwtRequest
 
   const user = await UserModel.findByPk(userId, {
-    include: [JobModel, ResumeModel]
+    include: [JobModel, ResumeModel],
+    order: [
+      [{model: ResumeModel, as: 'resumeList'}, 'createdAt', 'DESC']
+    ]
   })
 
   if (!user) {
