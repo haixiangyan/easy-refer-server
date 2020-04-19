@@ -16,7 +16,7 @@ export const users = [
     leetCodeUrl: 'https://leetcode.com',
     thirdPersonIntro: '这是张三，很完美的第三人称介绍',
     phone: '94934567',
-    avatar: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
+    avatarUrl: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
     jobId: 'job-1'
   },
   {
@@ -29,7 +29,7 @@ export const users = [
     leetCodeUrl: 'https://leetcode.com',
     thirdPersonIntro: '这是李四，很完美的第三人称介绍',
     phone: '94934567',
-    avatar: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
+    avatarUrl: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
     jobId: null
   }
 ]
