@@ -28,4 +28,15 @@ describe('/jobs', () => {
       expect(jobItemList[0].finishedChart).not.toBeNull()
     })
   })
+
+  describe('get /item/:jobId', () => {
+    it('成功获取 Job Item', async () => {
+      const {status, body: jobItem} = await request(app)
+        .get(`${getJobItemListRoute}/job-1`)
+
+      expect(status).toEqual(200)
+      expect(jobItem).toHaveProperty('finishedChart')
+      expect(jobItem.finishedChart).not.toBeNull()
+    })
+  })
 })
