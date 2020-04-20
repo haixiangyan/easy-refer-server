@@ -43,8 +43,17 @@ JobsRouter.get('/item/:jobId', async (req, res) => {
 })
 
 // 获取一个 Job
-JobsRouter.get('/:jobId', (req, res) => {
-  res.json(Mock.mock(Job))
+JobsRouter.get('/:jobId', async (req, res) => {
+  const {jobId} = req.params
+
+  const dbJob = await JobModel.findByPk(jobId)
+
+  if (!dbJob) {
+    res.status(404)
+    return res.json({message: '该内推职位不存在'})
+  }
+
+  res.json(dbJob)
 })
 
 // 创建一个 Job

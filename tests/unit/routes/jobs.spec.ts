@@ -4,6 +4,7 @@ import request from 'supertest'
 import app from '../../../app'
 
 const getJobItemListRoute = '/api/jobs/item'
+const getJobListRoute = '/api/jobs'
 
 describe('/jobs', () => {
   beforeAll(async () => {
@@ -45,12 +46,34 @@ describe('/jobs', () => {
       expect(jobItem).toHaveProperty('finishedChart')
       expect(jobItem.finishedChart).not.toBeNull()
     })
-    it ('不存在 Job', async () => {
+    it('不存在 Job', async () => {
       const {status, body} = await request(app)
         .get(`${getJobItemListRoute}/job-99`)
 
       expect(status).toEqual(404)
       expect(body.message).toEqual('该内推职位不存在')
+    })
+  })
+
+  describe('get /:jobId', () => {
+    it('成功获取一个 Job', async () => {
+      const {status, body: job} = await request(app)
+        .get(`${getJobListRoute}/job-1`)
+
+      expect(status).toEqual(200)
+
+      expect(job).toHaveProperty('jobId')
+      expect(job.jobId).toEqual('job-1')
+    })
+    it('获取不存在的 Job', async () => {
+      const {status, body: job} = await request(app)
+        .get(`${getJobListRoute}/job-99`)
+
+      expect(status).toEqual(404)
+
+      expect(job).not.toHaveProperty('jobId')
+      expect(job).toHaveProperty('message')
+      expect(job.message).toEqual('该内推职位不存在')
     })
   })
 })
