@@ -18,7 +18,7 @@ JobsRouter.get('/item', async (req, res) => {
 
   if (!page || !limit) {
     res.status(422)
-    return res.json({message: '缺少 page 或者 limit 参数'})
+    return res.json({message: '缺少参数'})
   }
 
   const {count: total, jobItemList} = await getJobItemList(page, limit)

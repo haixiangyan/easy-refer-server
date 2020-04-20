@@ -38,7 +38,7 @@ describe('/jobs', () => {
         .get(getJobItemListRoute)
 
       expect(status).toEqual(422)
-      expect(body.message).toEqual('缺少 page 或者 limit 参数')
+      expect(body.message).toEqual('缺少参数')
     })
   })
 
