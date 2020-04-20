@@ -20,16 +20,18 @@ class ResumeModel extends Model<ResumeModel> {
 
   // 外键
   @ForeignKey(() => UserModel)
+  @Column(DataTypes.STRING)
   public refereeId!: string | null
 
   @ForeignKey(() => ReferModel)
+  @Column(DataTypes.STRING)
   public referId!: string | null
 
   // 关系
-  @BelongsTo(() => UserModel)
+  @BelongsTo(() => UserModel, 'refereeId')
   public readonly referee?: UserModel
 
-  @BelongsTo(() => ReferModel)
+  @BelongsTo(() => ReferModel, 'referId')
   public readonly refer?: ReferModel
 }
 

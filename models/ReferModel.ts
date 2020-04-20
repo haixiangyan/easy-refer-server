@@ -76,7 +76,7 @@ class ReferModel extends Model<ReferModel> {
   @HasOne(() => ResumeModel)
   public readonly resume?: ResumeModel
 
-  @BelongsTo(() => JobModel)
+  @BelongsTo(() => JobModel, 'jobId')
   public readonly job!: JobModel
 
   @BelongsTo(() => UserModel, 'refererId')

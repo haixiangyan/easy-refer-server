@@ -33,10 +33,11 @@ class JobModel extends Model<JobModel> {
 
   // 外键
   @ForeignKey(() => UserModel)
+  @Column(DataTypes.STRING)
   public refererId!: string
 
   // 关系
-  @BelongsTo(() => UserModel)
+  @BelongsTo(() => UserModel, 'refererId')
   public readonly referer?: UserModel
 
   @HasMany(() => ReferModel)
