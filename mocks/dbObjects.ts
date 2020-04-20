@@ -93,7 +93,7 @@ export const refers = [
     name: '王五',
     email: 'user3@world.com',
     phone: '94934567',
-    experience: 2,
+    experience: 5,
     intro: '我是王五，这是一份个人介绍',
     leetCodeUrl: 'https://leetcode.com',
     thirdPersonIntro: '这是王五，很完美的第三人称介绍',

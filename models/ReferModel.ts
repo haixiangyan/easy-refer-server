@@ -17,6 +17,7 @@ import UserModel from '@/models/UserModel'
 
 @Table({tableName: 'refers'})
 class ReferModel extends Model<ReferModel> {
+  [key: string]: any
   // 字段
   @Unique
   @AllowNull(false)
@@ -57,29 +58,33 @@ class ReferModel extends Model<ReferModel> {
 
   // 外键
   @ForeignKey(() => ResumeModel)
+  @Column(DataTypes.STRING)
   public resumeId!: string | null
 
   @ForeignKey(() => JobModel)
+  @Column(DataTypes.STRING)
   public jobId!: string
 
   @ForeignKey(() => UserModel)
+  @Column(DataTypes.STRING)
   public refererId!: string
 
   @ForeignKey(() => UserModel)
+  @Column(DataTypes.STRING)
   public refereeId!: string
 
   // 关系
   @HasOne(() => ResumeModel)
   public readonly resume?: ResumeModel
 
-  @BelongsTo(() => JobModel)
-  public readonly job?: JobModel
+  @BelongsTo(() => JobModel, 'jobId')
+  public readonly job!: JobModel
 
-  @BelongsTo(() => UserModel, 'userId')
-  public readonly referer?: UserModel
+  @BelongsTo(() => UserModel, 'refererId')
+  public readonly referer!: UserModel
 
-  @BelongsTo(() => UserModel, 'userId')
-  public readonly referee?: UserModel
+  @BelongsTo(() => UserModel, 'refereeId')
+  public readonly referee!: UserModel
 }
 
 export default ReferModel

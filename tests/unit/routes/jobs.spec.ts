@@ -23,11 +23,11 @@ describe('/jobs', () => {
         .get(getJobItemListRoute)
         .query({page: 1, limit: 10})
 
-      const {jobItemList, totalPages} = body
+      const {jobItemList, total} = body
 
       expect(status).toEqual(200)
       expect(jobItemList.length).toBeLessThanOrEqual(10)
-      expect(totalPages).toEqual(1)
+      expect(total).toEqual(2)
 
       expect(jobItemList[0]).toHaveProperty('referredCount')
       expect(jobItemList[0]).toHaveProperty('finishedChart')
@@ -38,7 +38,7 @@ describe('/jobs', () => {
         .get(getJobItemListRoute)
 
       expect(status).toEqual(422)
-      expect(body.message).toEqual('缺少 page 或者 limit 参数')
+      expect(body.message).toEqual('缺少参数')
     })
   })
 
