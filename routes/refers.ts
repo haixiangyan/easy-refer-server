@@ -1,23 +1,45 @@
 import express from 'express'
-import Mock from 'mockjs'
-import {MyRefer, OtherRefer} from '@/mocks/objects'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
 import JobModel from '@/models/JobModel'
 import {v4 as uuidv4} from 'uuid'
 import dayjs from 'dayjs'
 import {Op} from 'sequelize'
+import UserModel from '@/models/UserModel'
 
 // '/refers'
 const RefersRouter = express.Router()
 
 // 获取 My Refer / Other Refer
-RefersRouter.get('/', (req, res) => {
-  const referTemplate = req.url.includes('my') ? MyRefer : OtherRefer
-  res.json(Mock.mock({
-    'referList|10': [referTemplate],
-    totalPages: 100
-  }))
+RefersRouter.get('/', async (req, res) => {
+  const role = req.query.role as string
+  const {userId} = req.user as TJWTUser
+  const page = parseInt(req.query.page as string)
+  const limit = parseInt(req.query.limit as string)
+
+  if (!role || !page || !limit) {
+    res.status(422)
+    return res.json({message: '缺少参数'})
+  }
+
+  const whereClause: {[key: string]: any} = {
+    my: {refereeId: userId},
+    other: {refererId: userId}
+  }
+
+  const {count: total, rows: referList} = await ReferModel.findAndCountAll({
+    offset: page - 1,
+    limit,
+    order: [['createdAt', 'DESC']],
+    include: [
+      ResumeModel, JobModel,
+      {model: UserModel, as: 'referer'},
+      {model: UserModel, as: 'referee'}
+    ],
+    where: {...whereClause[role]}
+  })
+
+  res.json({referList: referList, total})
 })
 
 // 获取一个 Refer

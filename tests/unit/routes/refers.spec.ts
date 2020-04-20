@@ -15,6 +15,44 @@ describe('/refers', () => {
   })
   afterAll(async () => await db.close())
 
+  describe('get /', () => {
+    it('查看自己所有的 Refer', async () => {
+      const jwtToken = generateJWT('user-2')
+      const {status, body} = await request(app)
+        .get(refersRoute)
+        .query({role: 'my', page: 1, limit: 10})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(200)
+
+      const {total, referList} = body
+      expect(total).toEqual(1)
+      expect(referList.length).toEqual(1)
+    })
+    it('查看别人的所有 Refer', async () => {
+      const jwtToken = generateJWT('user-1')
+      const {status, body} = await request(app)
+        .get(refersRoute)
+        .query({role: 'other', page: 1, limit: 10})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(200)
+
+      const {total, referList} = body
+      expect(total).toEqual(2)
+      expect(referList.length).toEqual(2)
+    })
+    it('缺少参数', async () => {
+      const jwtToken = generateJWT('user-1')
+      const {status, body} = await request(app)
+        .get(refersRoute)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(422)
+      expect(body.message).toEqual('缺少参数')
+    })
+  })
+
   describe('get /:referId', () => {
     it('查看自己的 Refer', async () => {
       const jwtToken = generateJWT('user-2')
