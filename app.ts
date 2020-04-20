@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser'
 import logger from 'morgan'
 
 import {parseEnv} from '@/utils/config'
-
 // 路由
 import JobsRouter from '@/routes/jobs'
 import RefersRouter from '@/routes/refers'
@@ -13,7 +12,9 @@ import AuthRouter from '@/routes/auth'
 import ResumesRouter from '@/routes/resumes'
 import UploadRouter from '@/routes/upload'
 import UsersRouter from '@/routes/users'
-import passport from '@/plugins/passport'
+// 中间件
+import multerMW from '@/middleware/multer'
+import jwtMW from '@/middleware/passport-jwt'
 
 const app = express()
 
@@ -27,10 +28,10 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/api/auth', AuthRouter)
 app.use('/api/jobs', JobsRouter)
-app.use('/api/refers', passport.authenticate('jwt', {session: false}), RefersRouter)
-app.use('/api/resumes', passport.authenticate('jwt', {session: false}), ResumesRouter)
-app.use('/api/upload', UploadRouter)
-app.use('/api/users', passport.authenticate('jwt', {session: false}), UsersRouter)
+app.use('/api/refers', jwtMW, RefersRouter)
+app.use('/api/resumes', jwtMW, ResumesRouter)
+app.use('/api/upload', jwtMW, UploadRouter)
+app.use('/api/users', jwtMW, UsersRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
