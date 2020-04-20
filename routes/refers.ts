@@ -2,6 +2,7 @@ import express from 'express'
 import Mock from 'mockjs'
 import {MyRefer, OtherRefer, Refer} from '@/mocks/objects'
 import ReferModel from '@/models/ReferModel'
+import ResumeModel from '@/models/ResumeModel'
 
 // '/refers'
 const RefersRouter = express.Router()
@@ -69,8 +70,31 @@ RefersRouter.patch('/:referId', async (req, res) => {
 })
 
 // 删除 Refer
-RefersRouter.delete('/:referId', (req, res) => {
-  res.json({})
+RefersRouter.delete('/:referId', async (req, res) => {
+  const {userId} = req.user as TJWTUser
+  const {referId} = req.params
+
+  const dbRefer = await ReferModel.findByPk(referId, {
+    include: [ResumeModel]
+  })
+
+  if (!dbRefer) {
+    res.status(404)
+    return res.json({message: '该内推不存在'})
+  }
+
+  if (dbRefer.refereeId !== userId) {
+    res.status(403)
+    return res.json({message: '无权限访问该内推'})
+  }
+
+  if (dbRefer.resume) {
+    await dbRefer.resume.destroy()
+  }
+
+  await dbRefer.destroy()
+
+  res.json()
 })
 
 export default RefersRouter

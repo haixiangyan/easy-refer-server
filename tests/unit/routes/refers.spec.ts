@@ -4,6 +4,7 @@ import {generateJWT} from '../../../utils/auth'
 import request from 'supertest'
 import app from '../../../app'
 import ReferModel from '../../../models/ReferModel'
+import ResumeModel from '../../../models/ResumeModel'
 
 const refersRoute = '/api/refers'
 
@@ -83,6 +84,44 @@ describe('/refers', () => {
 
       expect(status).toEqual(403)
       expect(refer.message).toEqual('无权限访问该内推')
+    })
+  })
+
+  describe('delete /:referId', () => {
+    it('成功删除 Refer', async () => {
+      const jwtToken = generateJWT('user-2')
+
+      const {status} = await request(app)
+        .delete(`${refersRoute}/refer-2`)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(200)
+
+      const dbDeletedRefer = await ReferModel.findByPk('refer-2')
+      expect(dbDeletedRefer).toBeNull()
+
+      const dbDeletedResume = await ResumeModel.findByPk('resume-2')
+      expect(dbDeletedResume).toBeNull()
+    })
+    it('删除不存在的 Refer', async () => {
+      const jwtToken = generateJWT('user-2')
+
+      const {status, body} = await request(app)
+        .delete(`${refersRoute}/refer-99`)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(404)
+      expect(body.message).toEqual('该内推不存在')
+    })
+    it('无权限删除 Refer', async () => {
+      const jwtToken = generateJWT('user-2')
+
+      const {status, body} = await request(app)
+        .delete(`${refersRoute}/refer-3`)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(403)
+      expect(body.message).toEqual('无权限访问该内推')
     })
   })
 })
