@@ -103,7 +103,11 @@ JobsRouter.put('/:jobId', passport.authenticate('jwt', {session: false}), async 
   }
 
   Object.entries(jobForm).forEach(([key, value]) => {
-    dbJob[key] = value
+    if (key === 'requiredFields') {
+      dbJob[key] = (value as string[]).join(',')
+    } else {
+      dbJob[key] = value
+    }
   })
 
   await dbJob.save()
@@ -122,6 +126,22 @@ const getJobItemList = async (page = 1, limit = 10, jobId?: string) => {
     limit
   })
 
+  // 获取所有 Id
+  const jobIds = dbJobItemList.map(jobItem => jobItem.jobId)
+
+  // 获取已内推数目
+  const dbReferredCount = await ReferModel.findAll({
+    attributes: [
+      'jobId',
+      [fn('COUNT', col('referId')), 'referredCount'],
+    ],
+    where: {
+      jobId: {[Op.in]: jobIds},
+      status: {[Op.not]: 'approved'}, // 已经 approve 的数据
+    },
+    group: ['jobId']
+  })
+
   // 获取内推图表的 Item
   const dbChartItemList = await ReferModel.findAll({
     attributes: [
@@ -130,21 +150,29 @@ const getJobItemList = async (page = 1, limit = 10, jobId?: string) => {
       [fn('COUNT', col('referId')), 'count'],
     ],
     where: {
-      ...jobIdCondition as {},
-      status: {[Op.eq]: 'processing'}, // 已经 process 的数据
+      jobId: {[Op.in]: jobIds},
+      status: {[Op.not]: 'processing'}, // 已经 process 的数据
       updatedOn: {[Op.gte]: dayjs().subtract(12, 'month').toDate()} // 查 12 个月内的数据
     },
-    group: ['refererId', 'jobId', 'updatedOn']
+    group: ['jobId', 'updatedOn']
   })
 
   // 提取 jobId，将数组变成对象
   const chartItemObject = extractField(dbChartItemList.map(i => i.toJSON()), 'jobId')
 
   // 将图表 Item 放入 JobItem 中
-  const jobItemList = dbJobItemList.map(dbJobItem => ({
-    ...dbJobItem.toJSON(),
-    finishedChart: chartItemObject[dbJobItem.jobId]
-  }))
+  const jobItemList = dbJobItemList.map(dbJobItem => {
+    const {jobId, requiredFields} = dbJobItem
+    const countItem = dbReferredCount.find(i => i.jobId === jobId)
+    const referredCount = countItem ? (countItem.toJSON() as any).referredCount : 0
+
+    return {
+      ...dbJobItem.toJSON(),
+      referredCount,
+      finishedChart: dbJobItem.jobId in chartItemObject ? chartItemObject[dbJobItem.jobId] : [],
+      requiredFields: requiredFields.split(',')
+    }
+  })
 
   return {count, jobItemList}
 }

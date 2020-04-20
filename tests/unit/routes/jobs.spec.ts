@@ -29,6 +29,7 @@ describe('/jobs', () => {
       expect(jobItemList.length).toBeLessThanOrEqual(10)
       expect(totalPages).toEqual(1)
 
+      expect(jobItemList[0]).toHaveProperty('referredCount')
       expect(jobItemList[0]).toHaveProperty('finishedChart')
       expect(jobItemList[0].finishedChart).not.toBeNull()
     })
@@ -47,6 +48,7 @@ describe('/jobs', () => {
         .get(`${getJobItemListRoute}/job-1`)
 
       expect(status).toEqual(200)
+      expect(jobItem).toHaveProperty('referredCount')
       expect(jobItem).toHaveProperty('finishedChart')
       expect(jobItem.finishedChart).not.toBeNull()
     })
