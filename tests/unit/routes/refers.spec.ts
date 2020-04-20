@@ -25,6 +25,15 @@ describe('/refers', () => {
       expect(status).toEqual(200)
       expect(refer.referId).toEqual('refer-2')
     })
+    it('获取不存在的 Refer', async () => {
+      const jwtToken = generateJWT('user-1')
+      const {status, body} = await request(app)
+        .get(`${refersRoute}/refer-99`)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(404)
+      expect(body.message).toEqual('该内推不存在')
+    })
     it('有权限查看别人的 Refer', async () => {
       const jwtToken = generateJWT('user-1')
       const {status, body: refer} = await request(app)
