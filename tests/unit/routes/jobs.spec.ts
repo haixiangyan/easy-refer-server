@@ -27,6 +27,13 @@ describe('/jobs', () => {
       expect(jobItemList[0]).toHaveProperty('finishedChart')
       expect(jobItemList[0].finishedChart).not.toBeNull()
     })
+    it('传错 page 和 limit 参数', async () => {
+      const {status, body} = await request(app)
+        .get(getJobItemListRoute)
+
+      expect(status).toEqual(422)
+      expect(body.message).toEqual('缺少 page 或者 limit 参数')
+    })
   })
 
   describe('get /item/:jobId', () => {
@@ -37,6 +44,13 @@ describe('/jobs', () => {
       expect(status).toEqual(200)
       expect(jobItem).toHaveProperty('finishedChart')
       expect(jobItem.finishedChart).not.toBeNull()
+    })
+    it ('不存在 Job', async () => {
+      const {status, body} = await request(app)
+        .get(`${getJobItemListRoute}/job-99`)
+
+      expect(status).toEqual(404)
+      expect(body.message).toEqual('该内推职位不存在')
     })
   })
 })

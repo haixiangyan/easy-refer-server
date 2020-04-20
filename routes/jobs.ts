@@ -32,11 +32,6 @@ JobsRouter.get('/item', async (req, res) => {
 // 获取一个 Job item
 JobsRouter.get('/item/:jobId', async (req, res) => {
   const {jobId} = req.params
-  if (!jobId) {
-    res.status(422)
-    return res.json({message: '缺少 jobId 参数'})
-  }
-
   const {count, jobItemList} = await getJobItemList(1, 1, jobId)
 
   if (count === 0) {
