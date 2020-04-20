@@ -21,11 +21,11 @@ JobsRouter.get('/item', async (req, res) => {
     return res.json({message: '缺少 page 或者 limit 参数'})
   }
 
-  const {count, jobItemList} = await getJobItemList(page, limit)
+  const {count: total, jobItemList} = await getJobItemList(page, limit)
 
   res.json({
     jobItemList,
-    totalPages: Math.ceil(count / limit)
+    total
   })
 })
 
@@ -123,7 +123,8 @@ const getJobItemList = async (page = 1, limit = 10, jobId?: string) => {
     where: {...jobIdCondition} as any,
     include: [{model: UserModel, as: 'referer', attributes: ['name', 'avatarUrl']}],
     offset: page - 1,
-    limit
+    limit,
+    order: [['createdAt', 'DESC']]
   })
 
   // 获取所有 Id
