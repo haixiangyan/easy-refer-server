@@ -99,7 +99,10 @@ AuthRouter.get('/user', passport.authenticate('jwt', {session: false}), async (r
 
   res.json({
     info,
-    job,
+    job: {
+      ...job,
+      requiredFields: job.requiredFields.split(',')
+    },
     resume: resumeList.length > 0 ? resumeList[0] : null,
   })
 })

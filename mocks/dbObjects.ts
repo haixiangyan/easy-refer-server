@@ -57,6 +57,16 @@ export const jobs = [
     referTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
     refererId: 'user-1'
+  },
+  {
+    jobId: 'job-2',
+    company: 'Facebook',
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'].join(','),
+    deadline: dayjs().add(3, 'month'),
+    expiration: 3,
+    referTotal: 300,
+    source: 'https://www.1point3acres.com/bbs/',
+    refererId: 'user-2'
   }
 ]
 
@@ -72,11 +82,28 @@ export const refers = [
     thirdPersonIntro: '这是张三，很完美的第三人称介绍',
     referLinks: 'http://google.com',
     status: 'processing',
-    updatedOn: dayjs().add(-10, 'day'),
+    updatedOn: dayjs().subtract(20, 'day').subtract(10, 'minute'),
     resumeId: 'resume-2',
     jobId: 'job-1',
     refererId: 'user-1',
     refereeId: 'user-2'
+  },
+  {
+    referId: 'refer-3',
+    name: '王五',
+    email: 'user3@world.com',
+    phone: '94934567',
+    experience: 2,
+    intro: '我是王五，这是一份个人介绍',
+    leetCodeUrl: 'https://leetcode.com',
+    thirdPersonIntro: '这是王五，很完美的第三人称介绍',
+    referLinks: 'http://google.com',
+    status: 'processing',
+    updatedOn: dayjs().subtract(20, 'day'),
+    resumeId: 'resume-3',
+    jobId: 'job-1',
+    refererId: 'user-1',
+    refereeId: 'user-3'
   }
 ]
 
