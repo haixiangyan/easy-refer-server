@@ -7,6 +7,8 @@ import {col, fn, Op} from 'sequelize'
 import ReferModel from '@/models/ReferModel'
 import dayjs from 'dayjs'
 import {extractField} from '@/utils/tool'
+import {v4 as uuidv4} from 'uuid'
+import passport from '@/plugins/passport'
 
 // '/jobs'
 const JobsRouter = express.Router()
@@ -57,8 +59,27 @@ JobsRouter.get('/:jobId', async (req, res) => {
 })
 
 // 创建一个 Job
-JobsRouter.post('/', (req, res) => {
-  res.json(Mock.mock(Job))
+JobsRouter.post('/', passport.authenticate('jwt', {session: false}), async (req, res) => {
+  const {userId} = req.user as TJWTUser
+  const jobForm: TJobForm = req.body
+
+  const hasJob = await JobModel.findOne({
+    where: {refererId: userId}
+  })
+
+  if (hasJob) {
+    res.status(403)
+    return res.json({message: '你已创建内推职位'})
+  }
+
+  const dbJob = await JobModel.create({
+    ...jobForm,
+    jobId: uuidv4(),
+    refererId: userId,
+    requiredFields: jobForm.requiredFields.join(',')
+  })
+
+  res.json(dbJob)
 })
 
 // 修改一个 Job

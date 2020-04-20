@@ -2,6 +2,10 @@ import db from '../../../models/db'
 import {initMockDB} from '../../../mocks/dbObjects'
 import request from 'supertest'
 import app from '../../../app'
+import {generateJWT} from '../../../utils/auth'
+import dayjs = require('dayjs')
+import UserModel from '../../../models/UserModel'
+import JobModel from '../../../models/JobModel'
 
 const getJobItemListRoute = '/api/jobs/item'
 const getJobListRoute = '/api/jobs'
@@ -74,6 +78,57 @@ describe('/jobs', () => {
       expect(job).not.toHaveProperty('jobId')
       expect(job).toHaveProperty('message')
       expect(job.message).toEqual('该内推职位不存在')
+    })
+  })
+
+  describe('post /', () => {
+    it('成功创建一个 Job', async () => {
+      const jwtToken = generateJWT('user-3')
+      const jobForm = {
+        company: 'google',
+        requiredFields: ['name', 'email', 'phone', 'experience'],
+        deadline: dayjs().add(10, 'month').toDate(),
+        expiration: 5,
+        referTotal: 100,
+        source: ''
+      }
+
+      const {status, body: job} = await request(app)
+        .post(getJobListRoute)
+        .send(jobForm)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(200)
+      Object.entries(jobForm).forEach(([key, value]) => {
+        if (key === 'requiredFields') {
+          return expect(job[key]).toEqual(jobForm.requiredFields.join(','))
+        }
+        if (key === 'deadline') {
+          return expect(job[key]).toEqual(jobForm.deadline.toISOString())
+        }
+        expect(job[key]).toEqual(value)
+      })
+
+      const dbUser3 = await UserModel.findByPk('user-3', {
+        include: [JobModel]
+      })
+
+      expect(dbUser3!.job).not.toBeNull()
+      expect(dbUser3!.job!.jobId).not.toBeUndefined()
+
+      // 去掉新生成的 Job
+      await JobModel.destroy({where: {jobId: dbUser3!.job!.jobId}})
+    })
+    it('已经创建过 Job', async () => {
+      const jwtToken = generateJWT('user-1')
+
+      const {status, body} = await request(app)
+        .post(getJobListRoute)
+        .send({})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(403)
+      expect(body.message).toEqual('你已创建内推职位')
     })
   })
 })
