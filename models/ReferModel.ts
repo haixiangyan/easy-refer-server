@@ -52,7 +52,7 @@ class ReferModel extends Model<ReferModel> {
   public status!: string | null
 
   @Default(new Date())
-  @Column(DataTypes.DATE)
+  @Column(DataTypes.DATEONLY)
   public updatedOn!: Date | null
 
   // 外键

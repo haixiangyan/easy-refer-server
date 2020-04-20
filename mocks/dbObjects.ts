@@ -72,11 +72,28 @@ export const refers = [
     thirdPersonIntro: '这是张三，很完美的第三人称介绍',
     referLinks: 'http://google.com',
     status: 'processing',
-    updatedOn: dayjs().add(-10, 'day'),
+    updatedOn: dayjs().subtract(20, 'day').subtract(10, 'minute'),
     resumeId: 'resume-2',
     jobId: 'job-1',
     refererId: 'user-1',
     refereeId: 'user-2'
+  },
+  {
+    referId: 'refer-3',
+    name: '王五',
+    email: 'user3@world.com',
+    phone: '94934567',
+    experience: 2,
+    intro: '我是王五，这是一份个人介绍',
+    leetCodeUrl: 'https://leetcode.com',
+    thirdPersonIntro: '这是王五，很完美的第三人称介绍',
+    referLinks: 'http://google.com',
+    status: 'processing',
+    updatedOn: dayjs().subtract(20, 'day'),
+    resumeId: 'resume-3',
+    jobId: 'job-1',
+    refererId: 'user-1',
+    refereeId: 'user-3'
   }
 ]
 

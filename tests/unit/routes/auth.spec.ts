@@ -74,7 +74,7 @@ describe('/auth', () => {
 
       expect(info.myReferTotal).toEqual(0)
       expect(info.approvedMyReferCount).toEqual(0)
-      expect(info.otherReferTotal).toEqual(1)
+      expect(info.otherReferTotal).toEqual(2)
       expect(info.approvedOtherReferCount).toEqual(0)
     })
     it ('成功获取 user-2', async () => {
