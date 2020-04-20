@@ -17,6 +17,7 @@ import UserModel from '@/models/UserModel'
 
 @Table({tableName: 'refers'})
 class ReferModel extends Model<ReferModel> {
+  [key: string]: any
   // 字段
   @Unique
   @AllowNull(false)

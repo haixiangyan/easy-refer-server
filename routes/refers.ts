@@ -42,8 +42,30 @@ RefersRouter.post('/', (req, res) => {
 })
 
 // 部分修改 Refer
-RefersRouter.patch('/:referId', (req, res) => {
-  res.json(Mock.mock(Refer))
+RefersRouter.patch('/:referId', async (req, res) => {
+  const {userId} = req.user as TJWTUser
+  const {referId} = req.params
+  const patchReferForm = req.body
+
+  const dbRefer = await ReferModel.findByPk(referId)
+
+  if (!dbRefer) {
+    res.status(404)
+    return res.json({message: '该内推不存在'})
+  }
+
+  if (dbRefer.refereeId !== userId) {
+    res.status(403)
+    return res.json({message: '无权限访问该内推'})
+  }
+
+  Object.entries(patchReferForm).forEach(([key, value]) => {
+    dbRefer[key] = value
+  })
+
+  await dbRefer.save()
+
+  res.json(dbRefer)
 })
 
 // 删除 Refer
