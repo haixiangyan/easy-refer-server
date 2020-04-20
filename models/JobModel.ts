@@ -5,6 +5,7 @@ import ReferModel from '@/models/ReferModel'
 
 @Table({tableName: 'jobs'})
 class JobModel extends Model<JobModel> {
+  [key: string]: any
   // 字段
   @Unique
   @AllowNull(false)

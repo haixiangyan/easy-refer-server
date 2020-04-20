@@ -87,7 +87,7 @@ describe('/auth', () => {
       expect(info.userId).toEqual(user2.userId)
       expect(info.email).toEqual(user2.email)
 
-      expect(job).toBeNull()
+      expect(job).not.toBeNull()
 
       expect(resume).not.toBeNull()
 

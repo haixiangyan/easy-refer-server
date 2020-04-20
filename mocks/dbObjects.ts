@@ -57,6 +57,16 @@ export const jobs = [
     referTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
     refererId: 'user-1'
+  },
+  {
+    jobId: 'job-2',
+    company: 'Facebook',
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'].join(','),
+    deadline: dayjs().add(3, 'month'),
+    expiration: 3,
+    referTotal: 300,
+    source: 'https://www.1point3acres.com/bbs/',
+    refererId: 'user-2'
   }
 ]
 

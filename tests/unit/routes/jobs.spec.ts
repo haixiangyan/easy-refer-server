@@ -131,4 +131,47 @@ describe('/jobs', () => {
       expect(body.message).toEqual('你已创建内推职位')
     })
   })
+
+  describe('put /:jobId', () => {
+    it('成功修改 Job', async () => {
+      const jwtToken = generateJWT('user-1')
+      const jobForm = {company: 'New Company',}
+
+      const {status, body: job} = await request(app)
+        .put(`${getJobListRoute}/job-1`)
+        .send(jobForm)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(200)
+      expect(job.company).toEqual(jobForm.company)
+
+      const dbJob1 = await JobModel.findByPk('job-1')
+      expect(dbJob1).not.toBeNull()
+      expect(dbJob1!.company).toEqual(jobForm.company)
+    })
+    it('修改不存在的 Job', async () => {
+      const jwtToken = generateJWT('user-1')
+      const jobForm = {company: 'New Company',}
+
+      const {status, body} = await request(app)
+        .put(`${getJobListRoute}/job-99`)
+        .send(jobForm)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(404)
+      expect(body.message).toEqual('该内推职不存在')
+    })
+    it('无权限修改 Job', async () => {
+      const jwtToken = generateJWT('user-1')
+      const jobForm = {company: 'New Company',}
+
+      const {status, body} = await request(app)
+        .put(`${getJobListRoute}/job-2`)
+        .send(jobForm)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(403)
+      expect(body.message).toEqual('无权限修改该内推职位')
+    })
+  })
 })

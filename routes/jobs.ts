@@ -1,6 +1,4 @@
 import express from 'express'
-import Mock from 'mockjs'
-import {Job} from '@/mocks/objects'
 import JobModel from '@/models/JobModel'
 import UserModel from '@/models/UserModel'
 import {col, fn, Op} from 'sequelize'
@@ -83,8 +81,34 @@ JobsRouter.post('/', passport.authenticate('jwt', {session: false}), async (req,
 })
 
 // 修改一个 Job
-JobsRouter.put('/:jobId', (req, res) => {
-  res.json(Mock.mock(Job))
+JobsRouter.put('/:jobId', passport.authenticate('jwt', {session: false}), async (req, res) => {
+  const {userId} = req.user as TJWTUser
+  const {jobId} = req.params
+  const jobForm: TJobForm = req.body
+
+  const dbJob = await JobModel.findByPk(jobId, {
+    include: [{model: UserModel, as: 'referer'}]
+  })
+
+  // 是否存在
+  if (!dbJob) {
+    res.status(404)
+    return res.json({message: '该内推职不存在'})
+  }
+
+  // 是否有权访问该 Job
+  if (!dbJob.referer || dbJob.referer.userId !== userId) {
+    res.status(403)
+    return res.json({message: '无权限修改该内推职位'})
+  }
+
+  Object.entries(jobForm).forEach(([key, value]) => {
+    dbJob[key] = value
+  })
+
+  await dbJob.save()
+
+  res.json(dbJob)
 })
 
 const getJobItemList = async (page = 1, limit = 10, jobId?: string) => {
