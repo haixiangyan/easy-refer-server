@@ -45,6 +45,65 @@ describe('/refers', () => {
     })
   })
 
+  describe('post /:jobId', () => {
+    it('成功申请 Refer', async () => {
+      const jwtToken = generateJWT('user-1')
+      const referForm = {
+        email: 'user1@mail.com',
+        phone: '12345678',
+        experience: 2,
+      }
+
+      const {status, body: refer} = await request(app)
+        .post(`${refersRoute}/job-2`)
+        .send(referForm)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(200)
+      expect(refer.phone).toEqual('12345678')
+
+      const dbRefer = await ReferModel.findOne({where: {email: 'user1@mail.com'}})
+      expect(dbRefer).not.toBeNull()
+      // 外键
+      expect(dbRefer!.refereeId).toEqual('user-1')
+      expect(dbRefer!.refererId).toEqual('user-2')
+      expect(dbRefer!.jobId).toEqual('job-2')
+    })
+    it('申请不存在的内推职位', async () => {
+      const jwtToken = generateJWT('user-1')
+
+      const {status, body} = await request(app)
+        .post(`${refersRoute}/job-99`)
+        .send({})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(404)
+      expect(body.message).toEqual('该内推职位不存在')
+    })
+    it('申请已申请过的内推职位', async () => {
+      const jwtToken = generateJWT('user-2')
+
+      const {status, body} = await request(app)
+        .post(`${refersRoute}/job-1`)
+        .send({})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(403)
+      expect(body.message).toEqual('你已申请该内推职位或这是你创建的内推职位')
+    })
+    it('申请自己创建的内推职位', async () => {
+      const jwtToken = generateJWT('user-1')
+
+      const {status, body} = await request(app)
+        .post(`${refersRoute}/job-1`)
+        .send({})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(403)
+      expect(body.message).toEqual('你已申请该内推职位或这是你创建的内推职位')
+    })
+  })
+
   describe('patch /:referId', () => {
     it('修改自己的 Refer', async () => {
       const jwtToken = generateJWT('user-2')
