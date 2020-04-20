@@ -1,6 +1,7 @@
 import express from 'express'
 import Mock from 'mockjs'
 import {MyRefer, OtherRefer, Refer} from '@/mocks/objects'
+import ReferModel from '@/models/ReferModel'
 
 // '/refers'
 const RefersRouter = express.Router()
@@ -15,8 +16,24 @@ RefersRouter.get('/', (req, res) => {
 })
 
 // 获取一个 Refer
-RefersRouter.get('/:referId', (req, res) => {
-  res.json(Mock.mock(Refer))
+RefersRouter.get('/:referId', async (req, res) => {
+  const {userId} = req.user as TJWTUser
+  const {referId} = req.params
+
+  const dbRefer = await ReferModel.findByPk(referId)
+
+  if (!dbRefer) {
+    res.status(404)
+    return res.json({message: '该内推不存在'})
+  }
+
+  // Refer 不属性该用户，且 Refer 不能被别的 Referer 看到
+  if (dbRefer.refereeId !== userId && dbRefer.refererId !== userId) {
+    res.status(403)
+    return res.json ({message: '无权限访问该内推'})
+  }
+
+  res.json(dbRefer)
 })
 
 // 创建 Refer
