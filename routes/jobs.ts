@@ -71,7 +71,8 @@ JobsRouter.post('/', passport.authenticate('jwt', {session: false}), async (req,
     ...jobForm,
     jobId: uuidv4(),
     refererId: userId,
-    requiredFields: jobForm.requiredFields.join(',')
+    requiredFields: jobForm.requiredFields.join(','),
+    updatedOn: dayjs().toDate()
   })
 
   res.json(dbJob)
@@ -99,6 +100,7 @@ JobsRouter.put('/:jobId', passport.authenticate('jwt', {session: false}), async 
     return res.json({message: '无权限修改该内推职位'})
   }
 
+  // 修改所有字段
   Object.entries(jobForm).forEach(([key, value]) => {
     if (key === 'requiredFields') {
       dbJob[key] = (value as string[]).join(',')
@@ -106,6 +108,9 @@ JobsRouter.put('/:jobId', passport.authenticate('jwt', {session: false}), async 
       dbJob[key] = value
     }
   })
+
+  // 添加 updatedOn
+  dbJob.updatedOn = dayjs().toDate()
 
   await dbJob.save()
 
@@ -167,7 +172,7 @@ const getJobItemList = async (page = 1, limit = 10, jobId?: string) => {
     return {
       ...dbJobItem.toJSON(),
       referredCount,
-      finishedChart: dbJobItem.jobId in chartItemObject ? chartItemObject[dbJobItem.jobId] : [],
+      processedChart: dbJobItem.jobId in chartItemObject ? chartItemObject[dbJobItem.jobId] : [],
       requiredFields: requiredFields.split(',')
     }
   })

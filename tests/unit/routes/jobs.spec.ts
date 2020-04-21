@@ -30,7 +30,7 @@ describe('获取内推职位接口 /jobs', () => {
       expect(total).toEqual(2)
 
       expect(jobItemList[0]).toHaveProperty('referredCount')
-      expect(jobItemList[0]).toHaveProperty('finishedChart')
+      expect(jobItemList[0]).toHaveProperty('processedChart')
       expect(jobItemList[0].finishedChart).not.toBeNull()
     })
     it('传错 page 和 limit 参数', async () => {
@@ -49,7 +49,7 @@ describe('获取内推职位接口 /jobs', () => {
 
       expect(status).toEqual(200)
       expect(jobItem).toHaveProperty('referredCount')
-      expect(jobItem).toHaveProperty('finishedChart')
+      expect(jobItem).toHaveProperty('processedChart')
       expect(jobItem.finishedChart).not.toBeNull()
     })
     it('不存在 Job', async () => {
