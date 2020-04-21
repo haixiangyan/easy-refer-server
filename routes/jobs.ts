@@ -98,12 +98,7 @@ JobsRouter.put('/:jobId', passport.authenticate('jwt', {session: false}), async 
     return res.json({message: '无权限修改该内推职位'})
   }
 
-  // 修改所有字段
-  Object.entries(jobForm).forEach(([key, value]) => {
-    dbJob[key] = value
-  })
-
-  await dbJob.save()
+  await dbJob.update(jobForm)
 
   res.json(dbJob)
 })

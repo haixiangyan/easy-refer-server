@@ -148,9 +148,9 @@ describe('获取内推职位接口 /jobs', () => {
       expect(status).toEqual(200)
       expect(job.company).toEqual(jobForm.company)
 
-      const dbJob1 = await JobModel.findByPk('job-1')
-      expect(dbJob1).not.toBeNull()
-      expect(dbJob1!.company).toEqual(jobForm.company)
+      const dbJob = await JobModel.findByPk('job-1')
+      expect(dbJob).not.toBeNull()
+      expect(dbJob!.company).toEqual(jobForm.company)
     })
     it('修改不存在的 Job', async () => {
       const jwtToken = generateJWT('user-1')
