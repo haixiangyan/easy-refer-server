@@ -10,20 +10,22 @@ const registerRoute = '/api/auth/register'
 
 const [user1] = users
 
-describe('/auth', () => {
+const agent = request(app)
+
+describe('AuthRoute 路由', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
   })
   afterAll(async () => await db.close())
 
-  describe('post /login', () => {
+  describe('登录 post /auth/login', () => {
     const loginForm = {
       email: user1.email,
       password: user1.password
     }
     it('成功登录', async () => {
-      const response = await request(app)
+      const response = await agent
         .post(loginRoute)
         .send(loginForm)
 
@@ -31,9 +33,9 @@ describe('/auth', () => {
       expect(response.body).toHaveProperty('token')
     })
     it('用户不存在，登录失败', async () => {
-      const invalidLoginForm = {...loginForm, email: 'invalid-user@mail.com'}
+      const invalidLoginForm = {...loginForm, email: 'user99@mail.com'}
 
-      const response = await request(app)
+      const response = await agent
         .post(loginRoute)
         .send(invalidLoginForm)
 
@@ -44,7 +46,7 @@ describe('/auth', () => {
     it('密码不正确，登录失败', async () => {
       const invalidLoginForm = {...loginForm, password: '123'}
 
-      const response = await request(app)
+      const response = await agent
         .post(loginRoute)
         .send(invalidLoginForm)
 
@@ -54,30 +56,30 @@ describe('/auth', () => {
     })
   })
 
-  describe('post /register', () => {
+  describe('注册 /auth/register', () => {
     it('用户注册成功', async () => {
       const registrationForm = {
         email: 'user99@mail.com',
         password: '123456'
       }
 
-      const {body: responseUser} = await request(app)
+      const {body: user} = await agent
         .post(registerRoute)
         .send(registrationForm)
 
-      const insertedUser = await UserModel.findOne({
+      const dbUser = await UserModel.findOne({
         where: {email: registrationForm.email}
       })
 
-      expect(insertedUser).not.toBeNull()
-      expect(responseUser.email).toEqual(registrationForm.email)
+      expect(dbUser).not.toBeNull()
+      expect(user.email).toEqual(registrationForm.email)
 
-      if (insertedUser) {
-        expect(insertedUser.email).toEqual(registrationForm.email)
-        expect(bcrypt.compareSync(registrationForm.password, insertedUser.password)).toBe(true)
+      if (dbUser) {
+        expect(dbUser.email).toEqual(registrationForm.email)
+        expect(bcrypt.compareSync(registrationForm.password, dbUser.password)).toBe(true)
 
         // 删除新建的用户
-        await insertedUser.destroy()
+        await dbUser.destroy()
       }
     })
     it('已存在的用户不能注册', async () => {
@@ -86,24 +88,25 @@ describe('/auth', () => {
         password: user1.password
       }
 
-      let userCount = await UserModel.count({
+      let dbUserCount = await UserModel.count({
         where: {email: registrationForm.email}
       })
 
-      expect(userCount).toEqual(1)
+      expect(dbUserCount).toEqual(1)
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .post(registerRoute)
         .send(registrationForm)
 
-      userCount = await UserModel.count({
-        where: {email: registrationForm.email}
-      })
-
-      expect(userCount).toEqual(1)
       expect(status).toEqual(403)
       expect(body).toHaveProperty('message')
       expect(body.message).toEqual('该用户已存在')
+
+      dbUserCount = await UserModel.count({
+        where: {email: registrationForm.email}
+      })
+
+      expect(dbUserCount).toEqual(1)
     })
   })
 })

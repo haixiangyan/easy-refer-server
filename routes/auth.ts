@@ -33,24 +33,24 @@ AuthRouter.post('/login', (req, res) => {
 AuthRouter.post('/register', async (req, res) => {
   const {email, password} = req.body
 
-  const existedUserCount = await UserModel.count({
+  const existedDbUser = await UserModel.findOne({
     where: {email}
   })
 
-  if (existedUserCount !== 0) {
+  if (existedDbUser) {
     res.status(403)
     return res.json({
       message: '该用户已存在'
     })
   }
 
-  const user = await UserModel.create({
+  const dbUser = await UserModel.create({
     userId: uuidv4(),
     email,
     password: encryptPassword(password)
   })
 
-  res.json(user)
+  res.json(dbUser)
 })
 
 export default AuthRouter
