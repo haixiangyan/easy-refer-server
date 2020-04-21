@@ -50,6 +50,7 @@ AuthRouter.post('/register', async (req, res) => {
     password: encryptPassword(password)
   })
 
+  res.status(201)
   res.json(dbUser)
 })
 

@@ -63,9 +63,11 @@ describe('AuthRoute 路由', () => {
         password: '123456'
       }
 
-      const {body: user} = await agent
+      const {status, body: user} = await agent
         .post(registerRoute)
         .send(registrationForm)
+
+      expect(status).toEqual(201)
 
       const dbUser = await UserModel.findOne({
         where: {email: registrationForm.email}
