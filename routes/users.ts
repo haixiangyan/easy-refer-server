@@ -3,6 +3,8 @@ import UserModel from '@/models/UserModel'
 import JobModel from '@/models/JobModel'
 import ResumeModel from '@/models/ResumeModel'
 import ReferModel from '@/models/ReferModel'
+import {Op} from 'sequelize'
+import dayjs from 'dayjs'
 
 // '/users'
 const UsersRouter = express.Router()
@@ -35,12 +37,19 @@ UsersRouter.get('/', async (req, res) => {
   const {userId} = req.user as TJWTUser
 
   const user = await UserModel.findByPk(userId, {
-    include: [JobModel, {
-      model: ResumeModel,
-      as: 'resumeList',
+    include: [{
+      model: JobModel,
+      as: 'jobList',
       limit: 1,
-      order: [['createdAt', 'DESC']]
-    }],
+      order: [['createdAt', 'DESC']],
+      where: {deadline: {[Op.gte]: dayjs().toDate()}}
+    },
+      {
+        model: ResumeModel,
+        as: 'resumeList',
+        limit: 1,
+        order: [['createdAt', 'DESC']]
+      }],
   })
 
   if (!user) {
@@ -62,7 +71,7 @@ UsersRouter.get('/', async (req, res) => {
     where: {refererId: userId, status: 'approved'}
   })
 
-  const {job, resumeList, ...userInfo}: any = user.toJSON()
+  const {jobList, resumeList, ...userInfo}: any = user.toJSON()
   const info: TUser = {
     ...userInfo,
     myReferTotal,
@@ -73,7 +82,7 @@ UsersRouter.get('/', async (req, res) => {
 
   res.json({
     info,
-    job,
+    job: jobList.length > 0 ? jobList[0] : null,
     resume: resumeList.length > 0 ? resumeList[0] : null,
   })
 })

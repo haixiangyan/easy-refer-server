@@ -2,12 +2,12 @@ import request from 'supertest'
 import app from '../../../app'
 import {generateJWT} from '../../../utils/auth'
 import db from '../../../models/db'
-import {initMockDB, users, jobs} from '../../../mocks/dbObjects'
+import {initMockDB, users} from '../../../mocks/dbObjects'
+import dayjs = require('dayjs')
 
 const userRoute = '/api/users'
 
 const [user1, user2] = users
-const [job1] = jobs
 
 describe('/users', () => {
   beforeAll(async () => {
@@ -16,7 +16,7 @@ describe('/users', () => {
   })
   afterAll(async () => await db.close())
   describe('put /', () => {
-    const userForm: TUserForm = {
+    const userForm = {
       email: 'user1@mail.com',
       name: '修改了的张三',
       experience: 3,
@@ -72,7 +72,8 @@ describe('/users', () => {
       expect(info.userId).toEqual(user1.userId)
       expect(info.email).toEqual(user1.email)
 
-      expect(job.jobId).toEqual(job1.jobId)
+      expect(job.jobId).toEqual('job-1')
+      expect(dayjs(job.deadline).isAfter(dayjs())).toBe(true)
 
       expect(resume).toBeNull()
 
@@ -92,6 +93,7 @@ describe('/users', () => {
       expect(info.email).toEqual(user2.email)
 
       expect(job).not.toBeNull()
+      expect(dayjs(job.deadline).isAfter(dayjs())).toBe(true)
 
       expect(resume).not.toBeNull()
 

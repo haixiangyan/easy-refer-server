@@ -49,6 +49,16 @@ export const users = [
 
 export const jobs = [
   {
+    jobId: 'expired-job-1',
+    company: 'Expired Google',
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
+    deadline: dayjs().subtract(3, 'month'),
+    expiration: 5,
+    referTotal: 400,
+    source: 'https://www.1point3acres.com/bbs/',
+    refererId: 'user-1'
+  },
+  {
     jobId: 'job-1',
     company: 'Google',
     requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],

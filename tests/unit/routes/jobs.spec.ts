@@ -3,9 +3,8 @@ import {initMockDB} from '../../../mocks/dbObjects'
 import request from 'supertest'
 import app from '../../../app'
 import {generateJWT} from '../../../utils/auth'
-import dayjs = require('dayjs')
-import UserModel from '../../../models/UserModel'
 import JobModel from '../../../models/JobModel'
+import dayjs = require('dayjs')
 
 const jobItemListRoute = '/api/jobs/items'
 const jobListRoute = '/api/jobs'
@@ -90,7 +89,7 @@ describe('JobsRouter', () => {
       const jobForm = {
         company: 'google',
         requiredFields: ['name', 'email', 'phone', 'experience'],
-        deadline: dayjs().add(10, 'month').toDate(),
+        deadline: dayjs().add(10, 'month').toISOString(),
         expiration: 5,
         referTotal: 100,
         source: ''
@@ -107,20 +106,13 @@ describe('JobsRouter', () => {
           return expect(job[key]).toStrictEqual(jobForm.requiredFields)
         }
         if (key === 'deadline') {
-          return expect(job[key]).toEqual(jobForm.deadline.toISOString())
+          return expect(job[key]).toEqual(jobForm.deadline)
         }
         expect(job[key]).toEqual(value)
       })
 
-      const dbUser = await UserModel.findByPk('user-3', {
-        include: [JobModel]
-      })
-
-      expect(dbUser!.job).not.toBeNull()
-      expect(dbUser!.job!.jobId).not.toBeUndefined()
-
       // 去掉新生成的 Job
-      await JobModel.destroy({where: {jobId: dbUser!.job!.jobId}})
+      await JobModel.destroy({where: {jobId: job!.jobId}})
     })
     it('已经创建过 Job', async () => {
       const jwtToken = generateJWT('user-1')
