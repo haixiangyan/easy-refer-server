@@ -1,6 +1,6 @@
 import request from 'supertest'
 import bcrypt from 'bcrypt'
-import app from '@/app'
+import app from '../../../app'
 import {initMockDB, users} from '../../../mocks/dbObjects'
 import UserModel from '../../../models/UserModel'
 import db from '../../../models/db'
