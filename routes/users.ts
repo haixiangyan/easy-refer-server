@@ -73,10 +73,7 @@ UsersRouter.get('/', async (req, res) => {
 
   res.json({
     info,
-    job: {
-      ...job,
-      requiredFields: job.requiredFields.split(',')
-    },
+    job,
     resume: resumeList.length > 0 ? resumeList[0] : null,
   })
 })

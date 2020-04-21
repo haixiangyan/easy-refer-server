@@ -69,6 +69,7 @@ describe('获取内推职位接口 /jobs', () => {
       expect(status).toEqual(200)
 
       expect(job).toHaveProperty('jobId')
+      expect(job.requiredFields instanceof Array).toBe(true)
       expect(job.jobId).toEqual('job-1')
     })
     it('获取不存在的 Job', async () => {
@@ -103,7 +104,7 @@ describe('获取内推职位接口 /jobs', () => {
       expect(status).toEqual(200)
       Object.entries(jobForm).forEach(([key, value]) => {
         if (key === 'requiredFields') {
-          return expect(job[key]).toEqual(jobForm.requiredFields.join(','))
+          return expect(job[key]).toStrictEqual(jobForm.requiredFields)
         }
         if (key === 'deadline') {
           return expect(job[key]).toEqual(jobForm.deadline.toISOString())

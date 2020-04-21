@@ -51,7 +51,7 @@ export const jobs = [
   {
     jobId: 'job-1',
     company: 'Google',
-    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'].join(','),
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().add(3, 'month'),
     expiration: 5,
     referTotal: 400,
@@ -61,7 +61,7 @@ export const jobs = [
   {
     jobId: 'job-2',
     company: 'Facebook',
-    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'].join(','),
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().add(3, 'month'),
     expiration: 3,
     referTotal: 300,

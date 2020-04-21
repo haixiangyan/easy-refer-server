@@ -70,9 +70,7 @@ JobsRouter.post('/', passport.authenticate('jwt', {session: false}), async (req,
   const dbJob = await JobModel.create({
     ...jobForm,
     jobId: uuidv4(),
-    refererId: userId,
-    requiredFields: jobForm.requiredFields.join(','),
-    updatedOn: dayjs().toDate()
+    refererId: userId
   })
 
   res.json(dbJob)
@@ -102,15 +100,8 @@ JobsRouter.put('/:jobId', passport.authenticate('jwt', {session: false}), async 
 
   // 修改所有字段
   Object.entries(jobForm).forEach(([key, value]) => {
-    if (key === 'requiredFields') {
-      dbJob[key] = (value as string[]).join(',')
-    } else {
-      dbJob[key] = value
-    }
+    dbJob[key] = value
   })
-
-  // 添加 updatedOn
-  dbJob.updatedOn = dayjs().toDate()
 
   await dbJob.save()
 
@@ -165,7 +156,7 @@ const getJobItemList = async (page = 1, limit = 10, jobId?: string) => {
 
   // 将图表 Item 放入 JobItem 中
   const jobItemList = dbJobItemList.map(dbJobItem => {
-    const {jobId, requiredFields} = dbJobItem
+    const {jobId} = dbJobItem
     const countItem = dbReferredCount.find(i => i.jobId === jobId)
     const referredCount = countItem ? (countItem.toJSON() as any).referredCount : 0
 
@@ -173,7 +164,6 @@ const getJobItemList = async (page = 1, limit = 10, jobId?: string) => {
       ...dbJobItem.toJSON(),
       referredCount,
       processedChart: dbJobItem.jobId in chartItemObject ? chartItemObject[dbJobItem.jobId] : [],
-      requiredFields: requiredFields.split(',')
     }
   })
 
