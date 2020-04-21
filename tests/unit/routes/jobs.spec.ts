@@ -10,7 +10,7 @@ import JobModel from '../../../models/JobModel'
 const jobItemListRoute = '/api/jobs/items'
 const jobListRoute = '/api/jobs'
 
-describe('获取内推职位接口 /jobs', () => {
+describe('JobsRouter', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
@@ -132,6 +132,25 @@ describe('获取内推职位接口 /jobs', () => {
 
       expect(status).toEqual(409)
       expect(body.message).toEqual('你已创建内推职位')
+    })
+    it('创建过期的 Job', async () => {
+      const jwtToken = generateJWT('user-3')
+      const jobForm = {
+        company: 'google',
+        requiredFields: ['name', 'email', 'phone', 'experience'],
+        deadline: dayjs().subtract(10, 'day').toDate(),
+        expiration: 5,
+        referTotal: 100,
+        source: ''
+      }
+
+      const {status, body} = await request(app)
+        .post(jobListRoute)
+        .send(jobForm)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(412)
+      expect(body.message).toEqual('截止日期应该在今天之后')
     })
   })
 

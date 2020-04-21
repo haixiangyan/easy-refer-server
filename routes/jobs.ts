@@ -43,7 +43,12 @@ JobsRouter.get('/items/:jobId', async (req, res) => {
 JobsRouter.get('/:jobId', async (req, res) => {
   const {jobId} = req.params
 
-  const dbJob = await JobModel.findByPk(jobId)
+  const dbJob = await JobModel.findOne({
+    where: {
+      jobId,
+      deadline: {[Op.gte]: dayjs().toDate()}
+    }
+  })
 
   if (!dbJob) {
     res.status(404)
@@ -58,8 +63,17 @@ JobsRouter.post('/', passport.authenticate('jwt', {session: false}), async (req,
   const {userId} = req.user as TJWTUser
   const jobForm: TJobForm = req.body
 
+  // deadline 在今天之前
+  if (dayjs(jobForm.deadline).isBefore(dayjs())) {
+    res.status(412)
+    return res.json({message: '截止日期应该在今天之后'})
+  }
+
   const hasJob = await JobModel.findOne({
-    where: {refererId: userId}
+    where: {
+      refererId: userId,
+      deadline: {[Op.gte]: dayjs().toDate()}
+    }
   })
 
   if (hasJob) {
@@ -108,7 +122,10 @@ const getJobItemList = async (page = 1, limit = 10, jobId?: string) => {
 
   // 获取所有 Job
   const {count, rows: dbJobItemList} = await JobModel.findAndCountAll({
-    where: {...jobIdCondition} as any,
+    where: {
+      ...jobIdCondition, // 是否需要用 jobId 过滤
+      deadline: {[Op.gte]: dayjs().toDate()} // 获取在 deadline 之前的内推职位
+    } as any,
     include: [{model: UserModel, as: 'referer', attributes: ['name', 'avatarUrl']}],
     offset: page - 1,
     limit,

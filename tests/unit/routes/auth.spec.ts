@@ -12,7 +12,7 @@ const [user1] = users
 
 const agent = request(app)
 
-describe('AuthRoute 路由', () => {
+describe('AuthRouter', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
