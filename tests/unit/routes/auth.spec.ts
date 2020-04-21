@@ -19,7 +19,7 @@ describe('AuthRoute 路由', () => {
   })
   afterAll(async () => await db.close())
 
-  describe('登录 post /auth/login', () => {
+  describe('登录 => post /auth/login', () => {
     const loginForm = {
       email: user1.email,
       password: user1.password
@@ -56,7 +56,7 @@ describe('AuthRoute 路由', () => {
     })
   })
 
-  describe('注册 /auth/register', () => {
+  describe('注册 => /auth/register', () => {
     it('用户注册成功', async () => {
       const registrationForm = {
         email: 'user99@mail.com',
