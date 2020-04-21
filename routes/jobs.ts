@@ -12,7 +12,7 @@ import passport from '@/plugins/passport'
 const JobsRouter = express.Router()
 
 // 获取 Job item list
-JobsRouter.get('/item', async (req, res) => {
+JobsRouter.get('/items', async (req, res) => {
   const page = parseInt(req.query.page as string)
   const limit = parseInt(req.query.limit as string)
 
@@ -23,14 +23,11 @@ JobsRouter.get('/item', async (req, res) => {
 
   const {count: total, jobItemList} = await getJobItemList(page, limit)
 
-  res.json({
-    jobItemList,
-    total
-  })
+  res.json({jobItemList, total})
 })
 
 // 获取一个 Job item
-JobsRouter.get('/item/:jobId', async (req, res) => {
+JobsRouter.get('/items/:jobId', async (req, res) => {
   const {jobId} = req.params
   const {count, jobItemList} = await getJobItemList(1, 1, jobId)
 
@@ -66,7 +63,7 @@ JobsRouter.post('/', passport.authenticate('jwt', {session: false}), async (req,
   })
 
   if (hasJob) {
-    res.status(403)
+    res.status(409)
     return res.json({message: '你已创建内推职位'})
   }
 

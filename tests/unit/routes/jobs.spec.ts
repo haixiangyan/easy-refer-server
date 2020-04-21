@@ -7,20 +7,20 @@ import dayjs = require('dayjs')
 import UserModel from '../../../models/UserModel'
 import JobModel from '../../../models/JobModel'
 
-const getJobItemListRoute = '/api/jobs/item'
-const getJobListRoute = '/api/jobs'
+const jobItemListRoute = '/api/jobs/items'
+const jobListRoute = '/api/jobs'
 
-describe('/jobs', () => {
+describe('获取内推职位接口 /jobs', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
   })
   afterAll(async () => await db.close())
 
-  describe('get /item', () => {
+  describe('获取多个 Job Item 接口 => get /item', () => {
     it('成功获取 Job Item List', async () => {
       const {status, body} = await request(app)
-        .get(getJobItemListRoute)
+        .get(jobItemListRoute)
         .query({page: 1, limit: 10})
 
       const {jobItemList, total} = body
@@ -35,17 +35,17 @@ describe('/jobs', () => {
     })
     it('传错 page 和 limit 参数', async () => {
       const {status, body} = await request(app)
-        .get(getJobItemListRoute)
+        .get(jobItemListRoute)
 
       expect(status).toEqual(422)
       expect(body.message).toEqual('缺少参数')
     })
   })
 
-  describe('get /item/:jobId', () => {
+  describe('获取一个 Job Item 接口 => get /item/:jobId', () => {
     it('成功获取 Job Item', async () => {
       const {status, body: jobItem} = await request(app)
-        .get(`${getJobItemListRoute}/job-1`)
+        .get(`${jobItemListRoute}/job-1`)
 
       expect(status).toEqual(200)
       expect(jobItem).toHaveProperty('referredCount')
@@ -54,17 +54,17 @@ describe('/jobs', () => {
     })
     it('不存在 Job', async () => {
       const {status, body} = await request(app)
-        .get(`${getJobItemListRoute}/job-99`)
+        .get(`${jobItemListRoute}/job-99`)
 
       expect(status).toEqual(404)
       expect(body.message).toEqual('该内推职位不存在')
     })
   })
 
-  describe('get /:jobId', () => {
+  describe('获取一个 Job 接口 => get /:jobId', () => {
     it('成功获取一个 Job', async () => {
       const {status, body: job} = await request(app)
-        .get(`${getJobListRoute}/job-1`)
+        .get(`${jobListRoute}/job-1`)
 
       expect(status).toEqual(200)
 
@@ -73,7 +73,7 @@ describe('/jobs', () => {
     })
     it('获取不存在的 Job', async () => {
       const {status, body: job} = await request(app)
-        .get(`${getJobListRoute}/job-99`)
+        .get(`${jobListRoute}/job-99`)
 
       expect(status).toEqual(404)
 
@@ -83,7 +83,7 @@ describe('/jobs', () => {
     })
   })
 
-  describe('post /', () => {
+  describe('创建一个 Job 接口 => post /', () => {
     it('成功创建一个 Job', async () => {
       const jwtToken = generateJWT('user-3')
       const jobForm = {
@@ -96,7 +96,7 @@ describe('/jobs', () => {
       }
 
       const {status, body: job} = await request(app)
-        .post(getJobListRoute)
+        .post(jobListRoute)
         .send(jobForm)
         .set('Authorization', jwtToken)
 
@@ -111,36 +111,36 @@ describe('/jobs', () => {
         expect(job[key]).toEqual(value)
       })
 
-      const dbUser3 = await UserModel.findByPk('user-3', {
+      const dbUser = await UserModel.findByPk('user-3', {
         include: [JobModel]
       })
 
-      expect(dbUser3!.job).not.toBeNull()
-      expect(dbUser3!.job!.jobId).not.toBeUndefined()
+      expect(dbUser!.job).not.toBeNull()
+      expect(dbUser!.job!.jobId).not.toBeUndefined()
 
       // 去掉新生成的 Job
-      await JobModel.destroy({where: {jobId: dbUser3!.job!.jobId}})
+      await JobModel.destroy({where: {jobId: dbUser!.job!.jobId}})
     })
     it('已经创建过 Job', async () => {
       const jwtToken = generateJWT('user-1')
 
       const {status, body} = await request(app)
-        .post(getJobListRoute)
+        .post(jobListRoute)
         .send({})
         .set('Authorization', jwtToken)
 
-      expect(status).toEqual(403)
+      expect(status).toEqual(409)
       expect(body.message).toEqual('你已创建内推职位')
     })
   })
 
-  describe('put /:jobId', () => {
+  describe('修改一个 Job 接口 => put /:jobId', () => {
     it('成功修改 Job', async () => {
       const jwtToken = generateJWT('user-1')
       const jobForm = {company: 'New Company',}
 
       const {status, body: job} = await request(app)
-        .put(`${getJobListRoute}/job-1`)
+        .put(`${jobListRoute}/job-1`)
         .send(jobForm)
         .set('Authorization', jwtToken)
 
@@ -156,7 +156,7 @@ describe('/jobs', () => {
       const jobForm = {company: 'New Company',}
 
       const {status, body} = await request(app)
-        .put(`${getJobListRoute}/job-99`)
+        .put(`${jobListRoute}/job-99`)
         .send(jobForm)
         .set('Authorization', jwtToken)
 
@@ -168,7 +168,7 @@ describe('/jobs', () => {
       const jobForm = {company: 'New Company',}
 
       const {status, body} = await request(app)
-        .put(`${getJobListRoute}/job-2`)
+        .put(`${jobListRoute}/job-2`)
         .send(jobForm)
         .set('Authorization', jwtToken)
 
