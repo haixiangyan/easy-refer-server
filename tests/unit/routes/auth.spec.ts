@@ -1,17 +1,14 @@
 import request from 'supertest'
 import bcrypt from 'bcrypt'
 import app from '@/app'
-import {initMockDB, jobs, users} from '../../../mocks/dbObjects'
-import {generateJWT} from '../../../utils/auth'
+import {initMockDB, users} from '../../../mocks/dbObjects'
 import UserModel from '../../../models/UserModel'
 import db from '../../../models/db'
 
 const loginRoute = '/api/auth/login'
 const registerRoute = '/api/auth/register'
-const userRoute = '/api/auth/user'
 
-const [user1, user2] = users
-const [job1] = jobs
+const [user1] = users
 
 describe('/auth', () => {
   beforeAll(async () => {
@@ -54,65 +51,6 @@ describe('/auth', () => {
       expect(response.status).toEqual(401)
       expect(response.body).toHaveProperty('message')
       expect(response.body.message).toEqual('密码不正确')
-    })
-  })
-
-  describe('get /user', () => {
-    it('成功获取 user-1', async () => {
-      const jwtToken = generateJWT('user-1')
-      const {body} = await request(app)
-        .get(userRoute)
-        .set('Authorization', jwtToken)
-      const {info, job, resume} = body
-
-      expect(info.userId).toEqual(user1.userId)
-      expect(info.email).toEqual(user1.email)
-
-      expect(job.jobId).toEqual(job1.jobId)
-
-      expect(resume).toBeNull()
-
-      expect(info.myReferTotal).toEqual(0)
-      expect(info.approvedMyReferCount).toEqual(0)
-      expect(info.otherReferTotal).toEqual(2)
-      expect(info.approvedOtherReferCount).toEqual(0)
-    })
-    it ('成功获取 user-2', async () => {
-      const jwtToken = generateJWT('user-2')
-      const {body} = await request(app)
-        .get(userRoute)
-        .set('Authorization', jwtToken)
-      const {info, job, resume} = body
-
-      expect(info.userId).toEqual(user2.userId)
-      expect(info.email).toEqual(user2.email)
-
-      expect(job).not.toBeNull()
-
-      expect(resume).not.toBeNull()
-
-      expect(info.myReferTotal).toEqual(1)
-      expect(info.approvedMyReferCount).toEqual(0)
-      expect(info.otherReferTotal).toEqual(0)
-      expect(info.approvedOtherReferCount).toEqual(0)
-    })
-    it('没有 token 不能获取 user-1', async () => {
-      const {status, body, text} = await request(app)
-        .get(userRoute)
-
-      expect(status).toEqual(401)
-      expect(body).toStrictEqual({})
-      expect(text).toEqual('Unauthorized')
-    })
-    it('不存在该用户', async () => {
-      const jwtToken = generateJWT('user-999')
-      const {status, body} = await request(app)
-        .get(userRoute)
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(404)
-      expect(body).toHaveProperty('message')
-      expect(body.message).toEqual('该用户不存在')
     })
   })
 
