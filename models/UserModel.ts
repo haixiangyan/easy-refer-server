@@ -59,7 +59,7 @@ class UserModel extends Model<UserModel> {
 
   @Default('https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png')
   @Column(DataTypes.STRING)
-  public avatarUrl: string = 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png'
+  public avatarUrl!: string
 
   // 外键
   @ForeignKey(() => JobModel)
