@@ -9,14 +9,14 @@ import dayjs = require('dayjs')
 const jobItemListRoute = '/api/jobs/items'
 const jobListRoute = '/api/jobs'
 
-describe('JobsRouter', () => {
+describe('JobsController', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
   })
   afterAll(async () => await db.close())
 
-  describe('获取多个 Job Item 接口 => get /item', () => {
+  describe('getJobItemList', () => {
     it('成功获取 Job Item List', async () => {
       const {status, body} = await request(app)
         .get(jobItemListRoute)
@@ -41,7 +41,7 @@ describe('JobsRouter', () => {
     })
   })
 
-  describe('获取一个 Job Item 接口 => get /item/:jobId', () => {
+  describe('getJobItem', () => {
     it('成功获取 Job Item', async () => {
       const {status, body: jobItem} = await request(app)
         .get(`${jobItemListRoute}/job-1`)
@@ -60,7 +60,7 @@ describe('JobsRouter', () => {
     })
   })
 
-  describe('获取一个 Job 接口 => get /:jobId', () => {
+  describe('getJob', () => {
     it('成功获取一个 Job', async () => {
       const {status, body: job} = await request(app)
         .get(`${jobListRoute}/job-1`)
@@ -83,7 +83,7 @@ describe('JobsRouter', () => {
     })
   })
 
-  describe('创建一个 Job 接口 => post /', () => {
+  describe('createJob', () => {
     it('成功创建一个 Job', async () => {
       const jwtToken = generateJWT('user-3')
       const jobForm = {
@@ -146,7 +146,7 @@ describe('JobsRouter', () => {
     })
   })
 
-  describe('修改一个 Job 接口 => put /:jobId', () => {
+  describe('editJob', () => {
     it('成功修改 Job', async () => {
       const jwtToken = generateJWT('user-1')
       const jobForm = {company: 'New Company',}

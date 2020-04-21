@@ -12,14 +12,14 @@ const [user1] = users
 
 const agent = request(app)
 
-describe('AuthRouter', () => {
+describe('AuthController', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
   })
   afterAll(async () => await db.close())
 
-  describe('登录 => post /auth/login', () => {
+  describe('login', () => {
     const loginForm = {
       email: user1.email,
       password: user1.password
@@ -56,7 +56,7 @@ describe('AuthRouter', () => {
     })
   })
 
-  describe('注册 => /auth/register', () => {
+  describe('register', () => {
     it('用户注册成功', async () => {
       const registrationForm = {
         email: 'user99@mail.com',
