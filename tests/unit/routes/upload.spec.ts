@@ -6,6 +6,7 @@ import {generateJWT} from '../../../utils/auth'
 import request from 'supertest'
 import app from '../../../app'
 import {clearUploadDir, createUploadDir, getUploadAssetsPath} from '../../../utils/upload'
+import ResumeModel from '../../../models/ResumeModel'
 
 const uploadAvatarRoute = '/api/upload/avatar'
 const uploadResumeRoute = '/api/upload/resume'
@@ -45,6 +46,34 @@ describe('/upload', () => {
       const {status, body} = await request(app)
         .post(uploadAvatarRoute)
         .attach('file', path.resolve(assetsPath, 'avatar.jpg'))
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(404)
+      expect(body.message).toEqual('该用户不存在')
+    })
+  })
+
+  describe('post /resume', () => {
+    it('成功上传简历', async () => {
+      const jwtToken = generateJWT('user-1')
+      const {status, body} = await request(app)
+        .post(uploadResumeRoute)
+        .attach('file', path.resolve(assetsPath, 'resume.pdf'))
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(200)
+      expect(body).toHaveProperty('resumeId')
+      expect(body).toHaveProperty('url')
+      expect(body).toHaveProperty('name')
+
+      const dbResume = await ResumeModel.findByPk(body!.resumeId)
+      expect(dbResume).not.toBeNull()
+    })
+    it('非法用户上传简历', async () => {
+      const jwtToken = generateJWT('user-99')
+      const {status, body} = await request(app)
+        .post(uploadResumeRoute)
+        .attach('file', path.resolve(assetsPath, 'resume.pdf'))
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(404)
