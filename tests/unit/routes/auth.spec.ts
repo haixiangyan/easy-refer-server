@@ -100,7 +100,7 @@ describe('AuthRoute 路由', () => {
         .post(registerRoute)
         .send(registrationForm)
 
-      expect(status).toEqual(403)
+      expect(status).toEqual(409)
       expect(body).toHaveProperty('message')
       expect(body.message).toEqual('该用户已存在')
 

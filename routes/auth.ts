@@ -38,10 +38,8 @@ AuthRouter.post('/register', async (req, res) => {
   })
 
   if (existedDbUser) {
-    res.status(403)
-    return res.json({
-      message: '该用户已存在'
-    })
+    res.status(409)
+    return res.json({message: '该用户已存在'})
   }
 
   const dbUser = await UserModel.create({
