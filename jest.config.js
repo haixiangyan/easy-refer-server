@@ -13,6 +13,7 @@ module.exports = {
     },
     collectCoverage: true,
     collectCoverageFrom: [
+        '<rootDir>/controllers/**/*.ts',
         '<rootDir>/routes/**/*.ts',
         "!**/node_modules/**"
     ],
