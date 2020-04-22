@@ -13,7 +13,9 @@ const uploadResumeRoute = '/api/upload/resume'
 
 const assetsPath = path.resolve(__dirname, '../../assets')
 
-describe('/upload', () => {
+const agent = request(app)
+
+describe('UploadCtrlr', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
@@ -26,10 +28,10 @@ describe('/upload', () => {
     clearUploadDir()
   })
 
-  describe('post /avatar', () => {
+  describe('createAvatar', () => {
     it('成功上传一张头像', async () => {
       const jwtToken = generateJWT('user-2')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .post(uploadAvatarRoute)
         .attach('file', path.resolve(assetsPath, 'avatar.jpg'))
         .set('Authorization', jwtToken)
@@ -43,7 +45,7 @@ describe('/upload', () => {
     })
     it('非法用户上传头像', async () => {
       const jwtToken = generateJWT('user-99')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .post(uploadAvatarRoute)
         .attach('file', path.resolve(assetsPath, 'avatar.jpg'))
         .set('Authorization', jwtToken)
@@ -53,10 +55,10 @@ describe('/upload', () => {
     })
   })
 
-  describe('post /resume', () => {
+  describe('createResume', () => {
     it('成功上传简历', async () => {
       const jwtToken = generateJWT('user-1')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .post(uploadResumeRoute)
         .attach('file', path.resolve(assetsPath, 'resume.pdf'))
         .set('Authorization', jwtToken)
@@ -71,7 +73,7 @@ describe('/upload', () => {
     })
     it('非法用户上传简历', async () => {
       const jwtToken = generateJWT('user-99')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .post(uploadResumeRoute)
         .attach('file', path.resolve(assetsPath, 'resume.pdf'))
         .set('Authorization', jwtToken)
