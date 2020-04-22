@@ -68,9 +68,9 @@ describe('UsersCtrlr', () => {
       expect(resume).toBeNull()
 
       expect(info.myReferTotal).toEqual(0)
-      expect(info.approvedMyReferCount).toEqual(0)
+      expect(info.processedMyReferCount).toEqual(0)
       expect(info.otherReferTotal).toEqual(2)
-      expect(info.approvedOtherReferCount).toEqual(0)
+      expect(info.processedOtherReferCount).toEqual(0)
     })
     it ('成功获取 user-2', async () => {
       const jwtToken = generateJWT('user-2')
@@ -88,9 +88,9 @@ describe('UsersCtrlr', () => {
       expect(resume).not.toBeNull()
 
       expect(info.myReferTotal).toEqual(1)
-      expect(info.approvedMyReferCount).toEqual(0)
+      expect(info.processedMyReferCount).toEqual(0)
       expect(info.otherReferTotal).toEqual(0)
-      expect(info.approvedOtherReferCount).toEqual(0)
+      expect(info.processedOtherReferCount).toEqual(0)
     })
     it('没有 token 不能获取 user-1', async () => {
       const {status, body, text} = await agent

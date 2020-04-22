@@ -30,13 +30,13 @@ class UsersCtrlr {
     const myReferTotal = await ReferModel.count({
       where: {refereeId: userId}
     })
-    const approvedMyReferCount = await ReferModel.count({
+    const processedMyReferCount = await ReferModel.count({
       where: {refereeId: userId, status: 'approved'}
     })
     const otherReferTotal = await ReferModel.count({
       where: {refererId: userId}
     })
-    const approvedOtherReferCount = await ReferModel.count({
+    const processedOtherReferCount = await ReferModel.count({
       where: {refererId: userId, status: 'approved'}
     })
 
@@ -44,9 +44,9 @@ class UsersCtrlr {
     const info: TUser = {
       ...userInfo,
       myReferTotal,
-      approvedMyReferCount,
+      processedMyReferCount,
       otherReferTotal,
-      approvedOtherReferCount
+      processedOtherReferCount
     }
 
     res.json({
