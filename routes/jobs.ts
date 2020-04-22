@@ -1,6 +1,6 @@
 import express from 'express'
 import JobsController from '@/controllers/JobsController'
-import jwtMW from '@/middleware/passport-jwt'
+import jwtMW from '@/middlewares/passport-jwt'
 
 // '/jobs'
 const JobsRouter = express.Router()

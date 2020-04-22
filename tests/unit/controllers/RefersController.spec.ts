@@ -8,14 +8,14 @@ import ResumeModel from '../../../models/ResumeModel'
 
 const refersRoute = '/api/refers'
 
-describe('/refers', () => {
+describe('RefersController', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
   })
   afterAll(async () => await db.close())
 
-  describe('get /', () => {
+  describe('getReferList', () => {
     it('查看自己所有的 Refer', async () => {
       const jwtToken = generateJWT('user-2')
       const {status, body} = await request(app)
@@ -53,7 +53,7 @@ describe('/refers', () => {
     })
   })
 
-  describe('get /:referId', () => {
+  describe('getRefer', () => {
     it('查看自己的 Refer', async () => {
       const jwtToken = generateJWT('user-2')
       const {status, body: refer} = await request(app)
@@ -92,7 +92,7 @@ describe('/refers', () => {
     })
   })
 
-  describe('post /:jobId', () => {
+  describe('createRefer', () => {
     it('成功申请 Refer', async () => {
       const jwtToken = generateJWT('user-1')
       const referForm = {
@@ -151,7 +151,7 @@ describe('/refers', () => {
     })
   })
 
-  describe('patch /:referId', () => {
+  describe('editRefer', () => {
     it('修改自己的 Refer', async () => {
       const jwtToken = generateJWT('user-2')
       const patchReferForm = {phone: '12345678'}
@@ -193,7 +193,7 @@ describe('/refers', () => {
     })
   })
 
-  describe('delete /:referId', () => {
+  describe('deleteRefer', () => {
     it('成功删除 Refer', async () => {
       const jwtToken = generateJWT('user-2')
 

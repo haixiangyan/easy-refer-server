@@ -8,6 +8,7 @@ import {v4 as uuidv4} from 'uuid'
 import dayjs from 'dayjs'
 
 class RefersController {
+
   public static async getReferList(req: Request, res: Response) {
     const role = req.query.role as string
     const {userId} = req.user as TJWTUser
@@ -19,7 +20,7 @@ class RefersController {
       return res.json({message: '缺少参数'})
     }
 
-    const whereClause: {[key: string]: any} = {
+    const whereClause: { [key: string]: any } = {
       my: {refereeId: userId},
       other: {refererId: userId}
     }
@@ -92,7 +93,8 @@ class RefersController {
       refereeId: userId,
       refererId: dbJob.refererId,
       status: 'processing',
-      updatedOn: dayjs().toDate()
+      updatedOn: dayjs().toDate(),
+      expiration: dayjs().add(dbJob.expiration, 'day')
     })
 
     res.json(dbRefer)

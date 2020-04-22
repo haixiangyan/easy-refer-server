@@ -96,7 +96,8 @@ export const refers = [
     resumeId: 'resume-2',
     jobId: 'job-1',
     refererId: 'user-1',
-    refereeId: 'user-2'
+    refereeId: 'user-2',
+    expiration: dayjs().add(5, 'day')
   },
   {
     referId: 'refer-3',
@@ -113,7 +114,8 @@ export const refers = [
     resumeId: 'resume-3',
     jobId: 'job-1',
     refererId: 'user-1',
-    refereeId: 'user-3'
+    refereeId: 'user-3',
+    expiration: dayjs().add(5, 'day')
   }
 ]
 

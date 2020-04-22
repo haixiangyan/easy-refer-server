@@ -32,6 +32,8 @@
     "@types",
     "bin",
     "mocks",
+    "constants",
+    "middlewares",
     "controllers",
     "models",
     "public",

@@ -1,5 +1,5 @@
 import express from 'express'
-import {avatarMulter, resumeMulter} from '@/middleware/multer'
+import {avatarMulter, resumeMulter} from '@/middlewares/multer'
 import UserModel from '@/models/UserModel'
 import ResumeModel from '@/models/ResumeModel'
 import {v4 as uuidv4} from 'uuid'
