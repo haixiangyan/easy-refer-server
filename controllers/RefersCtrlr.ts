@@ -9,15 +9,10 @@ import dayjs from 'dayjs'
 
 class RefersCtrlr {
   public static async getReferList(req: Request, res: Response) {
-    const role = req.query.role as string
     const {userId} = req.user as TJWTUser
+    const {roleId} = res.locals
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
-
-    const whereClause: { [key: string]: any } = {
-      my: {refereeId: userId},
-      other: {refererId: userId}
-    }
 
     const {count: total, rows: referList} = await ReferModel.findAndCountAll({
       offset: page - 1,
@@ -28,7 +23,7 @@ class RefersCtrlr {
         {model: UserModel, as: 'referer'},
         {model: UserModel, as: 'referee'}
       ],
-      where: {...whereClause[role]}
+      where: {[roleId]: userId}
     })
 
     res.json({referList: referList, total})

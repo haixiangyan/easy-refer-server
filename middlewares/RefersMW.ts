@@ -9,18 +9,18 @@ class RefersMW {
    */
   public static async updateReferStatus(req: Request, res: Response, next: NextFunction) {
     const {userId} = req.user as TJWTUser
-    const whereClause: TMapper = {
-      my: {refereeId: userId},
-      other: {refererId: userId}
-    }
+    const roleId = req.query.role === 'my' ? 'refereeId' : 'refererId'
 
     // 将过期的 Refer 更新为 rejected
     await ReferModel.update({status: 'rejected'}, {
       where: {
-        ...whereClause[req.query.role as string],
+        [roleId]: userId,
         expiration: {[Op.lt]: dayjs().toDate()}
       }
     })
+
+    // 传递 roleId
+    res.locals.roleId = roleId
 
     next(null)
   }
