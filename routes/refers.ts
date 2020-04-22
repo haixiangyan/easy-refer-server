@@ -15,6 +15,7 @@ RefersRouter.get(
 // 获取一个 Refer
 RefersRouter.get(
   '/:referId',
+  RefersMW.existRefer,
   RefersMW.updateReferStatus,
   RefersCtrlr.getRefer
 )
@@ -22,10 +23,18 @@ RefersRouter.get(
 // 创建 Refer
 RefersRouter.post('/:jobId', RefersCtrlr.createRefer)
 
-// 部分修改 Refer
-RefersRouter.patch('/:referId', RefersCtrlr.editRefer)
+// 修改 Refer
+RefersRouter.patch(
+  '/:referId',
+  RefersMW.existRefer,
+  RefersCtrlr.editRefer
+)
 
 // 删除 Refer
-RefersRouter.delete('/:referId', RefersCtrlr.deleteRefer)
+RefersRouter.delete(
+  '/:referId',
+  RefersMW.existRefer,
+  RefersCtrlr.deleteRefer
+)
 
 export default RefersRouter

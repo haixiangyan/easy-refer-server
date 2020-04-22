@@ -62,6 +62,7 @@ describe('RefersCtrlr', () => {
 
       expect(status).toEqual(200)
       expect(refer.referId).toEqual('refer-2')
+      expect(refer.resume).not.toBeNull()
     })
     it('获取不存在的 Refer', async () => {
       const jwtToken = generateJWT('user-1')

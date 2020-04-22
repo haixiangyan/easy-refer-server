@@ -36,20 +36,15 @@ class RefersCtrlr {
 
   public static async getRefer(req: Request, res: Response) {
     const {userId} = req.user as TJWTUser
-    const {referId} = req.params
+    const {dbRefer} = res.locals
 
-    const dbRefer = await ReferModel.findByPk(referId)
-
-    if (!dbRefer) {
-      res.status(404)
-      return res.json({message: '该内推不存在'})
-    }
-
-    // Refer 不属性该用户，且 Refer 不能被别的 Referer 看到
+    // Refer 不属于该用户，且 Refer 不能被别的 Referer 看到
     if (dbRefer.refereeId !== userId && dbRefer.refererId !== userId) {
       res.status(403)
       return res.json({message: '无权限访问该内推'})
     }
+
+    dbRefer.resume = await dbRefer.$get('resume')
 
     res.json(dbRefer)
   }
@@ -96,53 +91,36 @@ class RefersCtrlr {
 
   public static async editRefer(req: Request, res: Response) {
     const {userId} = req.user as TJWTUser
-    const {referId} = req.params
+    const {dbRefer} = res.locals
     const patchReferForm = req.body
-
-    const dbRefer = await ReferModel.findByPk(referId)
-
-    if (!dbRefer) {
-      res.status(404)
-      return res.json({message: '该内推不存在'})
-    }
 
     if (dbRefer.refereeId !== userId) {
       res.status(403)
       return res.json({message: '无权限访问该内推'})
     }
 
-    Object.entries(patchReferForm).forEach(([key, value]) => {
-      dbRefer[key] = value
+    await dbRefer.update({
+      ...patchReferForm,
+      updatedOn: dayjs().toDate()
     })
-    dbRefer.updatedOn = dayjs().toDate()
-
-    await dbRefer.save()
 
     res.json(dbRefer)
   }
 
   public static async deleteRefer(req: Request, res: Response) {
     const {userId} = req.user as TJWTUser
-    const {referId} = req.params
-
-    const dbRefer = await ReferModel.findByPk(referId, {
-      include: [ResumeModel]
-    })
-
-    if (!dbRefer) {
-      res.status(404)
-      return res.json({message: '该内推不存在'})
-    }
+    const {dbRefer} = res.locals
 
     if (dbRefer.refereeId !== userId) {
       res.status(403)
       return res.json({message: '无权限访问该内推'})
     }
 
-    if (dbRefer.resume) {
-      await dbRefer.resume.destroy()
-    }
+    // 如果该 Refer 包含有 Resume 则删除 Resume
+    const resume = await dbRefer.$get('resume')
+    resume && await resume.destroy()
 
+    // 最后删除该 Refer
     await dbRefer.destroy()
 
     res.json()

@@ -31,7 +31,26 @@ class RefersMW {
     // 传递 roleId
     res.locals.roleId = roleId
 
-    next(null)
+    next(false)
+  }
+
+  /**
+   * 判断是否存在该 Refer
+   */
+  public static async existRefer(req: Request, res: Response, next: NextFunction) {
+    const {referId} = req.params
+
+    const dbRefer = await ReferModel.findByPk(referId)
+
+    if (!dbRefer) {
+      res.status(404)
+      return res.json({message: '该内推不存在'})
+    }
+
+    // 传递数据库中的 Refer
+    res.locals.dbRefer = dbRefer
+
+    next(false)
   }
 }
 
