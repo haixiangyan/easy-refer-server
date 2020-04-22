@@ -49,18 +49,6 @@ describe('UsersCtrlr', () => {
       expect(body.job).toBeUndefined()
       expect(body.resume).toBeUndefined()
     })
-    it('不存在的用户不能修改', async () => {
-      const jwtToken = generateJWT('user-4')
-
-      const {status, body} = await agent
-        .put(userRoute)
-        .send(userForm)
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(404)
-      expect(body).toHaveProperty('message')
-      expect(body.message).toEqual('用户不存在')
-    })
   })
 
   describe('getUser', () => {
@@ -111,16 +99,6 @@ describe('UsersCtrlr', () => {
       expect(status).toEqual(401)
       expect(body).toStrictEqual({})
       expect(text).toEqual('Unauthorized')
-    })
-    it('不存在该用户', async () => {
-      const jwtToken = generateJWT('user-999')
-      const {status, body} = await agent
-        .get(userRoute)
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(404)
-      expect(body).toHaveProperty('message')
-      expect(body.message).toEqual('该用户不存在')
     })
   })
 })

@@ -43,16 +43,6 @@ describe('UploadCtrlr', () => {
       const avatarFileName = fs.readdirSync(getUploadAssetsPath('user-2', 'avatar'))[0]
       expect(/avatar-[\d]*.jpg/.test(avatarFileName)).toEqual(true)
     })
-    it('非法用户上传头像', async () => {
-      const jwtToken = generateJWT('user-99')
-      const {status, body} = await agent
-        .post(uploadAvatarRoute)
-        .attach('file', path.resolve(assetsPath, 'avatar.jpg'))
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(404)
-      expect(body.message).toEqual('该用户不存在')
-    })
   })
 
   describe('createResume', () => {
@@ -70,16 +60,6 @@ describe('UploadCtrlr', () => {
 
       const dbResume = await ResumeModel.findByPk(body!.resumeId)
       expect(dbResume).not.toBeNull()
-    })
-    it('非法用户上传简历', async () => {
-      const jwtToken = generateJWT('user-99')
-      const {status, body} = await agent
-        .post(uploadResumeRoute)
-        .attach('file', path.resolve(assetsPath, 'resume.pdf'))
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(404)
-      expect(body.message).toEqual('该用户不存在')
     })
   })
 })

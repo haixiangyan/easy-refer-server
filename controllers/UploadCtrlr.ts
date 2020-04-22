@@ -34,12 +34,7 @@ class UploadCtrlr {
     const {filename} = req.file
     const {userId} = req.user as TJWTUser
 
-    const dbUser = await UserModel.findByPk(userId)
-
-    if (!dbUser) {
-      res.status(404)
-      return res.json({message: '该用户不存在'})
-    }
+    const dbUser = await UserModel.findByPk(userId) as UserModel
 
     dbUser.avatarUrl = `${req.protocol}://${req.hostname}:4000/${userId}/avatar/${filename}`
 

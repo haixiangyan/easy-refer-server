@@ -10,7 +10,7 @@ class UsersCtrlr {
   public static async getUser(req: Request, res: Response) {
     const {userId} = req.user as TJWTUser
 
-    const user = await UserModel.findByPk(userId, {
+    const dbUser = await UserModel.findByPk(userId, {
       include: [{
         model: JobModel,
         as: 'jobList',
@@ -24,12 +24,7 @@ class UsersCtrlr {
           limit: 1,
           order: [['createdAt', 'DESC']]
         }],
-    })
-
-    if (!user) {
-      res.status(404)
-      return res.json({message: '该用户不存在'})
-    }
+    }) as UserModel
 
     // 统计已处理自己的 refer
     const myReferTotal = await ReferModel.count({
@@ -45,7 +40,7 @@ class UsersCtrlr {
       where: {refererId: userId, status: 'approved'}
     })
 
-    const {jobList, resumeList, ...userInfo}: any = user.toJSON()
+    const {jobList, resumeList, ...userInfo}: any = dbUser.toJSON()
     const info: TUser = {
       ...userInfo,
       myReferTotal,
@@ -65,22 +60,11 @@ class UsersCtrlr {
     const {userId} = req.user as TJWTUser
     const userForm: TUserForm = req.body
 
-    const updatedUser = await UserModel.findByPk(userId)
+    const dbUser = await UserModel.findByPk(userId) as UserModel
 
-    if (!updatedUser) {
-      res.status(404)
-      return res.json({
-        message: '用户不存在'
-      })
-    }
+    await dbUser.update(userForm)
 
-    Object.entries(userForm).forEach(([key, value]) => {
-      updatedUser[key] = value
-    })
-
-    await updatedUser.save()
-
-    res.json(updatedUser)
+    res.json(dbUser)
   }
 }
 
