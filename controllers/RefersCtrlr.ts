@@ -7,7 +7,7 @@ import {Op} from 'sequelize'
 import {v4 as uuidv4} from 'uuid'
 import dayjs from 'dayjs'
 
-class RefersController {
+class RefersCtrlr {
 
   public static async getReferList(req: Request, res: Response) {
     const role = req.query.role as string
@@ -155,4 +155,4 @@ class RefersController {
   }
 }
 
-export default RefersController
+export default RefersCtrlr

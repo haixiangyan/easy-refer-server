@@ -9,7 +9,7 @@ import dayjs = require('dayjs')
 const jobItemListRoute = '/api/jobs/items'
 const jobListRoute = '/api/jobs'
 
-describe('JobsController', () => {
+describe('JobsCtrlr', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()

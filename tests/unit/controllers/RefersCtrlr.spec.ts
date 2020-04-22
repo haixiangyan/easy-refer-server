@@ -8,7 +8,7 @@ import ResumeModel from '../../../models/ResumeModel'
 
 const refersRoute = '/api/refers'
 
-describe('RefersController', () => {
+describe('RefersCtrlr', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()

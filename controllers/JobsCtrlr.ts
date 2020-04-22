@@ -7,7 +7,7 @@ import ReferModel from '../models/ReferModel'
 import {extractField} from '@/utils/tool'
 import {v4 as uuidv4} from 'uuid'
 
-class JobsController {
+class JobsCtrlr {
   public static async getJobItemList(req: Request, res: Response) {
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
@@ -17,14 +17,14 @@ class JobsController {
       return res.json({message: '缺少参数'})
     }
 
-    const {count: total, jobItemList} = await JobsController.parseJobItemList(page, limit)
+    const {count: total, jobItemList} = await JobsCtrlr.parseJobItemList(page, limit)
 
     res.json({jobItemList, total})
   }
 
   public static async getJobItem(req: Request, res: Response) {
     const {jobId} = req.params
-    const {count, jobItemList} = await JobsController.parseJobItemList(1, 1, jobId)
+    const {count, jobItemList} = await JobsCtrlr.parseJobItemList(1, 1, jobId)
 
     if (count === 0) {
       res.status(404)
@@ -175,4 +175,4 @@ class JobsController {
   }
 }
 
-export default JobsController
+export default JobsCtrlr

@@ -4,7 +4,7 @@ import {Request, Response} from 'express'
 import UserModel from '@/models/UserModel'
 import {v4 as uuidv4} from 'uuid'
 
-class AuthController {
+class AuthCtrlr {
   // 登录
   public static async login (req: Request, res: Response) {
     passport.authenticate('local', {session: false}, (err, user, info) => {
@@ -50,4 +50,4 @@ class AuthController {
   }
 }
 
-export default AuthController
+export default AuthCtrlr

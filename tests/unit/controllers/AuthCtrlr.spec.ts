@@ -12,7 +12,7 @@ const [user1] = users
 
 const agent = request(app)
 
-describe('AuthController', () => {
+describe('AuthCtrlr', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
