@@ -7,15 +7,17 @@ import dayjs = require('dayjs')
 
 const userRoute = '/api/users'
 
+const agent = request(app)
+
 const [user1, user2] = users
 
-describe('/users', () => {
+describe('UsersCtrlr', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
   })
   afterAll(async () => await db.close())
-  describe('put /', () => {
+  describe('editUser', () => {
     const userForm = {
       email: 'user1@mail.com',
       name: '修改了的张三',
@@ -29,7 +31,7 @@ describe('/users', () => {
 
     it('成功修改 user-1 信息', async () => {
       const jwtToken = generateJWT('user-1')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .put(userRoute)
         .send(userForm)
         .set('Authorization', jwtToken)
@@ -50,7 +52,7 @@ describe('/users', () => {
     it('不存在的用户不能修改', async () => {
       const jwtToken = generateJWT('user-4')
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .put(userRoute)
         .send(userForm)
         .set('Authorization', jwtToken)
@@ -61,10 +63,10 @@ describe('/users', () => {
     })
   })
 
-  describe('get /user', () => {
+  describe('getUser', () => {
     it('成功获取 user-1', async () => {
       const jwtToken = generateJWT('user-1')
-      const {body} = await request(app)
+      const {body} = await agent
         .get(userRoute)
         .set('Authorization', jwtToken)
       const {info, job, resume} = body
@@ -84,7 +86,7 @@ describe('/users', () => {
     })
     it ('成功获取 user-2', async () => {
       const jwtToken = generateJWT('user-2')
-      const {body} = await request(app)
+      const {body} = await agent
         .get(userRoute)
         .set('Authorization', jwtToken)
       const {info, job, resume} = body
@@ -103,7 +105,7 @@ describe('/users', () => {
       expect(info.approvedOtherReferCount).toEqual(0)
     })
     it('没有 token 不能获取 user-1', async () => {
-      const {status, body, text} = await request(app)
+      const {status, body, text} = await agent
         .get(userRoute)
 
       expect(status).toEqual(401)
@@ -112,7 +114,7 @@ describe('/users', () => {
     })
     it('不存在该用户', async () => {
       const jwtToken = generateJWT('user-999')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(userRoute)
         .set('Authorization', jwtToken)
 
