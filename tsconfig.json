@@ -32,6 +32,7 @@
     "@types",
     "bin",
     "mocks",
+    "controllers",
     "models",
     "public",
     "routes",
