@@ -8,7 +8,6 @@ const RefersRouter = express.Router()
 // 获取 My Refer / Other Refer
 RefersRouter.get(
   '/',
-  RefersMW.validateGetReferList,
   RefersMW.updateReferStatus,
   RefersCtrlr.getReferList
 )
