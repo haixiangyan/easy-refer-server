@@ -9,6 +9,8 @@ import dayjs = require('dayjs')
 const jobItemListRoute = '/api/jobs/items'
 const jobListRoute = '/api/jobs'
 
+const agent = request(app)
+
 describe('JobsCtrlr', () => {
   beforeAll(async () => {
     await db.sync({force: true})
@@ -18,7 +20,7 @@ describe('JobsCtrlr', () => {
 
   describe('getJobItemList', () => {
     it('成功获取 Job Item List', async () => {
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(jobItemListRoute)
         .query({page: 1, limit: 10})
 
@@ -33,7 +35,7 @@ describe('JobsCtrlr', () => {
       expect(jobItemList[0].finishedChart).not.toBeNull()
     })
     it('传错 page 和 limit 参数', async () => {
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(jobItemListRoute)
 
       expect(status).toEqual(422)
@@ -43,7 +45,7 @@ describe('JobsCtrlr', () => {
 
   describe('getJobItem', () => {
     it('成功获取 Job Item', async () => {
-      const {status, body: jobItem} = await request(app)
+      const {status, body: jobItem} = await agent
         .get(`${jobItemListRoute}/job-1`)
 
       expect(status).toEqual(200)
@@ -52,7 +54,7 @@ describe('JobsCtrlr', () => {
       expect(jobItem.finishedChart).not.toBeNull()
     })
     it('不存在 Job', async () => {
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(`${jobItemListRoute}/job-99`)
 
       expect(status).toEqual(404)
@@ -62,7 +64,7 @@ describe('JobsCtrlr', () => {
 
   describe('getJob', () => {
     it('成功获取一个 Job', async () => {
-      const {status, body: job} = await request(app)
+      const {status, body: job} = await agent
         .get(`${jobListRoute}/job-1`)
 
       expect(status).toEqual(200)
@@ -72,7 +74,7 @@ describe('JobsCtrlr', () => {
       expect(job.jobId).toEqual('job-1')
     })
     it('获取不存在的 Job', async () => {
-      const {status, body: job} = await request(app)
+      const {status, body: job} = await agent
         .get(`${jobListRoute}/job-99`)
 
       expect(status).toEqual(404)
@@ -95,7 +97,7 @@ describe('JobsCtrlr', () => {
         source: ''
       }
 
-      const {status, body: job} = await request(app)
+      const {status, body: job} = await agent
         .post(jobListRoute)
         .send(jobForm)
         .set('Authorization', jwtToken)
@@ -117,7 +119,7 @@ describe('JobsCtrlr', () => {
     it('已经创建过 Job', async () => {
       const jwtToken = generateJWT('user-1')
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .post(jobListRoute)
         .send({})
         .set('Authorization', jwtToken)
@@ -136,7 +138,7 @@ describe('JobsCtrlr', () => {
         source: ''
       }
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .post(jobListRoute)
         .send(jobForm)
         .set('Authorization', jwtToken)
@@ -151,7 +153,7 @@ describe('JobsCtrlr', () => {
       const jwtToken = generateJWT('user-1')
       const jobForm = {company: 'New Company',}
 
-      const {status, body: job} = await request(app)
+      const {status, body: job} = await agent
         .put(`${jobListRoute}/job-1`)
         .send(jobForm)
         .set('Authorization', jwtToken)
@@ -167,7 +169,7 @@ describe('JobsCtrlr', () => {
       const jwtToken = generateJWT('user-1')
       const jobForm = {company: 'New Company',}
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .put(`${jobListRoute}/job-99`)
         .send(jobForm)
         .set('Authorization', jwtToken)
@@ -179,7 +181,7 @@ describe('JobsCtrlr', () => {
       const jwtToken = generateJWT('user-1')
       const jobForm = {company: 'New Company',}
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .put(`${jobListRoute}/job-2`)
         .send(jobForm)
         .set('Authorization', jwtToken)

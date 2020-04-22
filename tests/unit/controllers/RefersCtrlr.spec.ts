@@ -8,6 +8,8 @@ import ResumeModel from '../../../models/ResumeModel'
 
 const refersRoute = '/api/refers'
 
+const agent = request(app)
+
 describe('RefersCtrlr', () => {
   beforeAll(async () => {
     await db.sync({force: true})
@@ -18,7 +20,7 @@ describe('RefersCtrlr', () => {
   describe('getReferList', () => {
     it('查看自己所有的 Refer', async () => {
       const jwtToken = generateJWT('user-2')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(refersRoute)
         .query({role: 'my', page: 1, limit: 10})
         .set('Authorization', jwtToken)
@@ -31,7 +33,7 @@ describe('RefersCtrlr', () => {
     })
     it('查看别人的所有 Refer', async () => {
       const jwtToken = generateJWT('user-1')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(refersRoute)
         .query({role: 'other', page: 1, limit: 10})
         .set('Authorization', jwtToken)
@@ -44,7 +46,7 @@ describe('RefersCtrlr', () => {
     })
     it('缺少参数', async () => {
       const jwtToken = generateJWT('user-1')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(refersRoute)
         .set('Authorization', jwtToken)
 
@@ -56,7 +58,7 @@ describe('RefersCtrlr', () => {
   describe('getRefer', () => {
     it('查看自己的 Refer', async () => {
       const jwtToken = generateJWT('user-2')
-      const {status, body: refer} = await request(app)
+      const {status, body: refer} = await agent
         .get(`${refersRoute}/refer-2`)
         .set('Authorization', jwtToken)
 
@@ -66,7 +68,7 @@ describe('RefersCtrlr', () => {
     })
     it('获取不存在的 Refer', async () => {
       const jwtToken = generateJWT('user-1')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(`${refersRoute}/refer-99`)
         .set('Authorization', jwtToken)
 
@@ -75,7 +77,7 @@ describe('RefersCtrlr', () => {
     })
     it('有权限查看别人的 Refer', async () => {
       const jwtToken = generateJWT('user-1')
-      const {status, body: refer} = await request(app)
+      const {status, body: refer} = await agent
         .get(`${refersRoute}/refer-2`)
         .set('Authorization', jwtToken)
 
@@ -84,7 +86,7 @@ describe('RefersCtrlr', () => {
     })
     it('无权限查看别人的 Refer', async () => {
       const jwtToken = generateJWT('user-3')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(`${refersRoute}/refer-2`)
         .set('Authorization', jwtToken)
 
@@ -102,7 +104,7 @@ describe('RefersCtrlr', () => {
         experience: 2,
       }
 
-      const {status, body: refer} = await request(app)
+      const {status, body: refer} = await agent
         .post(`${refersRoute}/job-2`)
         .send(referForm)
         .set('Authorization', jwtToken)
@@ -120,7 +122,7 @@ describe('RefersCtrlr', () => {
     it('申请不存在的内推职位', async () => {
       const jwtToken = generateJWT('user-1')
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .post(`${refersRoute}/job-99`)
         .send({})
         .set('Authorization', jwtToken)
@@ -131,7 +133,7 @@ describe('RefersCtrlr', () => {
     it('申请已申请过的内推职位', async () => {
       const jwtToken = generateJWT('user-2')
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .post(`${refersRoute}/job-1`)
         .send({})
         .set('Authorization', jwtToken)
@@ -142,7 +144,7 @@ describe('RefersCtrlr', () => {
     it('申请自己创建的内推职位', async () => {
       const jwtToken = generateJWT('user-1')
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .post(`${refersRoute}/job-1`)
         .send({})
         .set('Authorization', jwtToken)
@@ -157,7 +159,7 @@ describe('RefersCtrlr', () => {
       const jwtToken = generateJWT('user-2')
       const patchReferForm = {phone: '12345678'}
 
-      const {status, body: refer} = await request(app)
+      const {status, body: refer} = await agent
         .patch(`${refersRoute}/refer-2`)
         .send(patchReferForm)
         .set('Authorization', jwtToken)
@@ -172,7 +174,7 @@ describe('RefersCtrlr', () => {
       const jwtToken = generateJWT('user-2')
       const patchReferForm = {phone: '12345678'}
 
-      const {status, body: refer} = await request(app)
+      const {status, body: refer} = await agent
         .patch(`${refersRoute}/refer-99`)
         .send(patchReferForm)
         .set('Authorization', jwtToken)
@@ -184,7 +186,7 @@ describe('RefersCtrlr', () => {
       const jwtToken = generateJWT('user-2')
       const patchReferForm = {phone: '12345678'}
 
-      const {status, body: refer} = await request(app)
+      const {status, body: refer} = await agent
         .patch(`${refersRoute}/refer-3`)
         .send(patchReferForm)
         .set('Authorization', jwtToken)
@@ -198,7 +200,7 @@ describe('RefersCtrlr', () => {
     it('成功删除 Refer', async () => {
       const jwtToken = generateJWT('user-2')
 
-      const {status} = await request(app)
+      const {status} = await agent
         .delete(`${refersRoute}/refer-2`)
         .set('Authorization', jwtToken)
 
@@ -213,7 +215,7 @@ describe('RefersCtrlr', () => {
     it('删除不存在的 Refer', async () => {
       const jwtToken = generateJWT('user-2')
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .delete(`${refersRoute}/refer-99`)
         .set('Authorization', jwtToken)
 
@@ -223,7 +225,7 @@ describe('RefersCtrlr', () => {
     it('无权限删除 Refer', async () => {
       const jwtToken = generateJWT('user-2')
 
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .delete(`${refersRoute}/refer-3`)
         .set('Authorization', jwtToken)
 
