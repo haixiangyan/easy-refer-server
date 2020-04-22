@@ -8,17 +8,11 @@ import {v4 as uuidv4} from 'uuid'
 import dayjs from 'dayjs'
 
 class RefersCtrlr {
-
   public static async getReferList(req: Request, res: Response) {
     const role = req.query.role as string
     const {userId} = req.user as TJWTUser
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
-
-    if (!role || !page || !limit) {
-      res.status(422)
-      return res.json({message: '缺少参数'})
-    }
 
     const whereClause: { [key: string]: any } = {
       my: {refereeId: userId},

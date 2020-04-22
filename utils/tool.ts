@@ -5,7 +5,7 @@
  * @param array
  * @param field
  */
-export const extractField = (array: any[], field: string): TExtractedObject => {
+export const extractField = (array: any[], field: string): TMapper => {
   let object: any = {}
 
   array.forEach(item => {
