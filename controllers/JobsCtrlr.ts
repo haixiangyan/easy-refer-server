@@ -9,7 +9,7 @@ import {extractField} from '@/utils/tool'
 import {v4 as uuidv4} from 'uuid'
 
 class JobsCtrlr {
-  public static async getJobItemList(req: Request, res: Response<TGetJobItemList>) {
+  public static async getJobList(req: Request, res: Response<TGetJobItemList>) {
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
 
@@ -22,7 +22,7 @@ class JobsCtrlr {
     res.json({jobItemList, total})
   }
 
-  public static async getJobItem(req: Request, res: Response<TGetJobItem>) {
+  public static async getJob(req: Request, res: Response<TGetJobItem>) {
     const {jobId} = req.params
     const {count, jobItemList} = await JobsCtrlr.parseJobItemList(1, 1, jobId)
 
@@ -31,23 +31,6 @@ class JobsCtrlr {
     }
 
     res.json(jobItemList[0])
-  }
-
-  public static async getJob(req: Request, res: Response<TGetJob>) {
-    const {jobId} = req.params
-
-    const dbJob = await JobModel.findOne({
-      where: {
-        jobId,
-        deadline: {[Op.gte]: dayjs().toDate()}
-      }
-    })
-
-    if (!dbJob) {
-      return res.status(404).json({message: '该内推职位不存在'})
-    }
-
-    res.json(dbJob)
   }
 
   public static async createJob(req: Request, res: Response<TGetJob>) {

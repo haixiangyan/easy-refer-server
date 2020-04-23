@@ -6,7 +6,6 @@ import {generateJWT} from '../../../utils/auth'
 import JobModel from '../../../models/JobModel'
 import dayjs = require('dayjs')
 
-const jobItemListRoute = '/api/jobs/items'
 const jobListRoute = '/api/jobs'
 
 const agent = request(app)
@@ -18,10 +17,10 @@ describe('JobsCtrlr', () => {
   })
   afterAll(async () => await db.close())
 
-  describe('getJobItemList', () => {
-    it('成功获取 Job Item List', async () => {
+  describe('getJobList', () => {
+    it('成功获取 Job List', async () => {
       const {status, body} = await agent
-        .get(jobItemListRoute)
+        .get(jobListRoute)
         .query({page: 1, limit: 10})
 
       const {jobItemList, total} = body
@@ -36,13 +35,13 @@ describe('JobsCtrlr', () => {
     })
     it('传错 page 和 limit 参数', async () => {
       const {status, body} = await agent
-        .get(jobItemListRoute)
+        .get(jobListRoute)
 
       expect(status).toEqual(422)
       expect(body.message).toEqual('参数不正确')
 
       const {status: status2, body: body2} = await agent
-        .get(jobItemListRoute)
+        .get(jobListRoute)
         .query({page: -1, limit: 4})
 
       expect(status2).toEqual(422)
@@ -50,10 +49,10 @@ describe('JobsCtrlr', () => {
     })
   })
 
-  describe('getJobItem', () => {
-    it('成功获取 Job Item', async () => {
+  describe('getJob', () => {
+    it('成功获取 Job', async () => {
       const {status, body: jobItem} = await agent
-        .get(`${jobItemListRoute}/job-1`)
+        .get(`${jobListRoute}/job-1`)
 
       expect(status).toEqual(200)
       expect(jobItem).toHaveProperty('referredCount')
@@ -63,33 +62,10 @@ describe('JobsCtrlr', () => {
     })
     it('不存在 Job', async () => {
       const {status, body} = await agent
-        .get(`${jobItemListRoute}/job-99`)
-
-      expect(status).toEqual(404)
-      expect(body.message).toEqual('该内推职位不存在')
-    })
-  })
-
-  describe('getJob', () => {
-    it('成功获取一个 Job', async () => {
-      const {status, body: job} = await agent
-        .get(`${jobListRoute}/job-1`)
-
-      expect(status).toEqual(200)
-
-      expect(job).toHaveProperty('jobId')
-      expect(job.requiredFields instanceof Array).toBe(true)
-      expect(job.jobId).toEqual('job-1')
-    })
-    it('获取不存在的 Job', async () => {
-      const {status, body: job} = await agent
         .get(`${jobListRoute}/job-99`)
 
       expect(status).toEqual(404)
-
-      expect(job).not.toHaveProperty('jobId')
-      expect(job).toHaveProperty('message')
-      expect(job.message).toEqual('该内推职位不存在')
+      expect(body.message).toEqual('该内推职位不存在')
     })
   })
 

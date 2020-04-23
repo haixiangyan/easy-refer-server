@@ -5,11 +5,8 @@ import jwtMW from '@/middlewares/passport-jwt'
 // '/jobs'
 const JobsRouter = express.Router()
 
-// 获取 Job item list
-JobsRouter.get('/items', JobsCtrlr.getJobItemList)
-
-// 获取一个 Job item
-JobsRouter.get('/items/:jobId', JobsCtrlr.getJobItem)
+// 获取 Job List
+JobsRouter.get('/', JobsCtrlr.getJobList)
 
 // 获取一个 Job
 JobsRouter.get('/:jobId', JobsCtrlr.getJob)
