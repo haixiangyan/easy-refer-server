@@ -1,6 +1,6 @@
 import express from 'express'
 import JobsCtrlr from '@/controllers/JobsCtrlr'
-import jwtMW from '@/middlewares/passport-jwt'
+import JWTMW from '@/middlewares/JWTMW'
 
 // '/jobs'
 const JobsRouter = express.Router()
@@ -12,9 +12,9 @@ JobsRouter.get('/', JobsCtrlr.getJobList)
 JobsRouter.get('/:jobId', JobsCtrlr.getJob)
 
 // 创建一个 Job
-JobsRouter.post('/', jwtMW, JobsCtrlr.createJob)
+JobsRouter.post('/', JWTMW.authenticate, JobsCtrlr.createJob)
 
 // 修改一个 Job
-JobsRouter.put('/:jobId', jwtMW, JobsCtrlr.editJob)
+JobsRouter.put('/:jobId', JWTMW.authenticate, JobsCtrlr.editJob)
 
 export default JobsRouter

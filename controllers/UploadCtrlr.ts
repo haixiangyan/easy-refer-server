@@ -2,12 +2,12 @@ import UserModel from '@/models/UserModel'
 import ResumeModel from '@/models/ResumeModel'
 import {v4 as uuidv4} from 'uuid'
 import {Request, RequestHandler, Response} from 'express'
-import {avatarMulter, resumeMulter} from '@/middlewares/multer'
+import UploadMW from '@/middlewares/UploadMW'
 import {TGetResume} from '@/@types/resume'
 import {TGetAvatar} from '@/@types/users'
 
 class UploadCtrlr {
-  public static uploadResume: RequestHandler = resumeMulter.single('file')
+  public static uploadResume: RequestHandler = UploadMW.resumeMulter.single('file')
 
   public static async createResume(req: Request, res: Response<TGetResume>) {
     const {filename} = req.file
@@ -29,7 +29,7 @@ class UploadCtrlr {
     return res.status(201).json(dbResume)
   }
 
-  public static uploadAvatar: RequestHandler = avatarMulter.single('file')
+  public static uploadAvatar: RequestHandler = UploadMW.avatarMulter.single('file')
 
   public static async createAvatar(req: Request, res: Response<TGetAvatar>) {
     const {filename} = req.file
