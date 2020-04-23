@@ -6,6 +6,7 @@ import ResumeModel from '@/models/ResumeModel'
 import ReferModel from '@/models/ReferModel'
 import {Request, Response} from 'express'
 import {TGetFullUser, TGetUser, TUserInfo} from '@/@types/users'
+import JobsCtrlr from '@/controllers/JobsCtrlr'
 
 class UsersCtrlr {
   public static async getUser(req: Request, res: Response<TGetFullUser>) {
@@ -31,11 +32,19 @@ class UsersCtrlr {
     const referRatio = await UsersCtrlr.getReferRatio(userId)
 
     const {jobList, resumeList, ...userInfo}: any = dbUser.toJSON()
+
+    // 获取 userInfo
     const info: TUserInfo = {...userInfo, ...referRatio}
+    // 获取 JobItem
+    let job = null
+    if (jobList.length > 0) {
+      const {count, jobItemList} = await JobsCtrlr.parseJobItemList(1, 1, jobList[0].jobId)
+      job = count > 0 ? jobItemList[0] : null
+    }
 
     return res.json({
       info,
-      job: jobList.length > 0 ? jobList[0] : null,
+      job,
       resume: resumeList.length > 0 ? resumeList[0] : null,
     })
   }
