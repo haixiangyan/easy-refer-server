@@ -109,7 +109,7 @@ describe('RefersCtrlr', () => {
         .send(referForm)
         .set('Authorization', jwtToken)
 
-      expect(status).toEqual(200)
+      expect(status).toEqual(201)
       expect(refer.phone).toEqual('12345678')
 
       const dbRefer = await ReferModel.findOne({where: {email: 'user1@mail.com'}})

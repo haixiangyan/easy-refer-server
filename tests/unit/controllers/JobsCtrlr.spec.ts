@@ -102,7 +102,7 @@ describe('JobsCtrlr', () => {
         .send(jobForm)
         .set('Authorization', jwtToken)
 
-      expect(status).toEqual(200)
+      expect(status).toEqual(201)
       Object.entries(jobForm).forEach(([key, value]) => {
         if (key === 'requiredFields') {
           return expect(job[key]).toStrictEqual(jobForm.requiredFields)

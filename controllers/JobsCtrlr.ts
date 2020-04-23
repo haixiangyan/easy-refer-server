@@ -13,8 +13,7 @@ class JobsCtrlr {
     const limit = parseInt(req.query.limit as string)
 
     if (!page || !limit) {
-      res.status(422)
-      return res.json({message: '缺少参数'})
+      return res.status(422).json({message: '缺少参数'})
     }
 
     const {count: total, jobItemList} = await JobsCtrlr.parseJobItemList(page, limit)
@@ -27,8 +26,7 @@ class JobsCtrlr {
     const {count, jobItemList} = await JobsCtrlr.parseJobItemList(1, 1, jobId)
 
     if (count === 0) {
-      res.status(404)
-      return res.json({message: '该内推职位不存在'})
+      return res.status(404).json({message: '该内推职位不存在'})
     }
 
     res.json(jobItemList[0])
@@ -45,8 +43,7 @@ class JobsCtrlr {
     })
 
     if (!dbJob) {
-      res.status(404)
-      return res.json({message: '该内推职位不存在'})
+      return res.status(404).json({message: '该内推职位不存在'})
     }
 
     res.json(dbJob)
@@ -58,8 +55,7 @@ class JobsCtrlr {
 
     // deadline 在今天之前
     if (dayjs(jobForm.deadline).isBefore(dayjs())) {
-      res.status(412)
-      return res.json({message: '截止日期应该在今天之后'})
+      return res.status(412).json({message: '截止日期应该在今天之后'})
     }
 
     const hasJob = await JobModel.findOne({
@@ -70,8 +66,7 @@ class JobsCtrlr {
     })
 
     if (hasJob) {
-      res.status(409)
-      return res.json({message: '你已创建内推职位'})
+      return res.status(409).json({message: '你已创建内推职位'})
     }
 
     const dbJob = await JobModel.create({
@@ -80,7 +75,7 @@ class JobsCtrlr {
       refererId: userId
     })
 
-    res.json(dbJob)
+    return res.status(201).json(dbJob)
   }
 
   public static async editJob(req: Request, res: Response) {
@@ -94,19 +89,17 @@ class JobsCtrlr {
 
     // 是否存在
     if (!dbJob) {
-      res.status(404)
-      return res.json({message: '该内推职不存在'})
+      return res.status(404).json({message: '该内推职不存在'})
     }
 
     // 是否有权访问该 Job
     if (!dbJob.referer || dbJob.referer.userId !== userId) {
-      res.status(403)
-      return res.json({message: '无权限修改该内推职位'})
+      return res.status(403).json({message: '无权限修改该内推职位'})
     }
 
     await dbJob.update(jobForm)
 
-    res.json(dbJob)
+    return res.json(dbJob)
   }
 
   private static async parseJobItemList(page = 1, limit = 10, jobId?: string) {

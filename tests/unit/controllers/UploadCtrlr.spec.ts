@@ -36,7 +36,7 @@ describe('UploadCtrlr', () => {
         .attach('file', path.resolve(assetsPath, 'avatar.jpg'))
         .set('Authorization', jwtToken)
 
-      expect(status).toEqual(200)
+      expect(status).toEqual(201)
       expect(body).toHaveProperty('avatarUrl')
 
       // 获取文件系统中的头像
@@ -53,7 +53,7 @@ describe('UploadCtrlr', () => {
         .attach('file', path.resolve(assetsPath, 'resume.pdf'))
         .set('Authorization', jwtToken)
 
-      expect(status).toEqual(200)
+      expect(status).toEqual(201)
       expect(body).toHaveProperty('resumeId')
       expect(body).toHaveProperty('url')
       expect(body).toHaveProperty('name')

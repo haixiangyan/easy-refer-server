@@ -32,7 +32,7 @@ class UsersCtrlr {
     const {jobList, resumeList, ...userInfo}: any = dbUser.toJSON()
     const info: TUser = {...userInfo, ...referRatio}
 
-    res.json({
+    return res.json({
       info,
       job: jobList.length > 0 ? jobList[0] : null,
       resume: resumeList.length > 0 ? resumeList[0] : null,
@@ -47,7 +47,7 @@ class UsersCtrlr {
 
     await dbUser.update(userForm)
 
-    res.json(dbUser)
+    return res.json(dbUser)
   }
 
   private static async getReferRatio(userId: string) {

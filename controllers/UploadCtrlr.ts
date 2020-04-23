@@ -14,8 +14,7 @@ class UploadCtrlr {
     const dbUser = await UserModel.findByPk(userId)
 
     if (!dbUser) {
-      res.status(404)
-      return res.json({message: '该用户不存在'})
+      return res.status(404).json({message: '该用户不存在'})
     }
 
     const dbResume = await ResumeModel.create({
@@ -25,7 +24,7 @@ class UploadCtrlr {
       refereeId: userId
     })
 
-    res.json(dbResume)
+    return res.status(201).json(dbResume)
   }
 
   public static uploadAvatar: RequestHandler = avatarMulter.single('file')
@@ -40,7 +39,7 @@ class UploadCtrlr {
 
     await dbUser.save()
 
-    res.json({avatarUrl: dbUser.avatarUrl})
+    return res.status(201).json({avatarUrl: dbUser.avatarUrl})
   }
 }
 

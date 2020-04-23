@@ -11,16 +11,14 @@ class ResumesCtrlr {
     const resume = await ResumeModel.findByPk(resumeId)
 
     if (!resume) {
-      res.status(404)
-      return res.json({message: '简历不存在'})
+      return res.status(404).json({message: '简历不存在'})
     }
 
     if (!await ResumesCtrlr.canAccessResume(userId, resumeId)) {
-      res.status(403)
-      return res.json({message: '无权访问该简历'})
+      return res.status(403).json({message: '无权访问该简历'})
     }
 
-    res.json(resume)
+    return res.json(resume)
   }
 
   private static async canAccessResume(userId: string, resumeId: string) {

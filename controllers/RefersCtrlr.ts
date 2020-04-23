@@ -15,8 +15,7 @@ class RefersCtrlr {
     const limit = parseInt(req.query.limit as string)
 
     if (Number.isNaN(page) || Number.isNaN(limit)) {
-      res.status(422)
-      return res.json({message: '缺少参数'})
+      return res.status(422).json({message: '缺少参数'})
     }
 
     const {count: total, rows: referList} = await ReferModel.findAndCountAll({
@@ -31,7 +30,7 @@ class RefersCtrlr {
       where: {[roleId]: userId}
     })
 
-    res.json({referList: referList, total})
+    return res.json({referList: referList, total})
   }
 
   public static async getRefer(req: Request, res: Response) {
@@ -40,13 +39,12 @@ class RefersCtrlr {
 
     // Refer 不属于该用户，且 Refer 不能被别的 Referer 看到
     if (dbRefer.refereeId !== userId && dbRefer.refererId !== userId) {
-      res.status(403)
-      return res.json({message: '无权限访问该内推'})
+      return res.status(403).json({message: '无权限访问该内推'})
     }
 
     dbRefer.resume = await dbRefer.$get('resume')
 
-    res.json(dbRefer)
+    return res.json(dbRefer)
   }
 
   public static async createRefer(req: Request, res: Response) {
@@ -65,14 +63,12 @@ class RefersCtrlr {
     })
 
     if (!dbJob) {
-      res.status(404)
-      return res.json({message: '该内推职位不存在'})
+      return res.status(404).json({message: '该内推职位不存在'})
     }
 
     // 重复申请或者自己创建的内推职位
     if (dbJob.referList && dbJob.referList.length > 0) {
-      res.status(403)
-      return res.json({message: '你已申请该内推职位或这是你创建的内推职位'})
+      return res.status(403).json({message: '你已申请该内推职位或这是你创建的内推职位'})
     }
 
     const dbRefer = await ReferModel.create({
@@ -86,7 +82,7 @@ class RefersCtrlr {
       expiration: dayjs().add(dbJob.expiration, 'day')
     })
 
-    res.json(dbRefer)
+    return res.status(201).json(dbRefer)
   }
 
   public static async editRefer(req: Request, res: Response) {
@@ -95,8 +91,7 @@ class RefersCtrlr {
     const patchReferForm = req.body
 
     if (dbRefer.refereeId !== userId) {
-      res.status(403)
-      return res.json({message: '无权限访问该内推'})
+      return res.status(403).json({message: '无权限访问该内推'})
     }
 
     await dbRefer.update({
@@ -104,7 +99,7 @@ class RefersCtrlr {
       updatedOn: dayjs().toDate()
     })
 
-    res.json(dbRefer)
+    return res.json(dbRefer)
   }
 
   public static async deleteRefer(req: Request, res: Response) {
@@ -112,8 +107,7 @@ class RefersCtrlr {
     const {dbRefer} = res.locals
 
     if (dbRefer.refereeId !== userId) {
-      res.status(403)
-      return res.json({message: '无权限访问该内推'})
+      return res.status(403).json({message: '无权限访问该内推'})
     }
 
     // 如果该 Refer 包含有 Resume 则删除 Resume
@@ -123,7 +117,7 @@ class RefersCtrlr {
     // 最后删除该 Refer
     await dbRefer.destroy()
 
-    res.json()
+    return res.json()
   }
 }
 

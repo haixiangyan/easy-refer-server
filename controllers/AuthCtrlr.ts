@@ -6,18 +6,15 @@ import {v4 as uuidv4} from 'uuid'
 
 class AuthCtrlr {
   // 登录
-  public static async login (req: Request, res: Response) {
+  public static async login(req: Request, res: Response) {
     passport.authenticate('local', {session: false}, (err, user, info) => {
       if (err || !user) {
-        return res.status(401).json({
-          message: info.message
-        })
+        return res.status(401).json({message: info.message})
       }
 
       req.login(user, {session: false}, (err) => {
         if (err) {
-          res.status(500)
-          return res.json({message: '登录时发生错误'})
+          return res.status(500).json({message: '登录时发生错误'})
         }
 
         const token = generateJWT(user.userId)
@@ -35,8 +32,7 @@ class AuthCtrlr {
     })
 
     if (existedDbUser) {
-      res.status(409)
-      return res.json({message: '该用户已存在'})
+      return res.status(409).json({message: '该用户已存在'})
     }
 
     const dbUser = await UserModel.create({
@@ -45,8 +41,7 @@ class AuthCtrlr {
       password: encryptPassword(password)
     })
 
-    res.status(201)
-    res.json(dbUser)
+    return res.status(201).json(dbUser)
   }
 }
 
