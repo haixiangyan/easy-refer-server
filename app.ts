@@ -13,7 +13,7 @@ import ResumesRouter from '@/routes/resumes'
 import UploadRouter from '@/routes/upload'
 import UsersRouter from '@/routes/users'
 // 中间件
-import jwtMW from '@/middlewares/passport-jwt'
+import JWTMW from '@/middlewares/JWTMW'
 
 const app = express()
 
@@ -28,10 +28,11 @@ app.use(express.static(path.join(__dirname, 'upload')))
 
 app.use('/api/auth', AuthRouter)
 app.use('/api/jobs', JobsRouter)
-app.use('/api/refers', jwtMW, RefersRouter)
-app.use('/api/resumes', jwtMW, ResumesRouter)
-app.use('/api/upload', jwtMW, UploadRouter)
-app.use('/api/users', jwtMW, UsersRouter)
+
+app.use('/api/refers', RefersRouter)
+app.use('/api/resumes', JWTMW.authenticate, ResumesRouter)
+app.use('/api/upload', JWTMW.authenticate, UploadRouter)
+app.use('/api/users', JWTMW.authenticate, UsersRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

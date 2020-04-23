@@ -8,12 +8,6 @@ import ResumeModel from '@/models/ResumeModel'
 class UserModel extends Model<UserModel> {
   [key: string]: any
 
-  // 普通字段
-  public myReferTotal = 0
-  public approvedMyReferCount = 0
-  public otherReferTotal = 0
-  public approvedOtherReferCount = 0
-
   // 字段
   @Unique
   @AllowNull(false)

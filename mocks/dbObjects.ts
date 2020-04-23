@@ -8,7 +8,7 @@ import {encryptPassword} from '@/utils/auth'
 
 export const users = [
   {
-    userId: 'user-1',
+    userId: 'user1@mail.com',
     password: encryptPassword('123456'),
     email: 'user1@mail.com',
     experience: 2,
@@ -21,7 +21,7 @@ export const users = [
     jobId: 'job-1'
   },
   {
-    userId: 'user-2',
+    userId: 'user2@mail.com',
     password: encryptPassword('123456'),
     email: 'user2@mail.com',
     experience: 2,
@@ -34,7 +34,7 @@ export const users = [
     jobId: null
   },
   {
-    userId: 'user-3',
+    userId: 'user3@mail.com',
     password: encryptPassword('123456'),
     email: 'user3@mail.com',
     experience: 2,
@@ -57,7 +57,7 @@ export const jobs = [
     expiration: 5,
     referTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
-    refererId: 'user-1'
+    refererId: 'user1@mail.com'
   },
   {
     jobId: 'job-1',
@@ -67,7 +67,7 @@ export const jobs = [
     expiration: 5,
     referTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
-    refererId: 'user-1'
+    refererId: 'user1@mail.com'
   },
   {
     jobId: 'job-2',
@@ -77,7 +77,7 @@ export const jobs = [
     expiration: 3,
     referTotal: 300,
     source: 'https://www.1point3acres.com/bbs/',
-    refererId: 'user-2'
+    refererId: 'user2@mail.com'
   }
 ]
 
@@ -96,8 +96,8 @@ export const refers = [
     updatedOn: dayjs().subtract(20, 'day').subtract(10, 'minute'),
     resumeId: 'resume-2',
     jobId: 'job-1',
-    refererId: 'user-1',
-    refereeId: 'user-2',
+    refererId: 'user1@mail.com',
+    refereeId: 'user2@mail.com',
     expiration: dayjs().add(5, 'day')
   },
   {
@@ -114,8 +114,8 @@ export const refers = [
     updatedOn: dayjs().subtract(20, 'day'),
     resumeId: 'resume-3',
     jobId: 'job-1',
-    refererId: 'user-1',
-    refereeId: 'user-3',
+    refererId: 'user1@mail.com',
+    refereeId: 'user3@mail.com',
     expiration: dayjs().add(5, 'day')
   }
 ]
@@ -125,35 +125,35 @@ export const resumes = [
     resumeId: 'resume-2',
     name: '李四的简历.pdf',
     url: 'https://user-2.pdf',
-    refereeId: 'user-2',
+    refereeId: 'user2@mail.com',
     referId: null
   },
   {
     resumeId: 'resume-21',
     name: '李四的简历.pdf',
     url: 'https://user-2.pdf',
-    refereeId: 'user-2',
+    refereeId: 'user2@mail.com',
     referId: null
   },
   {
     resumeId: 'resume-22',
     name: '李四的简历.pdf',
     url: 'https://user-2.pdf',
-    refereeId: 'user-2',
+    refereeId: 'user2@mail.com',
     referId: null
   },
   {
     resumeId: 'resume-23',
     name: '李四的简历.pdf',
     url: 'https://user-2.pdf',
-    refereeId: 'user-2',
+    refereeId: 'user2@mail.com',
     referId: null
   },
   {
     resumeId: 'resume-3',
     name: '李四的简历.pdf',
     url: 'https://user-3.pdf',
-    refereeId: 'user-3',
+    refereeId: 'user3@mail.com',
     referId: null
   },
 ]

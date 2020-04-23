@@ -1,13 +1,14 @@
 import db from '../../../models/db'
-import {initMockDB} from '../../../mocks/dbObjects'
+import {initMockDB, users} from '../../../mocks/dbObjects'
 import request from 'supertest'
 import app from '../../../app'
 import {generateJWT} from '../../../utils/auth'
 import JobModel from '../../../models/JobModel'
 import dayjs = require('dayjs')
 
-const jobItemListRoute = '/api/jobs/items'
 const jobListRoute = '/api/jobs'
+
+const [user1, user2, user3] = users
 
 const agent = request(app)
 
@@ -18,31 +19,31 @@ describe('JobsCtrlr', () => {
   })
   afterAll(async () => await db.close())
 
-  describe('getJobItemList', () => {
-    it('成功获取 Job Item List', async () => {
+  describe('getJobList', () => {
+    it('成功获取 Job List', async () => {
       const {status, body} = await agent
-        .get(jobItemListRoute)
+        .get(jobListRoute)
         .query({page: 1, limit: 10})
 
-      const {jobItemList, total} = body
+      const {jobList, total} = body
 
       expect(status).toEqual(200)
-      expect(jobItemList.length).toBeLessThanOrEqual(10)
+      expect(jobList.length).toBeLessThanOrEqual(10)
       expect(total).toEqual(2)
 
-      expect(jobItemList[0]).toHaveProperty('referredCount')
-      expect(jobItemList[0]).toHaveProperty('processedChart')
-      expect(jobItemList[0].finishedChart).not.toBeNull()
+      expect(jobList[0]).toHaveProperty('referredCount')
+      expect(jobList[0]).toHaveProperty('processedChart')
+      expect(jobList[0].finishedChart).not.toBeNull()
     })
     it('传错 page 和 limit 参数', async () => {
       const {status, body} = await agent
-        .get(jobItemListRoute)
+        .get(jobListRoute)
 
       expect(status).toEqual(422)
       expect(body.message).toEqual('参数不正确')
 
       const {status: status2, body: body2} = await agent
-        .get(jobItemListRoute)
+        .get(jobListRoute)
         .query({page: -1, limit: 4})
 
       expect(status2).toEqual(422)
@@ -50,10 +51,10 @@ describe('JobsCtrlr', () => {
     })
   })
 
-  describe('getJobItem', () => {
-    it('成功获取 Job Item', async () => {
+  describe('getJob', () => {
+    it('成功获取 Job', async () => {
       const {status, body: jobItem} = await agent
-        .get(`${jobItemListRoute}/job-1`)
+        .get(`${jobListRoute}/job-1`)
 
       expect(status).toEqual(200)
       expect(jobItem).toHaveProperty('referredCount')
@@ -63,39 +64,16 @@ describe('JobsCtrlr', () => {
     })
     it('不存在 Job', async () => {
       const {status, body} = await agent
-        .get(`${jobItemListRoute}/job-99`)
+        .get(`${jobListRoute}/job-99`)
 
       expect(status).toEqual(404)
       expect(body.message).toEqual('该内推职位不存在')
     })
   })
 
-  describe('getJob', () => {
-    it('成功获取一个 Job', async () => {
-      const {status, body: job} = await agent
-        .get(`${jobListRoute}/job-1`)
-
-      expect(status).toEqual(200)
-
-      expect(job).toHaveProperty('jobId')
-      expect(job.requiredFields instanceof Array).toBe(true)
-      expect(job.jobId).toEqual('job-1')
-    })
-    it('获取不存在的 Job', async () => {
-      const {status, body: job} = await agent
-        .get(`${jobListRoute}/job-99`)
-
-      expect(status).toEqual(404)
-
-      expect(job).not.toHaveProperty('jobId')
-      expect(job).toHaveProperty('message')
-      expect(job.message).toEqual('该内推职位不存在')
-    })
-  })
-
   describe('createJob', () => {
     it('成功创建一个 Job', async () => {
-      const jwtToken = generateJWT('user-3')
+      const jwtToken = generateJWT(user3.userId)
       const jobForm = {
         company: 'google',
         requiredFields: ['name', 'email', 'phone', 'experience'],
@@ -125,7 +103,7 @@ describe('JobsCtrlr', () => {
       await JobModel.destroy({where: {jobId: job!.jobId}})
     })
     it('已经创建过 Job', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
 
       const {status, body} = await agent
         .post(jobListRoute)
@@ -136,7 +114,7 @@ describe('JobsCtrlr', () => {
       expect(body.message).toEqual('你已创建内推职位')
     })
     it('创建过期的 Job', async () => {
-      const jwtToken = generateJWT('user-3')
+      const jwtToken = generateJWT(user3.userId)
       const jobForm = {
         company: 'google',
         requiredFields: ['name', 'email', 'phone', 'experience'],
@@ -158,7 +136,7 @@ describe('JobsCtrlr', () => {
 
   describe('editJob', () => {
     it('成功修改 Job', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const jobForm = {company: 'New Company',}
 
       const {status, body: job} = await agent
@@ -174,7 +152,7 @@ describe('JobsCtrlr', () => {
       expect(dbJob!.company).toEqual(jobForm.company)
     })
     it('修改不存在的 Job', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const jobForm = {company: 'New Company',}
 
       const {status, body} = await agent
@@ -186,7 +164,7 @@ describe('JobsCtrlr', () => {
       expect(body.message).toEqual('该内推职不存在')
     })
     it('无权限修改 Job', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const jobForm = {company: 'New Company',}
 
       const {status, body} = await agent

@@ -1,18 +1,18 @@
 import JobModel from '@/models/JobModel'
 
-type TJobItem = JobModel & {
+type TFullJob = JobModel & {
   referredCount: number
   processedChart: TChartItem[]
 }
 
-type TGetJobItemList = TResponse<{
-  jobItemList: TJobItem[],
+type TGetFullJobList = TResponse<{
+  jobList: TFullJob[],
   total: number
 }>
 
-type TGetJobItem = TResponse<TJobItem>
+type TGetFullJob = TResponse<TFullJob>
 
-type TGetJob = TResponse<TJob>
+type TGetJob = TResponse<JobModel>
 
 type TChartItem = {
   date: string

@@ -30,7 +30,7 @@ describe('UsersCtrlr', () => {
     }
 
     it('成功修改 user-1 信息', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const {status, body} = await agent
         .put(userRoute)
         .send(userForm)
@@ -53,7 +53,7 @@ describe('UsersCtrlr', () => {
 
   describe('getUser', () => {
     it('成功获取 user-1', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const {body} = await agent
         .get(userRoute)
         .set('Authorization', jwtToken)
@@ -73,7 +73,7 @@ describe('UsersCtrlr', () => {
       expect(info.processedOtherReferCount).toEqual(0)
     })
     it ('成功获取 user-2', async () => {
-      const jwtToken = generateJWT('user-2')
+      const jwtToken = generateJWT(user2.userId)
       const {body} = await agent
         .get(userRoute)
         .set('Authorization', jwtToken)

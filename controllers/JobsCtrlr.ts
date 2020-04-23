@@ -1,5 +1,5 @@
 import {Request, Response} from 'express'
-import {TGetJob, TGetJobItem, TGetJobItemList, TJobItem} from '@/@types/jobs'
+import {TFullJob, TGetFullJob, TGetFullJobList, TGetJob} from '@/@types/jobs'
 import JobModel from '../models/JobModel'
 import {col, fn, Op} from 'sequelize'
 import dayjs from 'dayjs'
@@ -9,7 +9,7 @@ import {extractField} from '@/utils/tool'
 import {v4 as uuidv4} from 'uuid'
 
 class JobsCtrlr {
-  public static async getJobItemList(req: Request, res: Response<TGetJobItemList>) {
+  public static async getJobList(req: Request, res: Response<TGetFullJobList>) {
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
 
@@ -17,37 +17,20 @@ class JobsCtrlr {
       return res.status(422).json({message: '参数不正确'})
     }
 
-    const {count: total, jobItemList} = await JobsCtrlr.parseJobItemList(page, limit)
+    const {count: total, jobList} = await JobsCtrlr.parseJobList(page, limit)
 
-    res.json({jobItemList, total})
+    res.json({jobList, total})
   }
 
-  public static async getJobItem(req: Request, res: Response<TGetJobItem>) {
+  public static async getJob(req: Request, res: Response<TGetFullJob>) {
     const {jobId} = req.params
-    const {count, jobItemList} = await JobsCtrlr.parseJobItemList(1, 1, jobId)
+    const {count, jobList} = await JobsCtrlr.parseJobList(1, 1, jobId)
 
     if (count === 0) {
       return res.status(404).json({message: '该内推职位不存在'})
     }
 
-    res.json(jobItemList[0])
-  }
-
-  public static async getJob(req: Request, res: Response<TGetJob>) {
-    const {jobId} = req.params
-
-    const dbJob = await JobModel.findOne({
-      where: {
-        jobId,
-        deadline: {[Op.gte]: dayjs().toDate()}
-      }
-    })
-
-    if (!dbJob) {
-      return res.status(404).json({message: '该内推职位不存在'})
-    }
-
-    res.json(dbJob)
+    res.json(jobList[0])
   }
 
   public static async createJob(req: Request, res: Response<TGetJob>) {
@@ -103,11 +86,11 @@ class JobsCtrlr {
     return res.json(dbJob)
   }
 
-  public static async parseJobItemList(page = 1, limit = 10, jobId?: string) {
+  public static async parseJobList(page = 1, limit = 10, jobId?: string) {
     const jobIdCondition = jobId ? {jobId} : {}
 
     // 获取所有 Job
-    const {count, rows: dbJobItemList} = await JobModel.findAndCountAll({
+    const {count, rows: dbJobList} = await JobModel.findAndCountAll({
       where: {
         ...jobIdCondition, // 是否需要用 jobId 过滤
         deadline: {[Op.gte]: dayjs().toDate()} // 获取在 deadline 之前的内推职位
@@ -119,7 +102,7 @@ class JobsCtrlr {
     })
 
     // 获取所有 Id
-    const jobIds = dbJobItemList.map(jobItem => jobItem.jobId)
+    const jobIds = dbJobList.map(job => job.jobId)
 
     // 获取已内推数目
     const dbReferredCount = await ReferModel.findAll({
@@ -153,18 +136,18 @@ class JobsCtrlr {
     const chartItemObject = extractField(dbChartItemList.map(i => i.toJSON()), 'jobId')
 
     // 将图表 Item 放入 JobItem 中
-    const jobItemList: TJobItem[] = dbJobItemList.map(dbJobItem => {
-      const {jobId} = dbJobItem
+    const jobList: TFullJob[] = dbJobList.map(dbJob => {
+      const {jobId} = dbJob
       const countItem = dbReferredCount.find(i => i.jobId === jobId)
       const referredCount: number = countItem ? (countItem.toJSON() as any).referredCount : 0
 
-      return Object.assign({}, dbJobItem.toJSON() as TJobItem, {
+      return Object.assign({}, dbJob.toJSON() as TFullJob, {
         referredCount,
-        processedChart: dbJobItem.jobId in chartItemObject ? chartItemObject[dbJobItem.jobId] : [],
+        processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : [],
       })
     })
 
-    return {count, jobItemList}
+    return {count, jobList}
   }
 }
 
