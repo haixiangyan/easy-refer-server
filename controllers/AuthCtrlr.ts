@@ -1,13 +1,16 @@
 import passport from '../plugins/passport'
 import {encryptPassword, generateJWT} from '@/utils/auth'
+import {TLogin, TRegister, TRegistrationForm} from '@/@types/auth'
 import {Request, Response} from 'express'
 import UserModel from '@/models/UserModel'
 import {v4 as uuidv4} from 'uuid'
 
 class AuthCtrlr {
-  // 登录
-  public static async login(req: Request, res: Response) {
-    passport.authenticate('local', {session: false}, (err, user, info) => {
+  /**
+   * 登录
+   */
+  public static async login(req: Request, res: Response<TLogin>) {
+    passport.authenticate('local', {session: false}, (err, user: TJWTUser, info) => {
       if (err || !user) {
         return res.status(401).json({message: info.message})
       }
@@ -19,13 +22,16 @@ class AuthCtrlr {
 
         const token = generateJWT(user.userId)
 
-        return res.json({user, token})
+        return res.json({token})
       })
     })(req, res)
   }
 
-  public static async register(req: Request, res: Response) {
-    const {email, password} = req.body
+  /**
+   * 注册用户
+   */
+  public static async register(req: Request, res: Response<TRegister>) {
+    const {email, password} = req.body as TRegistrationForm
 
     const existedDbUser = await UserModel.findOne({
       where: {email}

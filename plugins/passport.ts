@@ -10,15 +10,15 @@ passport.use(new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password'
   }, async (email, password, cb) => {
-    const user = await UserModel.findOne({
+    const dbUser = await UserModel.findOne({
       where: {email}
     })
 
-    if (!user) return cb(null, false, {message: '用户不存在'})
+    if (!dbUser) return cb(null, false, {message: '用户不存在'})
 
-    if (user.password !== password) return cb(null, false, {message: '密码不正确'})
+    if (dbUser.password !== password) return cb(null, false, {message: '密码不正确'})
 
-    cb(null, user, {message: '登录成功'})
+    cb(null, dbUser.toJSON(), {message: '登录成功'})
   }
 ))
 
