@@ -93,7 +93,8 @@ class RefersCtrlr {
     const {dbRefer} = res.locals
     const referForm: ReferModel = req.body
 
-    if (dbRefer.refereeId !== userId) {
+    // 只有 Referer 和 Referee 才能修改
+    if (dbRefer.refereeId !== userId && dbRefer.refererId !== userId) {
       return res.status(403).json({message: '无权限访问该内推'})
     }
 
