@@ -1,5 +1,5 @@
 import db from '../../../models/db'
-import {initMockDB} from '../../../mocks/dbObjects'
+import {initMockDB, users} from '../../../mocks/dbObjects'
 import request from 'supertest'
 import app from '../../../app'
 import {generateJWT} from '../../../utils/auth'
@@ -7,6 +7,8 @@ import JobModel from '../../../models/JobModel'
 import dayjs = require('dayjs')
 
 const jobListRoute = '/api/jobs'
+
+const [user1, user2, user3] = users
 
 const agent = request(app)
 
@@ -71,7 +73,7 @@ describe('JobsCtrlr', () => {
 
   describe('createJob', () => {
     it('成功创建一个 Job', async () => {
-      const jwtToken = generateJWT('user-3')
+      const jwtToken = generateJWT(user3.userId)
       const jobForm = {
         company: 'google',
         requiredFields: ['name', 'email', 'phone', 'experience'],
@@ -101,7 +103,7 @@ describe('JobsCtrlr', () => {
       await JobModel.destroy({where: {jobId: job!.jobId}})
     })
     it('已经创建过 Job', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
 
       const {status, body} = await agent
         .post(jobListRoute)
@@ -112,7 +114,7 @@ describe('JobsCtrlr', () => {
       expect(body.message).toEqual('你已创建内推职位')
     })
     it('创建过期的 Job', async () => {
-      const jwtToken = generateJWT('user-3')
+      const jwtToken = generateJWT(user3.userId)
       const jobForm = {
         company: 'google',
         requiredFields: ['name', 'email', 'phone', 'experience'],
@@ -134,7 +136,7 @@ describe('JobsCtrlr', () => {
 
   describe('editJob', () => {
     it('成功修改 Job', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const jobForm = {company: 'New Company',}
 
       const {status, body: job} = await agent
@@ -150,7 +152,7 @@ describe('JobsCtrlr', () => {
       expect(dbJob!.company).toEqual(jobForm.company)
     })
     it('修改不存在的 Job', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const jobForm = {company: 'New Company',}
 
       const {status, body} = await agent
@@ -162,7 +164,7 @@ describe('JobsCtrlr', () => {
       expect(body.message).toEqual('该内推职不存在')
     })
     it('无权限修改 Job', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const jobForm = {company: 'New Company',}
 
       const {status, body} = await agent

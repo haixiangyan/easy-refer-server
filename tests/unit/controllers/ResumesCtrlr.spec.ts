@@ -2,11 +2,11 @@ import request from 'supertest'
 import app from '../../../app'
 import {generateJWT} from '../../../utils/auth'
 import db from '../../../models/db'
-import {initMockDB} from '../../../mocks/dbObjects'
-import {resumes} from '../../../mocks/dbObjects'
+import {initMockDB, resumes, users} from '../../../mocks/dbObjects'
 
 const resumeRoute = '/api/resumes'
 const [resume2] = resumes
+const [user1, user2, user3] = users
 
 const agent = request(app)
 
@@ -19,7 +19,7 @@ describe('ResumesCtrlr', () => {
 
   describe('getResume', () => {
     it('成功获取 resume-2 简历', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const {status, body: responseResume} = await agent
         .get(`${resumeRoute}/resume-2`)
         .set('Authorization', jwtToken)
@@ -32,7 +32,7 @@ describe('ResumesCtrlr', () => {
     })
 
     it('找不到 resume-99 简历', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const {status, body} = await agent
         .get(`${resumeRoute}/resume-99`)
         .set('Authorization', jwtToken)
@@ -44,7 +44,7 @@ describe('ResumesCtrlr', () => {
     })
 
     it('user-3 无法访问 user-2 的简历', async () => {
-      const jwtToken = generateJWT('user-3')
+      const jwtToken = generateJWT(user3.userId)
       const {status, body} = await agent
         .get(`${resumeRoute}/resume-2`)
         .set('Authorization', jwtToken)

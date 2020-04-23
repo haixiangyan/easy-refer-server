@@ -20,9 +20,6 @@ RefersRouter.get(
   RefersCtrlr.getRefer
 )
 
-// 创建 Refer
-RefersRouter.post('/:jobId', RefersCtrlr.createRefer)
-
 // 修改 Refer
 RefersRouter.patch(
   '/:referId',

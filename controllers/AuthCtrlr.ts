@@ -3,7 +3,6 @@ import {encryptPassword, generateJWT} from '@/utils/auth'
 import {TLogin, TRegister, TRegistrationForm} from '@/@types/auth'
 import {Request, Response} from 'express'
 import UserModel from '@/models/UserModel'
-import {v4 as uuidv4} from 'uuid'
 
 class AuthCtrlr {
   /**
@@ -42,7 +41,7 @@ class AuthCtrlr {
     }
 
     const dbUser = await UserModel.create({
-      userId: uuidv4(),
+      userId: email,
       email,
       password: encryptPassword(password)
     })

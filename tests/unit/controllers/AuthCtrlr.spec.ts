@@ -21,7 +21,7 @@ describe('AuthCtrlr', () => {
 
   describe('login', () => {
     const loginForm = {
-      email: 'user1@mail.com',
+      email: user1.email,
       password: '123456'
     }
     it('成功登录', async () => {

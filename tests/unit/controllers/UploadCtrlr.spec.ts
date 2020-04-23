@@ -1,7 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import db from '../../../models/db'
-import {initMockDB} from '../../../mocks/dbObjects'
+import {initMockDB, users} from '../../../mocks/dbObjects'
 import {generateJWT} from '../../../utils/auth'
 import request from 'supertest'
 import app from '../../../app'
@@ -12,6 +12,8 @@ const uploadAvatarRoute = '/api/upload/avatar'
 const uploadResumeRoute = '/api/upload/resume'
 
 const assetsPath = path.resolve(__dirname, '../../assets')
+
+const [user1, user2, user3] = users
 
 const agent = request(app)
 
@@ -30,7 +32,7 @@ describe('UploadCtrlr', () => {
 
   describe('createAvatar', () => {
     it('成功上传一张头像', async () => {
-      const jwtToken = generateJWT('user-2')
+      const jwtToken = generateJWT(user2.userId)
       const {status, body} = await agent
         .post(uploadAvatarRoute)
         .attach('file', path.resolve(assetsPath, 'avatar.jpg'))
@@ -40,14 +42,14 @@ describe('UploadCtrlr', () => {
       expect(body).toHaveProperty('avatarUrl')
 
       // 获取文件系统中的头像
-      const avatarFileName = fs.readdirSync(getUploadAssetsPath('user-2', 'avatar'))[0]
+      const avatarFileName = fs.readdirSync(getUploadAssetsPath(user2.userId, 'avatar'))[0]
       expect(/avatar-[\d]*.jpg/.test(avatarFileName)).toEqual(true)
     })
   })
 
   describe('createResume', () => {
     it('成功上传简历', async () => {
-      const jwtToken = generateJWT('user-1')
+      const jwtToken = generateJWT(user1.userId)
       const {status, body} = await agent
         .post(uploadResumeRoute)
         .attach('file', path.resolve(assetsPath, 'resume.pdf'))

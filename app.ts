@@ -14,6 +14,7 @@ import UploadRouter from '@/routes/upload'
 import UsersRouter from '@/routes/users'
 // 中间件
 import JWTMW from '@/middlewares/JWTMW'
+import RefersCtrlr from '@/controllers/RefersCtrlr'
 
 const app = express()
 
@@ -28,6 +29,9 @@ app.use(express.static(path.join(__dirname, 'upload')))
 
 app.use('/api/auth', AuthRouter)
 app.use('/api/jobs', JobsRouter)
+// 创建 Refer
+app.post('/api/refers/:jobId', RefersCtrlr.createRefer)
+
 app.use('/api/refers', JWTMW.authenticate, RefersRouter)
 app.use('/api/resumes', JWTMW.authenticate, ResumesRouter)
 app.use('/api/upload', JWTMW.authenticate, UploadRouter)

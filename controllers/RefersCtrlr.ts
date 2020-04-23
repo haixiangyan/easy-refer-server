@@ -55,9 +55,9 @@ class RefersCtrlr {
   }
 
   public static async createRefer(req: Request, res: Response<TGetRefer>) {
-    const {userId} = req.user as TJWTUser
     const {jobId} = req.params
     const referForm: ReferModel = req.body
+    const {email} = referForm
 
     const dbJob = await JobModel.findByPk(jobId)
 
@@ -65,20 +65,30 @@ class RefersCtrlr {
       return res.status(404).json({message: '该内推职位不存在'})
     }
 
+    if (!email) {
+      return res.status(422).json({message: '参数不正确'})
+    }
+
     const appliedDbRefer = await dbJob.$get('referList', {
-      where: {refereeId: userId}
+      where: {refereeId: email}
     })
 
     // 重复申请或者自己创建的内推职位
-    if (dbJob.refererId === userId || appliedDbRefer.length > 0) {
+    if (dbJob.refererId === referForm.email || appliedDbRefer.length > 0) {
       return res.status(403).json({message: '你已申请该内推职位或这是你创建的内推职位'})
     }
+
+    // 如果没有该用户，则创建
+    await UserModel.findOrCreate({
+      where: {userId: email},
+      defaults: {userId: email}
+    })
 
     const dbRefer = await ReferModel.create({
       ...referForm,
       referId: uuidv4(),
       jobId,
-      refereeId: userId,
+      refereeId: email,
       refererId: dbJob.refererId,
       status: 'processing',
       updatedOn: dayjs().toDate(),
