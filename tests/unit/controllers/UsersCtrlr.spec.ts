@@ -70,7 +70,7 @@ describe('UsersCtrlr', () => {
       expect(info.myReferTotal).toEqual(0)
       expect(info.processedMyReferCount).toEqual(0)
       expect(info.otherReferTotal).toEqual(2)
-      expect(info.processedOtherReferCount).toEqual(0)
+      expect(info.processedOtherReferCount).toEqual(1)
     })
     it ('成功获取 user-2', async () => {
       const jwtToken = generateJWT(user2.userId)

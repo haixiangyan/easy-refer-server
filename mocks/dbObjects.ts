@@ -110,7 +110,7 @@ export const refers = [
     leetCodeUrl: 'https://leetcode.com',
     thirdPersonIntro: '这是王五，很完美的第三人称介绍',
     referLinks: 'http://google.com',
-    status: 'processing',
+    status: 'approved',
     updatedOn: dayjs().subtract(20, 'day'),
     resumeId: 'resume-3',
     jobId: 'job-1',

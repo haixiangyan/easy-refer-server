@@ -33,7 +33,8 @@ describe('JobsCtrlr', () => {
 
       expect(jobList[0]).toHaveProperty('referredCount')
       expect(jobList[0]).toHaveProperty('processedChart')
-      expect(jobList[0].finishedChart).not.toBeNull()
+      expect(jobList[0].processedChart).not.toBeNull()
+      expect(jobList[0].processedChart.length).toEqual(10)
     })
     it('传错 page 和 limit 参数', async () => {
       const {status, body} = await agent
@@ -53,14 +54,15 @@ describe('JobsCtrlr', () => {
 
   describe('getJob', () => {
     it('成功获取 Job', async () => {
-      const {status, body: jobItem} = await agent
+      const {status, body: job} = await agent
         .get(`${jobListRoute}/job-1`)
 
       expect(status).toEqual(200)
-      expect(jobItem).toHaveProperty('referredCount')
-      expect(jobItem).toHaveProperty('processedChart')
-      expect(jobItem.processedChart).not.toBeNull()
-      expect(jobItem.referer).not.toBeNull()
+      expect(job).toHaveProperty('referredCount')
+      expect(job).toHaveProperty('processedChart')
+      expect(job.processedChart).not.toBeNull()
+      expect(job.processedChart.length).toEqual(10)
+      expect(job.referer).not.toBeNull()
     })
     it('不存在 Job', async () => {
       const {status, body} = await agent

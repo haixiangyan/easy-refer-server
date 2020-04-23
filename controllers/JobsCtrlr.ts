@@ -7,6 +7,7 @@ import UserModel from '../models/UserModel'
 import ReferModel from '../models/ReferModel'
 import {extractField} from '@/utils/tool'
 import {v4 as uuidv4} from 'uuid'
+import {DATE_FORMAT} from '@/constants/format'
 
 class JobsCtrlr {
   public static async getJobList(req: Request, res: Response<TGetFullJobList>) {
@@ -127,13 +128,28 @@ class JobsCtrlr {
       where: {
         jobId: {[Op.in]: jobIds},
         status: {[Op.not]: 'processing'}, // 已经 process 的数据
-        updatedOn: {[Op.gte]: dayjs().subtract(12, 'month').toDate()} // 查 12 个月内的数据
+        updatedOn: {[Op.gte]: dayjs().subtract(10, 'day').toDate()} // 查 10 天内的数据
       },
+      limit: 10,
       group: ['jobId', 'updatedOn']
     })
 
     // 提取 jobId，将数组变成对象
-    const chartItemObject = extractField(dbChartItemList.map(i => i.toJSON()), 'jobId')
+    const chartItemObject = extractField(dbChartItemList.map(dbChartItem => {
+      const chartItem =  dbChartItem.toJSON() as {date: Date | string, count: number}
+      chartItem.date = dayjs(chartItem.date).format(DATE_FORMAT)
+      return chartItem
+    }), 'jobId')
+    // 不够 10 个数据就追加上
+    Object.values(chartItemObject).forEach(chartItemList => {
+      const diff = 10 - chartItemList.length
+      for (let i = 1; i <= diff; i++) {
+        chartItemList.unshift({date: dayjs().subtract(i, 'day').format(DATE_FORMAT), count: 0})
+      }
+    })
+    const defaultChart = Array
+      .from(Array(10))
+      .map((item, i) => ({date: dayjs().subtract(i, 'day').format(DATE_FORMAT), count: 0}))
 
     // 将图表 Item 放入 JobItem 中
     const jobList: TFullJob[] = dbJobList.map(dbJob => {
@@ -143,7 +159,7 @@ class JobsCtrlr {
 
       return Object.assign({}, dbJob.toJSON() as TFullJob, {
         referredCount,
-        processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : [],
+        processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : defaultChart,
       })
     })
 
