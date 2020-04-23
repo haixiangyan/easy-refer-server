@@ -72,7 +72,10 @@ describe('RefersCtrlr', () => {
 
       expect(status).toEqual(200)
       expect(refer.referId).toEqual('refer-2')
-      expect(refer.resume).not.toBeNull()
+      expect(refer.resume).not.toBeUndefined()
+      expect(refer.job).not.toBeUndefined()
+      expect(refer.referer).not.toBeUndefined()
+      expect(refer.referee).not.toBeUndefined()
     })
     it('获取不存在的 Refer', async () => {
       const jwtToken = generateJWT('user-1')

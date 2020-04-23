@@ -4,7 +4,6 @@ import ReferModel from '../models/ReferModel'
 import ResumeModel from '../models/ResumeModel'
 import JobModel from '../models/JobModel'
 import UserModel from '../models/UserModel'
-import {Op} from 'sequelize'
 import {v4 as uuidv4} from 'uuid'
 import dayjs from 'dayjs'
 
@@ -43,9 +42,16 @@ class RefersCtrlr {
       return res.status(403).json({message: '无权限访问该内推'})
     }
 
-    dbRefer.resume = await dbRefer.$get('resume')
+    const refer = dbRefer.toJSON()
 
-    return res.json(dbRefer)
+    const dbResume = await dbRefer.$get('resume')
+    refer.resume = !dbResume ? null : dbResume.toJSON()
+
+    refer.referer = (await dbRefer.$get('referer')).toJSON()
+    refer.referee = (await dbRefer.$get('referee')).toJSON()
+    refer.job = (await dbRefer.$get('job')).toJSON()
+
+    return res.json(refer)
   }
 
   public static async createRefer(req: Request, res: Response<TGetRefer>) {
@@ -53,22 +59,18 @@ class RefersCtrlr {
     const {jobId} = req.params
     const referForm: ReferModel = req.body
 
-    const dbJob = await JobModel.findByPk(jobId, {
-      include: [{
-        model: ReferModel, as: 'referList', where: {
-          // 重复申请或者自己创建的内推职位
-          [Op.or]: [{refereeId: userId}, {refererId: userId}]
-        },
-        separate: true // 分开查询非法申请的 SQL
-      }]
-    })
+    const dbJob = await JobModel.findByPk(jobId)
 
     if (!dbJob) {
       return res.status(404).json({message: '该内推职位不存在'})
     }
 
+    const appliedDbRefer = await dbJob.$get('referList', {
+      where: {refereeId: userId}
+    })
+
     // 重复申请或者自己创建的内推职位
-    if (dbJob.referList && dbJob.referList.length > 0) {
+    if (dbJob.refererId === userId || appliedDbRefer.length > 0) {
       return res.status(403).json({message: '你已申请该内推职位或这是你创建的内推职位'})
     }
 

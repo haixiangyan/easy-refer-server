@@ -103,7 +103,7 @@ class JobsCtrlr {
     return res.json(dbJob)
   }
 
-  private static async parseJobItemList(page = 1, limit = 10, jobId?: string) {
+  public static async parseJobItemList(page = 1, limit = 10, jobId?: string) {
     const jobIdCondition = jobId ? {jobId} : {}
 
     // 获取所有 Job

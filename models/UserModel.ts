@@ -54,10 +54,10 @@ class UserModel extends Model<UserModel> {
   @HasMany(() => JobModel)
   public readonly jobList?: JobModel[]
 
-  @HasMany(() => ReferModel, 'refereeId')
+  @HasMany(() => ReferModel)
   public readonly myReferList?: ReferModel[]
 
-  @HasMany(() => ReferModel, 'refererId')
+  @HasMany(() => ReferModel)
   public readonly otherReferList?: ReferModel[]
 
   @HasMany(() => ResumeModel)

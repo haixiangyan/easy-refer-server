@@ -58,7 +58,8 @@ describe('JobsCtrlr', () => {
       expect(status).toEqual(200)
       expect(jobItem).toHaveProperty('referredCount')
       expect(jobItem).toHaveProperty('processedChart')
-      expect(jobItem.finishedChart).not.toBeNull()
+      expect(jobItem.processedChart).not.toBeNull()
+      expect(jobItem.referer).not.toBeNull()
     })
     it('不存在 Job', async () => {
       const {status, body} = await agent
