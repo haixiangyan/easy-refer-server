@@ -79,7 +79,7 @@ class RefersCtrlr {
       refererId: dbJob.refererId,
       status: 'processing',
       updatedOn: dayjs().toDate(),
-      expiration: dayjs().add(dbJob.expiration, 'day')
+      expiration: dayjs().add(dbJob.autoRejectDay, 'day')
     })
 
     return res.status(201).json(dbRefer)

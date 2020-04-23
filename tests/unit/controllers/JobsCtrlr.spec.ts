@@ -92,7 +92,7 @@ describe('JobsCtrlr', () => {
         company: 'google',
         requiredFields: ['name', 'email', 'phone', 'experience'],
         deadline: dayjs().add(10, 'month').toISOString(),
-        expiration: 5,
+        autoRejectDay: 5,
         referTotal: 100,
         source: ''
       }

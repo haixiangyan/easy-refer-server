@@ -24,7 +24,7 @@ class JobModel extends Model<JobModel> {
   public deadline!: Date
 
   @Column(DataTypes.INTEGER)
-  public expiration!: number
+  public autoRejectDay!: number
 
   @Column(DataTypes.INTEGER)
   public referTotal!: number
