@@ -3,11 +3,13 @@ import ResumeModel from '@/models/ResumeModel'
 import {v4 as uuidv4} from 'uuid'
 import {Request, RequestHandler, Response} from 'express'
 import {avatarMulter, resumeMulter} from '@/middlewares/multer'
+import {TGetResume} from '@/@types/resume'
+import {TGetAvatar} from '@/@types/users'
 
 class UploadCtrlr {
   public static uploadResume: RequestHandler = resumeMulter.single('file')
 
-  public static async createResume(req: Request, res: Response) {
+  public static async createResume(req: Request, res: Response<TGetResume>) {
     const {filename} = req.file
     const {userId} = req.user as TJWTUser
 
@@ -29,7 +31,7 @@ class UploadCtrlr {
 
   public static uploadAvatar: RequestHandler = avatarMulter.single('file')
 
-  public static async createAvatar(req: Request, res: Response) {
+  public static async createAvatar(req: Request, res: Response<TGetAvatar>) {
     const {filename} = req.file
     const {userId} = req.user as TJWTUser
 

@@ -51,7 +51,7 @@ class RefersCtrlr {
   public static async createRefer(req: Request, res: Response<TGetRefer>) {
     const {userId} = req.user as TJWTUser
     const {jobId} = req.params
-    const referForm = req.body
+    const referForm: ReferModel = req.body
 
     const dbJob = await JobModel.findByPk(jobId, {
       include: [{
@@ -89,14 +89,14 @@ class RefersCtrlr {
   public static async editRefer(req: Request, res: Response<TGetRefer>) {
     const {userId} = req.user as TJWTUser
     const {dbRefer} = res.locals
-    const patchReferForm = req.body
+    const referForm: ReferModel = req.body
 
     if (dbRefer.refereeId !== userId) {
       return res.status(403).json({message: '无权限访问该内推'})
     }
 
     await dbRefer.update({
-      ...patchReferForm,
+      ...referForm,
       updatedOn: dayjs().toDate()
     })
 

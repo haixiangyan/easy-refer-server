@@ -5,9 +5,10 @@ import dayjs from 'dayjs'
 import ResumeModel from '@/models/ResumeModel'
 import ReferModel from '@/models/ReferModel'
 import {Request, Response} from 'express'
+import {TGetFullUser, TGetUser, TUserInfo} from '@/@types/users'
 
 class UsersCtrlr {
-  public static async getUser(req: Request, res: Response) {
+  public static async getUser(req: Request, res: Response<TGetFullUser>) {
     const {userId} = req.user as TJWTUser
 
     const dbUser = await UserModel.findByPk(userId, {
@@ -30,7 +31,7 @@ class UsersCtrlr {
     const referRatio = await UsersCtrlr.getReferRatio(userId)
 
     const {jobList, resumeList, ...userInfo}: any = dbUser.toJSON()
-    const info: TUser = {...userInfo, ...referRatio}
+    const info: TUserInfo = {...userInfo, ...referRatio}
 
     return res.json({
       info,
@@ -39,9 +40,9 @@ class UsersCtrlr {
     })
   }
 
-  public static async editUser(req: Request, res: Response) {
+  public static async editUser(req: Request, res: Response<TGetUser>) {
     const {userId} = req.user as TJWTUser
-    const userForm: TUserForm = req.body
+    const userForm: UserModel = req.body
 
     const dbUser = await UserModel.findByPk(userId) as UserModel
 
