@@ -3,22 +3,27 @@ import {Strategy as LocalStrategy} from 'passport-local'
 import {Strategy as JWTStrategy, ExtractJwt} from 'passport-jwt'
 import UserModel from '../models/UserModel'
 import {parseEnv} from '@/utils/config'
+import bcrypt from 'bcrypt'
 
 parseEnv()
 
 passport.use(new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password'
-  }, async (email, password, cb) => {
+  }, async (email, password, callback) => {
     const dbUser = await UserModel.findOne({
       where: {email}
     })
 
-    if (!dbUser) return cb(null, false, {message: '用户不存在'})
+    if (!dbUser) {
+      return callback(null, false, {message: '用户不存在'})
+    }
 
-    if (dbUser.password !== password) return cb(null, false, {message: '密码不正确'})
+    if (!bcrypt.compareSync(password, dbUser.password)) {
+      return callback(null, false, {message: '密码不正确'})
+    }
 
-    cb(null, dbUser.toJSON(), {message: '登录成功'})
+    callback(null, dbUser.toJSON(), {message: '登录成功'})
   }
 ))
 

@@ -21,8 +21,8 @@ describe('AuthCtrlr', () => {
 
   describe('login', () => {
     const loginForm = {
-      email: user1.email,
-      password: user1.password
+      email: 'user1@mail.com',
+      password: '123456'
     }
     it('成功登录', async () => {
       const response = await agent

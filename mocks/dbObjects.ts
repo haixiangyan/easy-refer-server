@@ -4,11 +4,12 @@ import UserModel from '@/models/UserModel'
 import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
+import {encryptPassword} from '@/utils/auth'
 
 export const users = [
   {
     userId: 'user-1',
-    password: '123456',
+    password: encryptPassword('123456'),
     email: 'user1@mail.com',
     experience: 2,
     name: '张三',
@@ -21,7 +22,7 @@ export const users = [
   },
   {
     userId: 'user-2',
-    password: '234567',
+    password: encryptPassword('123456'),
     email: 'user2@mail.com',
     experience: 2,
     name: '李四',
@@ -34,7 +35,7 @@ export const users = [
   },
   {
     userId: 'user-3',
-    password: '234567',
+    password: encryptPassword('123456'),
     email: 'user3@mail.com',
     experience: 2,
     name: '王五',
