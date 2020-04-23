@@ -1,4 +1,5 @@
 import {Request, Response} from 'express'
+import {TGetJob, TGetJobItem, TGetJobItemList, TJobItem} from '@/@types/jobs'
 import JobModel from '../models/JobModel'
 import {col, fn, Op} from 'sequelize'
 import dayjs from 'dayjs'
@@ -8,7 +9,7 @@ import {extractField} from '@/utils/tool'
 import {v4 as uuidv4} from 'uuid'
 
 class JobsCtrlr {
-  public static async getJobItemList(req: Request, res: Response) {
+  public static async getJobItemList(req: Request, res: Response<TGetJobItemList>) {
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
 
@@ -21,7 +22,7 @@ class JobsCtrlr {
     res.json({jobItemList, total})
   }
 
-  public static async getJobItem(req: Request, res: Response) {
+  public static async getJobItem(req: Request, res: Response<TGetJobItem>) {
     const {jobId} = req.params
     const {count, jobItemList} = await JobsCtrlr.parseJobItemList(1, 1, jobId)
 
@@ -32,7 +33,7 @@ class JobsCtrlr {
     res.json(jobItemList[0])
   }
 
-  public static async getJob(req: Request, res: Response) {
+  public static async getJob(req: Request, res: Response<TGetJob>) {
     const {jobId} = req.params
 
     const dbJob = await JobModel.findOne({
@@ -49,9 +50,9 @@ class JobsCtrlr {
     res.json(dbJob)
   }
 
-  public static async createJob(req: Request, res: Response) {
+  public static async createJob(req: Request, res: Response<TGetJob>) {
     const {userId} = req.user as TJWTUser
-    const jobForm: TJobForm = req.body
+    const jobForm: JobModel = req.body
 
     // deadline 在今天之前
     if (dayjs(jobForm.deadline).isBefore(dayjs())) {
@@ -78,10 +79,10 @@ class JobsCtrlr {
     return res.status(201).json(dbJob)
   }
 
-  public static async editJob(req: Request, res: Response) {
+  public static async editJob(req: Request, res: Response<TGetJob>) {
     const {userId} = req.user as TJWTUser
     const {jobId} = req.params
-    const jobForm: TJobForm = req.body
+    const jobForm: JobModel = req.body
 
     const dbJob = await JobModel.findByPk(jobId, {
       include: [{model: UserModel, as: 'referer'}]
@@ -152,16 +153,15 @@ class JobsCtrlr {
     const chartItemObject = extractField(dbChartItemList.map(i => i.toJSON()), 'jobId')
 
     // 将图表 Item 放入 JobItem 中
-    const jobItemList = dbJobItemList.map(dbJobItem => {
+    const jobItemList: TJobItem[] = dbJobItemList.map(dbJobItem => {
       const {jobId} = dbJobItem
       const countItem = dbReferredCount.find(i => i.jobId === jobId)
-      const referredCount = countItem ? (countItem.toJSON() as any).referredCount : 0
+      const referredCount: number = countItem ? (countItem.toJSON() as any).referredCount : 0
 
-      return {
-        ...dbJobItem.toJSON(),
+      return Object.assign({}, dbJobItem.toJSON() as TJobItem, {
         referredCount,
         processedChart: dbJobItem.jobId in chartItemObject ? chartItemObject[dbJobItem.jobId] : [],
-      }
+      })
     })
 
     return {count, jobItemList}
