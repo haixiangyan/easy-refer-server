@@ -1,4 +1,5 @@
 import {Request, Response} from 'express'
+import {TGetRefer, TGetReferList} from '@/@types/refers'
 import ReferModel from '../models/ReferModel'
 import ResumeModel from '../models/ResumeModel'
 import JobModel from '../models/JobModel'
@@ -8,7 +9,7 @@ import {v4 as uuidv4} from 'uuid'
 import dayjs from 'dayjs'
 
 class RefersCtrlr {
-  public static async getReferList(req: Request, res: Response) {
+  public static async getReferList(req: Request, res: Response<TGetReferList>) {
     const {userId} = req.user as TJWTUser
     const {roleId} = res.locals
     const page = parseInt(req.query.page as string)
@@ -33,7 +34,7 @@ class RefersCtrlr {
     return res.json({referList: referList, total})
   }
 
-  public static async getRefer(req: Request, res: Response) {
+  public static async getRefer(req: Request, res: Response<TGetRefer>) {
     const {userId} = req.user as TJWTUser
     const {dbRefer} = res.locals
 
@@ -47,7 +48,7 @@ class RefersCtrlr {
     return res.json(dbRefer)
   }
 
-  public static async createRefer(req: Request, res: Response) {
+  public static async createRefer(req: Request, res: Response<TGetRefer>) {
     const {userId} = req.user as TJWTUser
     const {jobId} = req.params
     const referForm = req.body
@@ -85,7 +86,7 @@ class RefersCtrlr {
     return res.status(201).json(dbRefer)
   }
 
-  public static async editRefer(req: Request, res: Response) {
+  public static async editRefer(req: Request, res: Response<TGetRefer>) {
     const {userId} = req.user as TJWTUser
     const {dbRefer} = res.locals
     const patchReferForm = req.body
