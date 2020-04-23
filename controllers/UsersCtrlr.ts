@@ -27,27 +27,10 @@ class UsersCtrlr {
     }) as UserModel
 
     // 统计已处理自己的 refer
-    const myReferTotal = await ReferModel.count({
-      where: {refereeId: userId}
-    })
-    const processedMyReferCount = await ReferModel.count({
-      where: {refereeId: userId, status: 'approved'}
-    })
-    const otherReferTotal = await ReferModel.count({
-      where: {refererId: userId}
-    })
-    const processedOtherReferCount = await ReferModel.count({
-      where: {refererId: userId, status: 'approved'}
-    })
+    const referRatio = await UsersCtrlr.getReferRatio(userId)
 
     const {jobList, resumeList, ...userInfo}: any = dbUser.toJSON()
-    const info: TUser = {
-      ...userInfo,
-      myReferTotal,
-      processedMyReferCount,
-      otherReferTotal,
-      processedOtherReferCount
-    }
+    const info: TUser = {...userInfo, ...referRatio}
 
     res.json({
       info,
@@ -65,6 +48,29 @@ class UsersCtrlr {
     await dbUser.update(userForm)
 
     res.json(dbUser)
+  }
+
+  private static async getReferRatio(userId: string) {
+    // 统计已处理自己的 refer
+    const myReferTotal = await ReferModel.count({
+      where: {refereeId: userId}
+    })
+    const processedMyReferCount = await ReferModel.count({
+      where: {refereeId: userId, status: {[Op.ne]: 'processing'}}
+    })
+    const otherReferTotal = await ReferModel.count({
+      where: {refererId: userId}
+    })
+    const processedOtherReferCount = await ReferModel.count({
+      where: {refererId: userId, status: {[Op.ne]: 'processing'}}
+    })
+
+    return {
+      myReferTotal,
+      processedMyReferCount,
+      otherReferTotal,
+      processedOtherReferCount
+    }
   }
 }
 
