@@ -5,8 +5,10 @@ import dayjs from 'dayjs'
 import ResumeModel from '@/models/ResumeModel'
 import ReferModel from '@/models/ReferModel'
 import {Request, Response} from 'express'
-import {TGetFullUser, TGetUser, TUserInfo} from '@/@types/users'
+import {TGetAvatar, TGetFullUser, TGetUser, TUserInfo} from '@/@types/users'
 import JobsCtrlr from '@/controllers/JobsCtrlr'
+import {TGetResume} from '@/@types/resume'
+import {v4 as uuidv4} from 'uuid'
 
 class UsersCtrlr {
   public static async getUser(req: Request, res: Response<TGetFullUser>) {
@@ -81,6 +83,39 @@ class UsersCtrlr {
       otherReferTotal,
       processedOtherReferCount
     }
+  }
+
+  public static async createResume(req: Request, res: Response<TGetResume>) {
+    const {filename} = req.file
+    const {userId} = req.user as TJWTUser
+
+    const dbUser = await UserModel.findByPk(userId)
+
+    if (!dbUser) {
+      return res.status(404).json({message: '该用户不存在'})
+    }
+
+    const dbResume = await ResumeModel.create({
+      resumeId: uuidv4(),
+      url: `${req.protocol}://${req.hostname}:4000/${userId}/resumes/${filename}`,
+      name: filename,
+      refereeId: userId
+    })
+
+    return res.status(201).json(dbResume)
+  }
+
+  public static async createAvatar(req: Request, res: Response<TGetAvatar>) {
+    const {filename} = req.file
+    const {userId} = req.user as TJWTUser
+
+    const dbUser = await UserModel.findByPk(userId) as UserModel
+
+    dbUser.avatarUrl = `${req.protocol}://${req.hostname}:4000/${userId}/avatar/${filename}`
+
+    await dbUser.save()
+
+    return res.status(201).json({avatarUrl: dbUser.avatarUrl})
   }
 }
 
