@@ -13,7 +13,7 @@ import ResumesRouter from '@/routes/resumes'
 import UploadRouter from '@/routes/upload'
 import UsersRouter from '@/routes/users'
 // 中间件
-import jwtMW from '@/middleware/passport-jwt'
+import jwtMW from '@/middlewares/passport-jwt'
 
 const app = express()
 

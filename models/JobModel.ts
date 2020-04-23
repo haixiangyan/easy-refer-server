@@ -6,6 +6,7 @@ import ReferModel from '@/models/ReferModel'
 @Table({tableName: 'jobs'})
 class JobModel extends Model<JobModel> {
   [key: string]: any
+
   // 字段
   @Unique
   @AllowNull(false)
@@ -16,14 +17,14 @@ class JobModel extends Model<JobModel> {
   @Column(DataTypes.STRING)
   public company!: string
 
-  @Column(DataTypes.STRING)
+  @Column(DataTypes.JSON)
   public requiredFields!: string
 
   @Column(DataTypes.DATE)
   public deadline!: Date
 
   @Column(DataTypes.INTEGER)
-  public expiration!: number
+  public autoRejectDay!: number
 
   @Column(DataTypes.INTEGER)
   public referTotal!: number

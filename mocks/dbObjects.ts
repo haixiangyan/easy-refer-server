@@ -4,11 +4,12 @@ import UserModel from '@/models/UserModel'
 import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
+import {encryptPassword} from '@/utils/auth'
 
 export const users = [
   {
     userId: 'user-1',
-    password: '123456',
+    password: encryptPassword('123456'),
     email: 'user1@mail.com',
     experience: 2,
     name: '张三',
@@ -21,7 +22,7 @@ export const users = [
   },
   {
     userId: 'user-2',
-    password: '234567',
+    password: encryptPassword('123456'),
     email: 'user2@mail.com',
     experience: 2,
     name: '李四',
@@ -34,7 +35,7 @@ export const users = [
   },
   {
     userId: 'user-3',
-    password: '234567',
+    password: encryptPassword('123456'),
     email: 'user3@mail.com',
     experience: 2,
     name: '王五',
@@ -49,9 +50,19 @@ export const users = [
 
 export const jobs = [
   {
+    jobId: 'expired-job-1',
+    company: 'Expired Google',
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
+    deadline: dayjs().subtract(3, 'month'),
+    expiration: 5,
+    referTotal: 400,
+    source: 'https://www.1point3acres.com/bbs/',
+    refererId: 'user-1'
+  },
+  {
     jobId: 'job-1',
     company: 'Google',
-    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'].join(','),
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().add(3, 'month'),
     expiration: 5,
     referTotal: 400,
@@ -61,7 +72,7 @@ export const jobs = [
   {
     jobId: 'job-2',
     company: 'Facebook',
-    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'].join(','),
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().add(3, 'month'),
     expiration: 3,
     referTotal: 300,
@@ -86,7 +97,8 @@ export const refers = [
     resumeId: 'resume-2',
     jobId: 'job-1',
     refererId: 'user-1',
-    refereeId: 'user-2'
+    refereeId: 'user-2',
+    expiration: dayjs().add(5, 'day')
   },
   {
     referId: 'refer-3',
@@ -103,7 +115,8 @@ export const refers = [
     resumeId: 'resume-3',
     jobId: 'job-1',
     refererId: 'user-1',
-    refereeId: 'user-3'
+    refereeId: 'user-3',
+    expiration: dayjs().add(5, 'day')
   }
 ]
 

@@ -14,6 +14,7 @@ import {
 import ResumeModel from '@/models/ResumeModel'
 import JobModel from '@/models/JobModel'
 import UserModel from '@/models/UserModel'
+import {TExperience, TStatus} from '@/@types/refers'
 
 @Table({tableName: 'refers'})
 class ReferModel extends Model<ReferModel> {
@@ -35,7 +36,7 @@ class ReferModel extends Model<ReferModel> {
   public phone!: string | null
 
   @Column(DataTypes.INTEGER)
-  public experience!: number | null
+  public experience!: TExperience | null
 
   @Column(DataTypes.TEXT)
   public intro!: string | null
@@ -50,11 +51,14 @@ class ReferModel extends Model<ReferModel> {
   public referLinks!: string | null
 
   @Column(DataTypes.STRING)
-  public status!: string | null
+  public status!: TStatus | null
 
   @Default(new Date())
   @Column(DataTypes.DATEONLY)
-  public updatedOn!: Date | null
+  public updatedOn!: Date
+
+  @Column(DataTypes.DATEONLY)
+  public expiration!: Date
 
   // 外键
   @ForeignKey(() => ResumeModel)

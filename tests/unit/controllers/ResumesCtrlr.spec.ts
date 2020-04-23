@@ -8,17 +8,19 @@ import {resumes} from '../../../mocks/dbObjects'
 const resumeRoute = '/api/resumes'
 const [resume2] = resumes
 
-describe('/resumes', () => {
+const agent = request(app)
+
+describe('ResumesCtrlr', () => {
   beforeAll(async () => {
     await db.sync({force: true})
     await initMockDB()
   })
   afterAll(async () => await db.close())
 
-  describe('get /:resumeId', () => {
+  describe('getResume', () => {
     it('成功获取 resume-2 简历', async () => {
       const jwtToken = generateJWT('user-1')
-      const {status, body: responseResume} = await request(app)
+      const {status, body: responseResume} = await agent
         .get(`${resumeRoute}/resume-2`)
         .set('Authorization', jwtToken)
 
@@ -31,7 +33,7 @@ describe('/resumes', () => {
 
     it('找不到 resume-99 简历', async () => {
       const jwtToken = generateJWT('user-1')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(`${resumeRoute}/resume-99`)
         .set('Authorization', jwtToken)
 
@@ -43,7 +45,7 @@ describe('/resumes', () => {
 
     it('user-3 无法访问 user-2 的简历', async () => {
       const jwtToken = generateJWT('user-3')
-      const {status, body} = await request(app)
+      const {status, body} = await agent
         .get(`${resumeRoute}/resume-2`)
         .set('Authorization', jwtToken)
 

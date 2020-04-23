@@ -1,16 +1,5 @@
 import {DataTypes} from 'sequelize'
-import {
-  AllowNull,
-  Column,
-  Default,
-  HasMany,
-  HasOne,
-  PrimaryKey,
-  Table,
-  Unique,
-  Model,
-  ForeignKey
-} from 'sequelize-typescript'
+import {AllowNull, Column, Default, HasMany, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
 import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
@@ -61,18 +50,14 @@ class UserModel extends Model<UserModel> {
   @Column(DataTypes.STRING)
   public avatarUrl!: string
 
-  // 外键
-  @ForeignKey(() => JobModel)
-  public jobId!: string | null
-
   // 关系
-  @HasOne(() => JobModel)
-  public readonly job?: JobModel
+  @HasMany(() => JobModel)
+  public readonly jobList?: JobModel[]
 
-  @HasMany(() => ReferModel, 'refereeId')
+  @HasMany(() => ReferModel)
   public readonly myReferList?: ReferModel[]
 
-  @HasMany(() => ReferModel, 'refererId')
+  @HasMany(() => ReferModel)
   public readonly otherReferList?: ReferModel[]
 
   @HasMany(() => ResumeModel)
