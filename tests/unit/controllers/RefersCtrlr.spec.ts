@@ -44,14 +44,22 @@ describe('RefersCtrlr', () => {
       expect(total).toEqual(2)
       expect(referList.length).toEqual(2)
     })
-    it('缺少参数', async () => {
+    it('参数不正确', async () => {
       const jwtToken = generateJWT('user-1')
       const {status, body} = await agent
         .get(refersRoute)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(422)
-      expect(body.message).toEqual('缺少参数')
+      expect(body.message).toEqual('参数不正确')
+
+      const {status: status2, body: body2} = await agent
+        .get(refersRoute)
+        .query({page: -1, limit: 4})
+        .set('Authorization', jwtToken)
+
+      expect(status2).toEqual(422)
+      expect(body2.message).toEqual('参数不正确')
     })
   })
 

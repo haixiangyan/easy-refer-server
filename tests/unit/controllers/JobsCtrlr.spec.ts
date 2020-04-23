@@ -39,7 +39,14 @@ describe('JobsCtrlr', () => {
         .get(jobItemListRoute)
 
       expect(status).toEqual(422)
-      expect(body.message).toEqual('缺少参数')
+      expect(body.message).toEqual('参数不正确')
+
+      const {status: status2, body: body2} = await agent
+        .get(jobItemListRoute)
+        .query({page: -1, limit: 4})
+
+      expect(status2).toEqual(422)
+      expect(body2.message).toEqual('参数不正确')
     })
   })
 

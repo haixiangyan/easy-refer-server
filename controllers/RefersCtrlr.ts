@@ -15,8 +15,8 @@ class RefersCtrlr {
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
 
-    if (Number.isNaN(page) || Number.isNaN(limit)) {
-      return res.status(422).json({message: '缺少参数'})
+    if (Number.isNaN(page) || Number.isNaN(limit) || page < 0 || limit < 1) {
+      return res.status(422).json({message: '参数不正确'})
     }
 
     const {count: total, rows: referList} = await ReferModel.findAndCountAll({
