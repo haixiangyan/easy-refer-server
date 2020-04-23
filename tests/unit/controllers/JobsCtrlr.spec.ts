@@ -23,15 +23,15 @@ describe('JobsCtrlr', () => {
         .get(jobListRoute)
         .query({page: 1, limit: 10})
 
-      const {jobItemList, total} = body
+      const {jobList, total} = body
 
       expect(status).toEqual(200)
-      expect(jobItemList.length).toBeLessThanOrEqual(10)
+      expect(jobList.length).toBeLessThanOrEqual(10)
       expect(total).toEqual(2)
 
-      expect(jobItemList[0]).toHaveProperty('referredCount')
-      expect(jobItemList[0]).toHaveProperty('processedChart')
-      expect(jobItemList[0].finishedChart).not.toBeNull()
+      expect(jobList[0]).toHaveProperty('referredCount')
+      expect(jobList[0]).toHaveProperty('processedChart')
+      expect(jobList[0].finishedChart).not.toBeNull()
     })
     it('传错 page 和 limit 参数', async () => {
       const {status, body} = await agent

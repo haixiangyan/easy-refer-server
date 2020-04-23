@@ -1,10 +1,10 @@
 import UserModel from '@/models/UserModel'
 import ResumeModel from '@/models/ResumeModel'
-import {TJobItem} from '@/@types/jobs'
+import {TFullJob} from '@/@types/jobs'
 
 type TUser = {
   info: TUserInfo
-  job: TJobItem | null
+  job: TFullJob | null
   resume: ResumeModel | null
 }
 

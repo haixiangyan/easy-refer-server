@@ -31,15 +31,15 @@ class UsersCtrlr {
     // 统计已处理自己的 refer
     const referRatio = await UsersCtrlr.getReferRatio(userId)
 
-    const {jobList, resumeList, ...userInfo}: any = dbUser.toJSON()
+    const {jobList: userJobList, resumeList, ...userInfo}: any = dbUser.toJSON()
 
     // 获取 userInfo
     const info: TUserInfo = {...userInfo, ...referRatio}
     // 获取 JobItem
     let job = null
-    if (jobList.length > 0) {
-      const {count, jobItemList} = await JobsCtrlr.parseJobItemList(1, 1, jobList[0].jobId)
-      job = count > 0 ? jobItemList[0] : null
+    if (userJobList.length > 0) {
+      const {count, jobList} = await JobsCtrlr.parseJobList(1, 1, userJobList[0].jobId)
+      job = count > 0 ? jobList[0] : null
     }
 
     return res.json({
