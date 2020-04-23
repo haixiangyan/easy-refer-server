@@ -1,9 +1,10 @@
 import {Request, Response} from 'express'
 import ResumeModel from '@/models/ResumeModel'
 import ReferModel from '@/models/ReferModel'
+import {TGetResume} from '@/@types/resume'
 
 class ResumesCtrlr {
-  public static async getResume(req: Request, res: Response) {
+  public static async getResume(req: Request, res: Response<TGetResume>) {
     const {userId} = req.user as TJWTUser
     const {resumeId} = req.params
 
