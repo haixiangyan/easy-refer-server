@@ -21,19 +21,13 @@ class UsersCtrlr {
         limit: 1,
         order: [['createdAt', 'DESC']],
         where: {deadline: {[Op.gte]: dayjs().toDate()}}
-      },
-        {
-          model: ResumeModel,
-          as: 'resumeList',
-          limit: 1,
-          order: [['createdAt', 'DESC']]
-        }],
+      }],
     }) as UserModel
 
     // 统计已处理自己的 refer
     const referRatio = await UsersCtrlr.getReferRatio(userId)
 
-    const {jobList: userJobList, resumeList, ...userInfo}: any = dbUser.toJSON()
+    const {jobList: userJobList, ...userInfo}: any = dbUser.toJSON()
 
     // 获取 userInfo
     const info: TUserInfo = {...userInfo, ...referRatio}
@@ -44,11 +38,7 @@ class UsersCtrlr {
       job = count > 0 ? jobList[0] : null
     }
 
-    return res.json({
-      info,
-      job,
-      resume: resumeList.length > 0 ? resumeList[0] : null,
-    })
+    return res.json({info, job})
   }
 
   public static async editUser(req: Request, res: Response<TGetUser>) {
