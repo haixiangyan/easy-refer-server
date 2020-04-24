@@ -63,11 +63,6 @@ describe('UsersCtrlr', () => {
 
       expect(job.jobId).toEqual('job-1')
       expect(dayjs(job.deadline).isAfter(dayjs())).toBe(true)
-
-      expect(info.myReferTotal).toEqual(0)
-      expect(info.processedMyReferCount).toEqual(0)
-      expect(info.otherReferTotal).toEqual(2)
-      expect(info.processedOtherReferCount).toEqual(1)
     })
     it ('成功获取 user-2', async () => {
       const jwtToken = generateJWT(user2.userId)
@@ -81,11 +76,6 @@ describe('UsersCtrlr', () => {
 
       expect(job).not.toBeNull()
       expect(dayjs(job.deadline).isAfter(dayjs())).toBe(true)
-
-      expect(info.myReferTotal).toEqual(1)
-      expect(info.processedMyReferCount).toEqual(0)
-      expect(info.otherReferTotal).toEqual(0)
-      expect(info.processedOtherReferCount).toEqual(0)
     })
     it('没有 token 不能获取 user-1', async () => {
       const {status, body, text} = await agent
