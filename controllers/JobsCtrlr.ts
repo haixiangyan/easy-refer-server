@@ -113,7 +113,7 @@ class JobsCtrlr {
       ],
       where: {
         jobId: {[Op.in]: jobIds},
-        status: {[Op.not]: 'approved'}, // 已经 approve 的数据
+        status: {[Op.not]: 'referred'}, // 已经 approve 的数据
       },
       group: ['jobId']
     })

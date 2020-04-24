@@ -27,7 +27,7 @@ class RefersCtrlr {
         {model: UserModel, as: 'referer'},
         {model: UserModel, as: 'referee'}
       ],
-      where: {[roleId]: userId}
+      where: {[roleId]: userId, status: 'processing'}
     })
 
     return res.json({referList: referList, total})

@@ -43,8 +43,8 @@ describe('RefersCtrlr', () => {
       expect(status).toEqual(200)
 
       const {total, referList} = body
-      expect(total).toEqual(2)
-      expect(referList.length).toEqual(2)
+      expect(total).toEqual(1)
+      expect(referList.length).toEqual(1)
     })
     it('参数不正确', async () => {
       const jwtToken = generateJWT(user1.userId)
@@ -155,7 +155,7 @@ describe('RefersCtrlr', () => {
       expect(body.message).toEqual('你已申请该内推职位或这是你创建的内推职位')
     })
     it('不存用户申请内推', async () => {
-      const {status, body} = await agent
+      const {status} = await agent
         .post(`${refersRoute}/job-1`)
         .send({email: 'user99@mail.com'})
 

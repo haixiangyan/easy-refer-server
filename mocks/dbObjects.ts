@@ -54,7 +54,7 @@ export const jobs = [
     company: 'Expired Google',
     requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().subtract(3, 'month'),
-    expiration: 5,
+    autoRejectDay: 5,
     referTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
     refererId: 'user1@mail.com'
@@ -64,7 +64,7 @@ export const jobs = [
     company: 'Google',
     requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().add(3, 'month'),
-    expiration: 5,
+    autoRejectDay: 5,
     referTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
     refererId: 'user1@mail.com'
@@ -74,7 +74,7 @@ export const jobs = [
     company: 'Facebook',
     requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().add(3, 'month'),
-    expiration: 3,
+    autoRejectDay: 3,
     referTotal: 300,
     source: 'https://www.1point3acres.com/bbs/',
     refererId: 'user2@mail.com'
@@ -110,7 +110,7 @@ export const refers = [
     leetCodeUrl: 'https://leetcode.com',
     thirdPersonIntro: '这是王五，很完美的第三人称介绍',
     referLinks: 'http://google.com',
-    status: 'approved',
+    status: 'referred',
     updatedOn: dayjs().subtract(20, 'day'),
     resumeId: 'resume-3',
     jobId: 'job-1',
