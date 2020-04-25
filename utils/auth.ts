@@ -26,9 +26,16 @@ export const encryptPassword = (plainTextPassword: string) => {
   return bcrypt.hashSync(plainTextPassword, parseInt(SALT_ROUNDS))
 }
 
-// 使用 uuid v5 来创建 userId
 export const generateUserId = (email: string) => {
-  if (!process.env.USER_ID_NAMESPACE) throw new Error('环境变量 USER_ID_NAMESPACE 不存在')
+  if (!process.env.USER_NAMESPACE) throw new Error('环境变量 USER_NAMESPACE 不存在')
 
-  return uuidv5(email, process.env.USER_ID_NAMESPACE as string)
+  return uuidv5(email, process.env.USER_NAMESPACE)
+}
+
+export const generateJobId = (refererId: string, timestamp: number) => {
+  if (!process.env.JOB_NAMESPACE) throw new Error('环境变量 JOB_NAMESPACE 不存在')
+
+  const raw = `${refererId}-${timestamp}`
+
+  return uuidv5(raw, process.env.JOB_NAMESPACE)
 }

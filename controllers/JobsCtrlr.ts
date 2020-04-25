@@ -6,8 +6,8 @@ import dayjs from 'dayjs'
 import UserModel from '../models/UserModel'
 import ReferModel from '../models/ReferModel'
 import {extractField} from '@/utils/tool'
-import {v4 as uuidv4} from 'uuid'
 import {DATE_FORMAT} from '@/constants/format'
+import {generateJobId} from '@/utils/auth'
 
 class JobsCtrlr {
   public static async getJobList(req: Request, res: Response<TGetFullJobList>) {
@@ -56,7 +56,7 @@ class JobsCtrlr {
 
     const dbJob = await JobModel.create({
       ...jobForm,
-      jobId: uuidv4(),
+      jobId: generateJobId(userId, new Date().getTime()),
       refererId: userId
     })
 
