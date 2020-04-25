@@ -47,7 +47,6 @@ describe('UsersCtrlr', () => {
       expect(body.avatarUrl).toEqual(userForm.avatarUrl)
 
       expect(body.job).toBeUndefined()
-      expect(body.resume).toBeUndefined()
     })
   })
 
@@ -57,40 +56,26 @@ describe('UsersCtrlr', () => {
       const {body} = await agent
         .get(userRoute)
         .set('Authorization', jwtToken)
-      const {info, job, resume} = body
+      const {info, job} = body
 
       expect(info.userId).toEqual(user1.userId)
       expect(info.email).toEqual(user1.email)
 
       expect(job.jobId).toEqual('job-1')
       expect(dayjs(job.deadline).isAfter(dayjs())).toBe(true)
-
-      expect(resume).toBeNull()
-
-      expect(info.myReferTotal).toEqual(0)
-      expect(info.processedMyReferCount).toEqual(0)
-      expect(info.otherReferTotal).toEqual(2)
-      expect(info.processedOtherReferCount).toEqual(1)
     })
     it ('成功获取 user-2', async () => {
       const jwtToken = generateJWT(user2.userId)
       const {body} = await agent
         .get(userRoute)
         .set('Authorization', jwtToken)
-      const {info, job, resume} = body
+      const {info, job} = body
 
       expect(info.userId).toEqual(user2.userId)
       expect(info.email).toEqual(user2.email)
 
       expect(job).not.toBeNull()
       expect(dayjs(job.deadline).isAfter(dayjs())).toBe(true)
-
-      expect(resume).not.toBeNull()
-
-      expect(info.myReferTotal).toEqual(1)
-      expect(info.processedMyReferCount).toEqual(0)
-      expect(info.otherReferTotal).toEqual(0)
-      expect(info.processedOtherReferCount).toEqual(0)
     })
     it('没有 token 不能获取 user-1', async () => {
       const {status, body, text} = await agent
