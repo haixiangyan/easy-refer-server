@@ -7,7 +7,7 @@ import {Request, Response} from 'express'
 import {TGetAvatar, TGetFullUser, TGetUser} from '@/@types/users'
 import JobsCtrlr from '@/controllers/JobsCtrlr'
 import {TGetResume} from '@/@types/resume'
-import {v4 as uuidv4} from 'uuid'
+import {generateResumeId} from '@/utils/auth'
 
 class UsersCtrlr {
   public static async getUser(req: Request, res: Response<TGetFullUser>) {
@@ -56,9 +56,11 @@ class UsersCtrlr {
       return res.status(404).json({message: '该用户不存在'})
     }
 
+    const url = `${req.protocol}://${req.hostname}:4000/${userId}/resumes/${filename}`
+
     const dbResume = await ResumeModel.create({
-      resumeId: uuidv4(),
-      url: `${req.protocol}://${req.hostname}:4000/${userId}/resumes/${filename}`,
+      resumeId: generateResumeId(userId, url),
+      url,
       name: filename,
       refereeId: userId
     })

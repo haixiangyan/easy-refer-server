@@ -32,6 +32,14 @@ export const generateUserId = (email: string) => {
   return uuidv5(email, process.env.USER_NAMESPACE)
 }
 
+export const generateResumeId = (userId: string, url: string) => {
+  if (!process.env.USER_NAMESPACE) throw new Error('环境变量 USER_NAMESPACE 不存在')
+
+  const raw = `${userId}-resume-${url}`
+
+  return uuidv5(raw, process.env.USER_NAMESPACE)
+}
+
 export const generateJobId = (refererId: string, timestamp: number) => {
   if (!process.env.JOB_NAMESPACE) throw new Error('环境变量 JOB_NAMESPACE 不存在')
 
