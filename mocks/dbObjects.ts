@@ -5,6 +5,9 @@ import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
 import {encryptPassword} from '@/utils/auth'
+import {parseEnv} from '@/utils/config'
+
+parseEnv()
 
 export const users = [
   {
@@ -48,6 +51,8 @@ export const users = [
   }
 ]
 
+const [user1, user2, user3] = users
+
 export const jobs = [
   {
     jobId: 'expired-job-1',
@@ -57,7 +62,7 @@ export const jobs = [
     autoRejectDay: 5,
     referTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
-    refererId: 'user1@mail.com'
+    refererId: user1.userId
   },
   {
     jobId: 'job-1',
@@ -67,7 +72,7 @@ export const jobs = [
     autoRejectDay: 5,
     referTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
-    refererId: 'user1@mail.com'
+    refererId: user1.userId
   },
   {
     jobId: 'job-2',
@@ -77,9 +82,51 @@ export const jobs = [
     autoRejectDay: 3,
     referTotal: 300,
     source: 'https://www.1point3acres.com/bbs/',
-    refererId: 'user2@mail.com'
+    refererId: user2.userId
   }
 ]
+
+const [expiredJob1, job1, job2] = jobs
+
+export const resumes = [
+  {
+    resumeId: 'resume-2',
+    name: '李四的简历.pdf',
+    url: 'https://user-2.pdf',
+    refereeId: user2.userId,
+    referId: null
+  },
+  {
+    resumeId: 'resume-21',
+    name: '李四的简历.pdf',
+    url: 'https://user-2.pdf',
+    refereeId: user2.userId,
+    referId: null
+  },
+  {
+    resumeId: 'resume-22',
+    name: '李四的简历.pdf',
+    url: 'https://user-2.pdf',
+    refereeId: user2.userId,
+    referId: null
+  },
+  {
+    resumeId: 'resume-23',
+    name: '李四的简历.pdf',
+    url: 'https://user-2.pdf',
+    refereeId: user2.userId,
+    referId: null
+  },
+  {
+    resumeId: 'resume-3',
+    name: '李四的简历.pdf',
+    url: 'https://user-3.pdf',
+    refereeId: user3.userId,
+    referId: null
+  },
+]
+
+const [resume2, resume21, resume22, resume23, resume3] = resumes
 
 export const refers = [
   {
@@ -94,10 +141,10 @@ export const refers = [
     referLinks: 'http://google.com',
     status: 'processing',
     updatedOn: dayjs().subtract(20, 'day').subtract(10, 'minute'),
-    resumeId: 'resume-2',
-    jobId: 'job-1',
-    refererId: 'user1@mail.com',
-    refereeId: 'user2@mail.com',
+    resumeId: resume2.resumeId,
+    jobId: job1.jobId,
+    refererId: user1.userId,
+    refereeId: user2.userId,
     expiration: dayjs().add(5, 'day')
   },
   {
@@ -112,50 +159,12 @@ export const refers = [
     referLinks: 'http://google.com',
     status: 'referred',
     updatedOn: dayjs().subtract(20, 'day'),
-    resumeId: 'resume-3',
-    jobId: 'job-1',
-    refererId: 'user1@mail.com',
-    refereeId: 'user3@mail.com',
+    resumeId: resume3.resumeId,
+    jobId: job1.jobId,
+    refererId: user1.userId,
+    refereeId: user3.userId,
     expiration: dayjs().add(5, 'day')
   }
-]
-
-export const resumes = [
-  {
-    resumeId: 'resume-2',
-    name: '李四的简历.pdf',
-    url: 'https://user-2.pdf',
-    refereeId: 'user2@mail.com',
-    referId: null
-  },
-  {
-    resumeId: 'resume-21',
-    name: '李四的简历.pdf',
-    url: 'https://user-2.pdf',
-    refereeId: 'user2@mail.com',
-    referId: null
-  },
-  {
-    resumeId: 'resume-22',
-    name: '李四的简历.pdf',
-    url: 'https://user-2.pdf',
-    refereeId: 'user2@mail.com',
-    referId: null
-  },
-  {
-    resumeId: 'resume-23',
-    name: '李四的简历.pdf',
-    url: 'https://user-2.pdf',
-    refereeId: 'user2@mail.com',
-    referId: null
-  },
-  {
-    resumeId: 'resume-3',
-    name: '李四的简历.pdf',
-    url: 'https://user-3.pdf',
-    refereeId: 'user3@mail.com',
-    referId: null
-  },
 ]
 
 export const initMockDB = async () => {

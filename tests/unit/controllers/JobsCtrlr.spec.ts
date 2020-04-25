@@ -105,11 +105,19 @@ describe('JobsCtrlr', () => {
       await JobModel.destroy({where: {jobId: job!.jobId}})
     })
     it('已经创建过 Job', async () => {
+      const jobForm = {
+        company: 'google',
+        requiredFields: ['name', 'email', 'phone', 'experience'],
+        deadline: dayjs().add(10, 'month').toISOString(),
+        autoRejectDay: 5,
+        referTotal: 100,
+        source: ''
+      }
       const jwtToken = generateJWT(user1.userId)
 
       const {status, body} = await agent
         .post(jobListRoute)
-        .send({})
+        .send(jobForm)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(409)

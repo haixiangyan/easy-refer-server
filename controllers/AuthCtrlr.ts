@@ -1,8 +1,11 @@
 import passport from '../plugins/passport'
-import {encryptPassword, generateJWT} from '@/utils/auth'
+import {encryptPassword, generateJWT, generateUserId} from '@/utils/auth'
 import {TLogin, TRegister, TRegistrationForm} from '@/@types/auth'
 import {Request, Response} from 'express'
 import UserModel from '@/models/UserModel'
+import {parseEnv} from '@/utils/config'
+
+parseEnv()
 
 class AuthCtrlr {
   /**
@@ -40,8 +43,11 @@ class AuthCtrlr {
       return res.status(409).json({message: '该用户已存在'})
     }
 
+    if (!process.env.USER_ID_NAMESPACE) throw new Error('没有设置 USER_ID_NAMESPACE')
+
+
     const dbUser = await UserModel.create({
-      userId: email,
+      userId: generateUserId(email),
       email,
       password: encryptPassword(password)
     })
