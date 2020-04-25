@@ -4,8 +4,8 @@ import ReferModel from '../models/ReferModel'
 import ResumeModel from '../models/ResumeModel'
 import JobModel from '../models/JobModel'
 import UserModel from '../models/UserModel'
-import {v4 as uuidv4} from 'uuid'
 import dayjs from 'dayjs'
+import {generateReferId, generateUserId} from '@/utils/auth'
 
 class RefersCtrlr {
   public static async getReferList(req: Request, res: Response<TGetReferList>) {
@@ -57,7 +57,6 @@ class RefersCtrlr {
   public static async createRefer(req: Request, res: Response<TGetRefer>) {
     const {jobId} = req.params
     const referForm: ReferModel = req.body
-    const {email} = referForm
 
     const dbJob = await JobModel.findByPk(jobId)
 
@@ -65,30 +64,31 @@ class RefersCtrlr {
       return res.status(404).json({message: '该内推职位不存在'})
     }
 
-    if (!email) {
+    if (!referForm.email) {
       return res.status(422).json({message: '参数不正确'})
     }
 
+    const userId = generateUserId(referForm.email)
     const appliedDbRefer = await dbJob.$get('referList', {
-      where: {refereeId: email}
+      where: {refereeId: userId}
     })
 
     // 重复申请或者自己创建的内推职位
-    if (dbJob.refererId === referForm.email || appliedDbRefer.length > 0) {
+    if (dbJob.refererId === userId|| appliedDbRefer.length > 0) {
       return res.status(403).json({message: '你已申请该内推职位或这是你创建的内推职位'})
     }
 
     // 如果没有该用户，则创建
     await UserModel.findOrCreate({
-      where: {userId: email},
-      defaults: {userId: email}
+      where: {userId},
+      defaults: {userId, email: referForm.email}
     })
 
     const dbRefer = await ReferModel.create({
       ...referForm,
-      referId: uuidv4(),
+      referId: generateReferId(dbJob.refererId, userId, dbJob.jobId, new Date().getTime()),
       jobId,
-      refereeId: email,
+      refereeId: userId,
       refererId: dbJob.refererId,
       status: 'processing',
       updatedOn: dayjs().toDate(),

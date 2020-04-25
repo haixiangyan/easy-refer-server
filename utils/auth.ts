@@ -39,3 +39,11 @@ export const generateJobId = (refererId: string, timestamp: number) => {
 
   return uuidv5(raw, process.env.JOB_NAMESPACE)
 }
+
+export const generateReferId = (refererId: string, refereeId: string, jobId: string, timestamp: number) => {
+  if (!process.env.REFER_NAMESPACE) throw new Error('环境变量 REFER_NAMESPACE 不存在')
+
+  const raw = `${refererId}-${refererId}-${jobId}-${timestamp}`
+
+  return uuidv5(raw, process.env.REFER_NAMESPACE)
+}

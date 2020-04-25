@@ -110,20 +110,22 @@ describe('RefersCtrlr', () => {
 
   describe('createRefer', () => {
     it('成功申请 Refer', async () => {
+      const jwtToken = generateJWT(user1.userId)
       const referForm = {
-        email: 'user1@mail.com',
-        phone: '12345678',
-        experience: 2,
+        email: user1.email,
+        phone: user1.phone,
+        experience: user1.experience
       }
 
       const {status, body: refer} = await agent
         .post(`${refersRoute}/job-2`)
         .send(referForm)
+        .set('Authorization', jwtToken)
 
       expect(status).toEqual(201)
-      expect(refer.phone).toEqual('12345678')
+      expect(refer.phone).toEqual(user1.phone)
 
-      const dbRefer = await ReferModel.findOne({where: {email: 'user1@mail.com'}})
+      const dbRefer = await ReferModel.findOne({where: {referId: refer.referId}})
       expect(dbRefer).not.toBeNull()
       // 外键
       expect(dbRefer!.refereeId).toEqual(user1.userId)
@@ -141,7 +143,7 @@ describe('RefersCtrlr', () => {
     it('申请已申请过的内推职位', async () => {
       const {status, body} = await agent
         .post(`${refersRoute}/job-1`)
-        .send({email: user2.userId})
+        .send({email: user2.email})
 
       expect(status).toEqual(403)
       expect(body.message).toEqual('你已申请该内推职位或这是你创建的内推职位')
@@ -149,22 +151,22 @@ describe('RefersCtrlr', () => {
     it('申请自己创建的内推职位', async () => {
       const {status, body} = await agent
         .post(`${refersRoute}/job-1`)
-        .send({email: user1.userId})
+        .send({email: user1.email})
 
       expect(status).toEqual(403)
       expect(body.message).toEqual('你已申请该内推职位或这是你创建的内推职位')
     })
-    it('不存用户申请内推', async () => {
-      const {status} = await agent
+    it('不存在用户申请内推', async () => {
+      const {status, body: refer} = await agent
         .post(`${refersRoute}/job-1`)
         .send({email: 'user99@mail.com'})
 
       expect(status).toEqual(201)
 
-      const dbUser = await UserModel.findByPk('user99@mail.com')
+      const dbUser = await UserModel.findOne({where: {email: 'user99@mail.com'}})
       expect(dbUser).not.toBeNull()
 
-      const dbRefer = await ReferModel.findOne({where: {refereeId: 'user99@mail.com'}})
+      const dbRefer = await ReferModel.findOne({where: {referId: refer.referId}})
       expect(dbRefer).not.toBeNull()
     })
   })
