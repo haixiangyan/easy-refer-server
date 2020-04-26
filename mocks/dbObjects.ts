@@ -4,14 +4,14 @@ import UserModel from '@/models/UserModel'
 import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
-import {encryptPassword} from '@/utils/auth'
+import {encryptPassword, generateUserId} from '@/utils/auth'
 import {parseEnv} from '@/utils/config'
 
 parseEnv()
 
 export const users = [
   {
-    userId: 'user1@mail.com',
+    userId: generateUserId('user1@mail.com'),
     password: encryptPassword('123456'),
     email: 'user1@mail.com',
     experience: 2,
@@ -24,7 +24,7 @@ export const users = [
     jobId: 'job-1'
   },
   {
-    userId: 'user2@mail.com',
+    userId: generateUserId('user2@mail.com'),
     password: encryptPassword('123456'),
     email: 'user2@mail.com',
     experience: 2,
@@ -37,7 +37,7 @@ export const users = [
     jobId: null
   },
   {
-    userId: 'user3@mail.com',
+    userId: generateUserId('user3@mail.com'),
     password: encryptPassword('123456'),
     email: 'user3@mail.com',
     experience: 2,

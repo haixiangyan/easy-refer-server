@@ -43,9 +43,6 @@ class AuthCtrlr {
       return res.status(409).json({message: '该用户已存在'})
     }
 
-    if (!process.env.USER_ID_NAMESPACE) throw new Error('没有设置 USER_ID_NAMESPACE')
-
-
     const dbUser = await UserModel.create({
       userId: generateUserId(email),
       email,
