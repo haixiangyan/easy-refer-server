@@ -14,7 +14,7 @@ export const generateJWT = (userId: string) => {
     userId
   }, JWT_SECRET, {
     algorithm: 'HS256',
-    expiresIn: '10m'
+    expiresIn: '10 days'
   })
 }
 
