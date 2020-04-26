@@ -30,6 +30,13 @@ class AuthCtrlr {
   }
 
   /**
+   * 激活账号
+   */
+  public static async activate(req: Request, res: Response) {
+
+  }
+
+  /**
    * 注册用户
    */
   public static async register(req: Request, res: Response<TRegister>) {
@@ -40,7 +47,7 @@ class AuthCtrlr {
     })
 
     if (existedDbUser) {
-      return res.status(409).json({message: '该用户已存在'})
+      return res.status(409).json({message: '该用户已存在或需要激活'})
     }
 
     const dbUser = await UserModel.create({

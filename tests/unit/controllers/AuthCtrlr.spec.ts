@@ -54,6 +54,17 @@ describe('AuthCtrlr', () => {
       expect(response.body).toHaveProperty('message')
       expect(response.body.message).toEqual('密码不正确')
     })
+    it('用户需要激活', async () => {
+      const invalidLoginForm = {...loginForm, email: 'user4@mail.com', password: '123'}
+
+      const response = await agent
+        .post(loginRoute)
+        .send(invalidLoginForm)
+
+      expect(response.status).toEqual(401)
+      expect(response.body).toHaveProperty('message')
+      expect(response.body.message).toEqual('该用户需要激活使用')
+    })
   })
 
   describe('register', () => {
@@ -102,7 +113,7 @@ describe('AuthCtrlr', () => {
 
       expect(status).toEqual(409)
       expect(body).toHaveProperty('message')
-      expect(body.message).toEqual('该用户已存在')
+      expect(body.message).toEqual('该用户已存在或需要激活')
 
       dbUserCount = await UserModel.count({
         where: {email: registrationForm.email}
