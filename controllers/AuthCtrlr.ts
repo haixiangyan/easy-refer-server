@@ -1,9 +1,12 @@
 import passport from '../plugins/passport'
+import {v4 as uuidv4} from 'uuid'
 import {encryptPassword, generateJWT, generateUserId} from '@/utils/auth'
 import {TLogin, TLoginForm, TRegister, TRegistrationForm} from '@/@types/auth'
 import {Request, Response} from 'express'
 import UserModel from '@/models/UserModel'
 import {parseEnv} from '@/utils/config'
+import TokenModel from '@/models/TokenModel'
+import dayjs from 'dayjs'
 
 parseEnv()
 
@@ -17,14 +20,21 @@ class AuthCtrlr {
         return res.status(401).json({message: info.message})
       }
 
-      req.login(user, {session: false}, (err) => {
+      req.login(user, {session: false}, async (err) => {
         if (err) {
           return res.status(500).json({message: '登录时发生错误'})
         }
 
-        const token = generateJWT(user.userId)
+        const accessToken = generateJWT(user.userId)
+        const refreshToken = uuidv4()
+        const expireAt = dayjs().add(1, 'month').toDate()
 
-        return res.json({token})
+        // 存入 refresh token
+        await TokenModel.create({refreshToken, expireAt, userId: user.userId})
+        // 更新 user
+        await UserModel.update({refreshToken}, {where: {userId: user.userId}})
+
+        return res.json({accessToken, refreshToken, expireAt})
       })
     })(req, res)
   }
@@ -33,11 +43,27 @@ class AuthCtrlr {
    * 获取新的 token
    */
   public static async refresh(req: Request, res: Response<TLogin>) {
-    const user = req.user as TJWTUser
+    // 判断是否存在
+    const dbToken = await TokenModel.findByPk(req.body.refreshToken)
+    if (!dbToken) {
+      return res.status(401).json({message: 'Refresh Token 不存在'})
+    }
 
-    const token = generateJWT(user.userId)
+    // 判断是否过期
+    if (dayjs(dbToken.expireAt).isBefore(dayjs())) {
+      return res.status(401).json({message: 'Refresh Token 已过期'})
+    }
 
-    return res.json({token})
+    const accessToken = generateJWT(dbToken.userId)
+    const refreshToken = uuidv4()
+    const expireAt = dayjs().add(1, 'month').toDate()
+
+    // 更新 token 信息
+    await UserModel.update({refreshToken}, {where: {userId: dbToken.userId}})
+    await TokenModel.create({refreshToken, expireAt})
+    await dbToken.destroy()
+
+    return res.json({accessToken, refreshToken, expireAt})
   }
 
   /**
@@ -61,9 +87,7 @@ class AuthCtrlr {
     dbUser.password = encryptPassword(password)
     await dbUser.save()
 
-    const token = generateJWT(userId)
-
-    return res.status(201).json({token})
+    return res.status(201).json()
   }
 
   /**

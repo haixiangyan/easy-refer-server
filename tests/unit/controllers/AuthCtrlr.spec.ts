@@ -4,7 +4,6 @@ import app from '../../../app'
 import {initMockDB, users} from '../../../mocks/dbObjects'
 import UserModel from '../../../models/UserModel'
 import db from '../../../models/db'
-import {generateJWT} from '../../../utils/auth'
 
 const loginRoute = '/api/auth/login'
 const refreshRoute = '/api/auth/refresh'
@@ -33,7 +32,9 @@ describe('AuthCtrlr', () => {
         .send(loginForm)
 
       expect(response.status).toEqual(200)
-      expect(response.body).toHaveProperty('token')
+      expect(response.body).toHaveProperty('accessToken')
+      expect(response.body).toHaveProperty('refreshToken')
+      expect(response.body).toHaveProperty('expireAt')
     })
     it('用户不存在，登录失败', async () => {
       const invalidLoginForm = {...loginForm, email: 'user99@mail.com'}
@@ -72,18 +73,16 @@ describe('AuthCtrlr', () => {
 
   describe('refresh', () => {
     it('成功更新 token', async () => {
-      const jwtToken = generateJWT(user1.userId)
+      const response = await agent
+        .post(loginRoute)
+        .send({email: user1.email, password: '123456'})
 
       const {status, body} = await agent
         .post(refreshRoute)
-        .set('Authorization', jwtToken)
+        .send({refreshToken: response.body.refreshToken})
 
       expect(status).toEqual(200)
-      expect(body).toHaveProperty('token')
-    })
-    it('未登录不能更新 token', async () => {
-      const {status} = await agent.post(refreshRoute)
-      expect(status).toEqual(401)
+      expect(body).toHaveProperty('accessToken')
     })
   })
 
@@ -94,7 +93,6 @@ describe('AuthCtrlr', () => {
         .send({email: user4.email, password: '123456'})
 
       expect(status).toEqual(201)
-      expect(body).toHaveProperty('token')
 
       const dbUser = await UserModel.findOne({where: {email: user4.email}})
 

@@ -1,7 +1,9 @@
 import UserModel from '@/models/UserModel'
 
 type TLogin = TResponse<{
-  token: string
+  accessToken: string
+  refreshToken: string
+  expireAt: Date
 }>
 
 type TLoginForm = {
