@@ -19,6 +19,10 @@ passport.use(new LocalStrategy({
       return callback(null, false, {message: '用户不存在'})
     }
 
+    if (!dbUser.password) {
+      return callback(null, false, {message: '该用户需要激活使用'})
+    }
+
     if (!bcrypt.compareSync(password, dbUser.password)) {
       return callback(null, false, {message: '密码不正确'})
     }
