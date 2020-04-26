@@ -75,14 +75,14 @@ describe('AuthCtrlr', () => {
       const jwtToken = generateJWT(user1.userId)
 
       const {status, body} = await agent
-        .get(refreshRoute)
+        .post(refreshRoute)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(200)
       expect(body).toHaveProperty('token')
     })
     it('未登录不能更新 token', async () => {
-      const {status} = await agent.get(refreshRoute)
+      const {status} = await agent.post(refreshRoute)
       expect(status).toEqual(401)
     })
   })
