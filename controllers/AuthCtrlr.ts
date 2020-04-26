@@ -15,24 +15,30 @@ class AuthCtrlr {
    * 登录
    */
   public static async login(req: Request, res: Response<TLogin>) {
-    passport.authenticate('local', {session: false}, (err, user: TJWTUser, info) => {
-      if (err || !user) {
+    passport.authenticate('local', {session: false}, (err, dbUser: UserModel, info) => {
+      if (err || !dbUser) {
         return res.status(401).json({message: info.message})
       }
 
-      req.login(user, {session: false}, async (err) => {
+      req.login(dbUser, {session: false}, async (err) => {
         if (err) {
           return res.status(500).json({message: '登录时发生错误'})
         }
 
-        const accessToken = generateJWT(user.userId)
+        // 去掉原来的 refreshToken
+        const preRefreshToken = dbUser.refreshToken
+        await dbUser.update({refreshToken: null})
+        await TokenModel.destroy({where: {refreshToken: preRefreshToken}})
+
+        // 新的 token 信息
+        const accessToken = generateJWT(dbUser.userId)
         const refreshToken = uuidv4()
         const expireAt = dayjs().add(1, 'month').toDate()
 
         // 存入 refresh token
-        await TokenModel.create({refreshToken, expireAt, userId: user.userId})
+        await TokenModel.create({refreshToken, expireAt, userId: dbUser.userId})
         // 更新 user
-        await UserModel.update({refreshToken}, {where: {userId: user.userId}})
+        await UserModel.update({refreshToken}, {where: {userId: dbUser.userId}})
 
         return res.json({accessToken, refreshToken, expireAt})
       })

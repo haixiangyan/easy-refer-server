@@ -1,9 +1,8 @@
 import {DataTypes} from 'sequelize'
-import {AllowNull, Column, Default, HasMany, HasOne, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
+import {AllowNull, Column, Default, HasMany, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
 import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
-import TokenModel from '@/models/TokenModel'
 
 @Table({tableName: 'users'})
 class UserModel extends Model<UserModel> {
@@ -45,10 +44,10 @@ class UserModel extends Model<UserModel> {
   @Column(DataTypes.STRING)
   public avatarUrl!: string
 
-  // 关系
-  @HasOne(() => TokenModel)
-  public readonly refreshToken!: TokenModel
+  @Column(DataTypes.STRING)
+  public refreshToken!: string | null
 
+  // 关系
   @HasMany(() => JobModel)
   public readonly jobList?: JobModel[]
 

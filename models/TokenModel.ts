@@ -1,6 +1,5 @@
 import {DataTypes} from 'sequelize'
-import {AllowNull, BelongsTo, Column, ForeignKey, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
-import UserModel from '@/models/UserModel'
+import {AllowNull, Column, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
 
 @Table({tableName: 'tokens'})
 class TokenModel extends Model<TokenModel> {
@@ -15,13 +14,8 @@ class TokenModel extends Model<TokenModel> {
   @Column(DataTypes.DATE)
   public expireAt!: Date
 
-  @ForeignKey(() => UserModel)
   @Column(DataTypes.STRING)
   public userId!: string
-
-  // 关系
-  @BelongsTo(() => UserModel, 'userId')
-  public readonly user?: UserModel
 }
 
 export default TokenModel

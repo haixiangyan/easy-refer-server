@@ -27,7 +27,7 @@ passport.use(new LocalStrategy({
       return callback(null, false, {message: '密码不正确'})
     }
 
-    callback(null, dbUser.toJSON(), {message: '登录成功'})
+    callback(null, dbUser, {message: '登录成功'})
   }
 ))
 

@@ -4,6 +4,7 @@ import app from '../../../app'
 import {initMockDB, users} from '../../../mocks/dbObjects'
 import UserModel from '../../../models/UserModel'
 import db from '../../../models/db'
+import TokenModel from '../../../models/TokenModel'
 
 const loginRoute = '/api/auth/login'
 const refreshRoute = '/api/auth/refresh'
@@ -35,6 +36,18 @@ describe('AuthCtrlr', () => {
       expect(response.body).toHaveProperty('accessToken')
       expect(response.body).toHaveProperty('refreshToken')
       expect(response.body).toHaveProperty('expireAt')
+    })
+    it('连续登录', async () => {
+      const {body: preTokenInfo} = await agent.post(loginRoute).send(loginForm)
+
+      const {body: tokenInfo} = await agent.post(loginRoute).send(loginForm)
+
+      const dbUser = await UserModel.findByPk(user1.userId)
+      const preDbToken = await TokenModel.findByPk(preTokenInfo.refreshToken)
+
+      expect(dbUser!.refreshToken).toEqual(tokenInfo.refreshToken)
+      expect(dbUser!.refreshToken).not.toEqual(preTokenInfo.refreshToken)
+      expect(preDbToken).toBeNull()
     })
     it('用户不存在，登录失败', async () => {
       const invalidLoginForm = {...loginForm, email: 'user99@mail.com'}
@@ -88,7 +101,7 @@ describe('AuthCtrlr', () => {
 
   describe('activate', () => {
     it('成功激活用户', async () => {
-      const {status, body} = await agent
+      const {status} = await agent
         .post(activateRoute)
         .send({email: user4.email, password: '123456'})
 
