@@ -30,6 +30,17 @@ class AuthCtrlr {
   }
 
   /**
+   * 获取新的 token
+   */
+  public static async refresh(req: Request, res: Response<TLogin>) {
+    const user = req.user as TJWTUser
+
+    const token = generateJWT(user.userId)
+
+    return res.json({token})
+  }
+
+  /**
    * 激活账号
    */
   public static async activate(req: Request, res: Response) {

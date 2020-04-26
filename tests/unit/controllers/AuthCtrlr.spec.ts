@@ -4,8 +4,10 @@ import app from '../../../app'
 import {initMockDB, users} from '../../../mocks/dbObjects'
 import UserModel from '../../../models/UserModel'
 import db from '../../../models/db'
+import {generateJWT} from '../../../utils/auth'
 
 const loginRoute = '/api/auth/login'
+const refreshRoute = '/api/auth/refresh'
 const activateRoute = '/api/auth/activate'
 const registerRoute = '/api/auth/register'
 
@@ -65,6 +67,23 @@ describe('AuthCtrlr', () => {
       expect(response.status).toEqual(401)
       expect(response.body).toHaveProperty('message')
       expect(response.body.message).toEqual('该用户需要激活使用')
+    })
+  })
+
+  describe('refresh', () => {
+    it('成功更新 token', async () => {
+      const jwtToken = generateJWT(user1.userId)
+
+      const {status, body} = await agent
+        .get(refreshRoute)
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(200)
+      expect(body).toHaveProperty('token')
+    })
+    it('未登录不能更新 token', async () => {
+      const {status} = await agent.get(refreshRoute)
+      expect(status).toEqual(401)
     })
   })
 
