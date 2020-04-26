@@ -1,36 +1,20 @@
 import express from 'express'
-import Mock from 'mockjs'
-import {Job, JobItem} from '@/mocks/objects'
+import JobsCtrlr from '@/controllers/JobsCtrlr'
+import JWTMW from '@/middlewares/JWTMW'
 
 // '/jobs'
 const JobsRouter = express.Router()
 
-// 获取 Job item list
-JobsRouter.get('/item', (req, res) => {
-  res.json(Mock.mock({
-    'jobItemList|10': [JobItem],
-    totalPages: 100
-  }))
-})
-
-// 获取一个 Job item
-JobsRouter.get('/item/:jobId', (req, res) => {
-  res.json(Mock.mock(JobItem))
-})
+// 获取 Job List
+JobsRouter.get('/', JobsCtrlr.getJobList)
 
 // 获取一个 Job
-JobsRouter.get('/:jobId', (req, res) => {
-  res.json(Mock.mock(Job))
-})
+JobsRouter.get('/:jobId', JobsCtrlr.getJob)
 
 // 创建一个 Job
-JobsRouter.post('/', (req, res) => {
-  res.json(Mock.mock(Job))
-})
+JobsRouter.post('/', JWTMW.authenticate, JobsCtrlr.createJob)
 
 // 修改一个 Job
-JobsRouter.put('/:jobId', (req, res) => {
-  res.json(Mock.mock(Job))
-})
+JobsRouter.put('/:jobId', JWTMW.authenticate, JobsCtrlr.editJob)
 
 export default JobsRouter

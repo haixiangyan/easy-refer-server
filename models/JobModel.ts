@@ -5,6 +5,8 @@ import ReferModel from '@/models/ReferModel'
 
 @Table({tableName: 'jobs'})
 class JobModel extends Model<JobModel> {
+  [key: string]: any
+
   // 字段
   @Unique
   @AllowNull(false)
@@ -13,29 +15,30 @@ class JobModel extends Model<JobModel> {
   public jobId!: string
 
   @Column(DataTypes.STRING)
-  public company!: string | null
+  public company!: string
 
-  @Column(DataTypes.STRING)
-  public requiredFields!: string | null
+  @Column(DataTypes.JSON)
+  public requiredFields!: string
 
   @Column(DataTypes.DATE)
-  public deadline!: Date | null
+  public deadline!: Date
 
   @Column(DataTypes.INTEGER)
-  public expiration!: number | null
+  public autoRejectDay!: number
 
   @Column(DataTypes.INTEGER)
-  public referTotal!: number | null
+  public referTotal!: number
 
   @Column(DataTypes.STRING)
   public source!: string | null
 
   // 外键
   @ForeignKey(() => UserModel)
-  public readonly refererId!: string | null
+  @Column(DataTypes.STRING)
+  public refererId!: string
 
   // 关系
-  @BelongsTo(() => UserModel)
+  @BelongsTo(() => UserModel, 'refererId')
   public readonly referer?: UserModel
 
   @HasMany(() => ReferModel)

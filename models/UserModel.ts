@@ -1,27 +1,12 @@
 import {DataTypes} from 'sequelize'
-import {
-  AllowNull,
-  Column,
-  Default,
-  HasMany,
-  HasOne,
-  PrimaryKey,
-  Table,
-  Unique,
-  Model,
-  ForeignKey
-} from 'sequelize-typescript'
+import {AllowNull, Column, Default, HasMany, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
 import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
 
 @Table({tableName: 'users'})
 class UserModel extends Model<UserModel> {
-  // 普通字段
-  public myReferTotal = 0
-  public approvedMyReferCount = 0
-  public otherReferTotal = 0
-  public approvedOtherReferCount = 0
+  [key: string]: any
 
   // 字段
   @Unique
@@ -57,21 +42,19 @@ class UserModel extends Model<UserModel> {
 
   @Default('https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png')
   @Column(DataTypes.STRING)
-  public avatarUrl: string = 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png'
+  public avatarUrl!: string
 
-  // 外键
-  @ForeignKey(() => JobModel)
   @Column(DataTypes.STRING)
-  public readonly jobId!: string | null
+  public refreshToken!: string | null
 
   // 关系
-  @HasOne(() => JobModel)
-  public readonly job?: JobModel
+  @HasMany(() => JobModel)
+  public readonly jobList?: JobModel[]
 
-  @HasMany(() => ReferModel, 'refereeId')
+  @HasMany(() => ReferModel)
   public readonly myReferList?: ReferModel[]
 
-  @HasMany(() => ReferModel, 'refererId')
+  @HasMany(() => ReferModel)
   public readonly otherReferList?: ReferModel[]
 
   @HasMany(() => ResumeModel)

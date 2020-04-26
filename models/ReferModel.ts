@@ -14,9 +14,11 @@ import {
 import ResumeModel from '@/models/ResumeModel'
 import JobModel from '@/models/JobModel'
 import UserModel from '@/models/UserModel'
+import {TExperience, TStatus} from '@/@types/refers'
 
 @Table({tableName: 'refers'})
 class ReferModel extends Model<ReferModel> {
+  [key: string]: any
   // 字段
   @Unique
   @AllowNull(false)
@@ -34,7 +36,7 @@ class ReferModel extends Model<ReferModel> {
   public phone!: string | null
 
   @Column(DataTypes.INTEGER)
-  public experience!: number | null
+  public experience!: TExperience | null
 
   @Column(DataTypes.TEXT)
   public intro!: string | null
@@ -49,37 +51,44 @@ class ReferModel extends Model<ReferModel> {
   public referLinks!: string | null
 
   @Column(DataTypes.STRING)
-  public status!: string | null
+  public status!: TStatus | null
 
   @Default(new Date())
-  @Column(DataTypes.DATE)
-  public updatedOn!: Date | null
+  @Column(DataTypes.DATEONLY)
+  public updatedOn!: Date
+
+  @Column(DataTypes.DATEONLY)
+  public expiration!: Date
 
   // 外键
   @ForeignKey(() => ResumeModel)
-  public readonly resumeId!: string | null
+  @Column(DataTypes.STRING)
+  public resumeId!: string | null
 
   @ForeignKey(() => JobModel)
-  public readonly jobId!: string
+  @Column(DataTypes.STRING)
+  public jobId!: string
 
   @ForeignKey(() => UserModel)
-  public readonly refererId!: string
+  @Column(DataTypes.STRING)
+  public refererId!: string
 
   @ForeignKey(() => UserModel)
-  public readonly refereeId!: string
+  @Column(DataTypes.STRING)
+  public refereeId!: string
 
   // 关系
   @HasOne(() => ResumeModel)
   public readonly resume?: ResumeModel
 
-  @BelongsTo(() => JobModel)
-  public readonly job?: JobModel
+  @BelongsTo(() => JobModel, 'jobId')
+  public readonly job!: JobModel
 
-  @BelongsTo(() => UserModel, 'userId')
-  public readonly referer?: UserModel
+  @BelongsTo(() => UserModel, 'refererId')
+  public readonly referer!: UserModel
 
-  @BelongsTo(() => UserModel, 'userId')
-  public readonly referee?: UserModel
+  @BelongsTo(() => UserModel, 'refereeId')
+  public readonly referee!: UserModel
 }
 
 export default ReferModel

@@ -1,20 +1,11 @@
 import express from 'express'
-import Mock from 'mockjs'
+import UploadCtrlr from '@/controllers/UploadCtrlr'
+import UsersCtrlr from '@/controllers/UsersCtrlr'
 
 const UploadRouter = express.Router()
 
-UploadRouter.post('/resume', (req, res) => {
-  res.json(Mock.mock({
-    resumeId: '@ID',
-    url: '@URL',
-    name: '@URL',
-  }))
-})
+UploadRouter.post('/resume', UploadCtrlr.uploadResume, UsersCtrlr.createResume)
 
-UploadRouter.post('/avatar', (req, res) => {
-  res.json(Mock.mock({
-    avatarUrl: Mock.Random.image('100x100', '#fff')
-  }))
-})
+UploadRouter.post('/avatar', UploadCtrlr.uploadAvatar, UsersCtrlr.createAvatar)
 
 export default UploadRouter

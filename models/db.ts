@@ -5,6 +5,7 @@ import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
 import {parseEnv} from '@/utils/config'
+import TokenModel from '@/models/TokenModel'
 
 // 创建连接实例
 const initDB = () => {
@@ -22,7 +23,7 @@ const initDB = () => {
     username: DB_USER,
     password: DB_PASSWORD,
     storage: ':memory:',
-    models: [UserModel, JobModel, ReferModel, ResumeModel],
+    models: [UserModel, JobModel, ReferModel, ResumeModel, TokenModel],
     logging: false,
     define: {
       charset: 'utf8'

@@ -7,10 +7,10 @@ import app from '@/app'
 import consola from 'consola'
 import http from 'http'
 import {HttpError} from 'http-errors'
-
 // 数据库
 import db from '@/models/db'
 import {initMockDB} from '@/mocks/dbObjects'
+import {createUploadDir} from '@/utils/upload'
 
 /**
  * Get port from environment and store in Express.
@@ -85,12 +85,7 @@ function onError(error: HttpError) {
  */
 
 async function onListening() {
-  const addr = server.address()
-  const bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr!.port
-  consola.info('监听端口：' + bind)
-
+  // 准备数据库
   try {
     const dev = process.env.NODE_ENV === 'development'
 
@@ -99,4 +94,13 @@ async function onListening() {
   } catch (error) {
     consola.error(error)
   }
+
+  // 准备 /uploads
+  createUploadDir()
+
+  const addr = server.address()
+  const bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr!.port
+  consola.info('监听端口：' + bind)
 }

@@ -13,23 +13,25 @@ class ResumeModel extends Model<ResumeModel> {
   public resumeId!: string
 
   @Column(DataTypes.STRING)
-  public name!: string | null
+  public name!: string
 
   @Column(DataTypes.STRING)
-  public url!: string | null
+  public url!: string
 
   // 外键
   @ForeignKey(() => UserModel)
-  public readonly refereeId!: string | null
+  @Column(DataTypes.STRING)
+  public refereeId!: string | null
 
   @ForeignKey(() => ReferModel)
+  @Column(DataTypes.STRING)
   public referId!: string | null
 
   // 关系
-  @BelongsTo(() => UserModel)
+  @BelongsTo(() => UserModel, 'refereeId')
   public readonly referee?: UserModel
 
-  @BelongsTo(() => ReferModel)
+  @BelongsTo(() => ReferModel, 'referId')
   public readonly refer?: ReferModel
 }
 
