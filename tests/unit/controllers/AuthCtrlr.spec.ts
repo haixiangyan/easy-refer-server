@@ -6,9 +6,10 @@ import UserModel from '../../../models/UserModel'
 import db from '../../../models/db'
 
 const loginRoute = '/api/auth/login'
+const activateRoute = '/api/auth/activate'
 const registerRoute = '/api/auth/register'
 
-const [user1] = users
+const [user1, user2, user3, user4] = users
 
 const agent = request(app)
 
@@ -64,6 +65,39 @@ describe('AuthCtrlr', () => {
       expect(response.status).toEqual(401)
       expect(response.body).toHaveProperty('message')
       expect(response.body.message).toEqual('该用户需要激活使用')
+    })
+  })
+
+  describe('activate', () => {
+    it('成功激活用户', async () => {
+      const {status, body} = await agent
+        .post(activateRoute)
+        .send({email: user4.email, password: '123456'})
+
+      expect(status).toEqual(201)
+      expect(body).toHaveProperty('token')
+
+      const dbUser = await UserModel.findOne({where: {email: user4.email}})
+
+      expect(bcrypt.compareSync('123456', dbUser!.password)).toEqual(true)
+    })
+    it('不存在用户不能激活', async () => {
+      const {status, body} = await agent
+        .post(activateRoute)
+        .send({email: 'user99@mail.com', password: '123456'})
+
+      expect(status).toEqual(404)
+      expect(body).toHaveProperty('message')
+      expect(body.message).toEqual('用户不存在')
+    })
+    it('已激活用户不能激活', async () => {
+      const {status, body} = await agent
+        .post(activateRoute)
+        .send({email: 'user1@mail.com', password: '123456'})
+
+      expect(status).toEqual(400)
+      expect(body).toHaveProperty('message')
+      expect(body.message).toEqual('该用户已激活')
     })
   })
 
