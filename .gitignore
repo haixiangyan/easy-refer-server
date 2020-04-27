@@ -173,3 +173,6 @@ $RECYCLE.BIN/
 .idea
 
 upload
+
+# 前端打包文件
+fe
