@@ -1,3 +1,10 @@
+/**
+ * 引入环境变量
+ */
+const dotenv = require('dotenv')
+const result = dotenv.config()
+if (result.error) throw result.error
+
 module.exports = {
     moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/$1'
