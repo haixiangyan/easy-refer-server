@@ -5,9 +5,6 @@ import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
 import {encryptPassword, generateUserId} from '@/utils/auth'
-import {parseEnv} from '@/utils/config'
-
-parseEnv()
 
 export const users = [
   {

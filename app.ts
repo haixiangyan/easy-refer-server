@@ -4,7 +4,6 @@ import path from 'path'
 import cookieParser from 'cookie-parser'
 import logger from 'morgan'
 
-import {parseEnv} from '@/utils/config'
 // 路由
 import JobsRouter from '@/routes/jobs'
 import RefersRouter from '@/routes/refers'
@@ -16,8 +15,6 @@ import UsersRouter from '@/routes/users'
 import JWTMW from '@/middlewares/JWTMW'
 
 const app = express()
-
-parseEnv()
 
 app.use(logger('dev'))
 app.use(express.json())
