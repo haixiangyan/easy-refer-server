@@ -4,11 +4,8 @@ import {encryptPassword, generateJWT, generateUserId} from '@/utils/auth'
 import {TLogin, TLoginForm, TRegister, TRegistrationForm} from '@/@types/auth'
 import {Request, Response} from 'express'
 import UserModel from '@/models/UserModel'
-import {parseEnv} from '@/utils/config'
 import TokenModel from '@/models/TokenModel'
 import dayjs from 'dayjs'
-
-parseEnv()
 
 class AuthCtrlr {
   /**

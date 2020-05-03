@@ -2,10 +2,7 @@ import passport from 'passport'
 import {Strategy as LocalStrategy} from 'passport-local'
 import {Strategy as JWTStrategy, ExtractJwt} from 'passport-jwt'
 import UserModel from '../models/UserModel'
-import {parseEnv} from '@/utils/config'
 import bcrypt from 'bcrypt'
-
-parseEnv()
 
 passport.use(new LocalStrategy({
     usernameField: 'email',

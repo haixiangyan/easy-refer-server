@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 
 /**
+ * 引入环境变量
+ */
+const dotenv = require('dotenv')
+const result = dotenv.config()
+if (result.error) throw result.error
+
+/**
  * Module dependencies.
  */
 import app from '@/app'

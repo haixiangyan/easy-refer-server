@@ -1,9 +1,6 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-import {parseEnv} from '@/utils/config'
 import {v5 as uuidv5} from 'uuid'
-
-parseEnv()
 
 export const generateJWT = (userId: string) => {
   const {JWT_SECRET} = process.env
