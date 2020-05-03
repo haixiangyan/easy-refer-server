@@ -131,7 +131,8 @@ class JobsCtrlr {
         updatedOn: {[Op.gte]: dayjs().subtract(10, 'day').toDate()} // 查 10 天内的数据
       },
       limit: 10,
-      group: ['jobId', 'updatedOn']
+      group: ['jobId', 'updatedOn'],
+      order: [['updatedOn', 'DESC']]
     })
 
     // 提取 jobId，将数组变成对象
