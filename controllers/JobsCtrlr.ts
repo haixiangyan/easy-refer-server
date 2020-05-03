@@ -1,5 +1,5 @@
 import {Request, Response} from 'express'
-import {TFullJob, TGetFullJob, TGetFullJobList, TGetJob} from '@/@types/jobs'
+import {TChartItem, TFullJob, TGetFullJob, TGetFullJobList, TGetJob} from '@/@types/jobs'
 import JobModel from '../models/JobModel'
 import {col, fn, Op} from 'sequelize'
 import dayjs from 'dayjs'
@@ -136,20 +136,19 @@ class JobsCtrlr {
 
     // 提取 jobId，将数组变成对象
     const chartItemObject = extractField(dbChartItemList.map(dbChartItem => {
-      const chartItem =  dbChartItem.toJSON() as {date: Date | string, count: number}
+      const chartItem = dbChartItem.toJSON() as { date: Date | string, count: number }
       chartItem.date = dayjs(chartItem.date).format(DATE_FORMAT)
       return chartItem
     }), 'jobId')
-    // 不够 10 个数据就追加上
-    Object.values(chartItemObject).forEach(chartItemList => {
-      const diff = 10 - chartItemList.length
-      for (let i = 1; i <= diff; i++) {
-        chartItemList.unshift({date: dayjs().subtract(i, 'day').format(DATE_FORMAT), count: 0})
-      }
+    // 不够 10 个数据就追加上，且反转，让最近的在最后
+    Object.entries(chartItemObject).forEach(([key, chartItemList]) => {
+      chartItemObject[key] = [...JobsCtrlr.padChartItem(chartItemList)].reverse()
     })
+    // 默认图表数据
     const defaultChart = Array
       .from(Array(10))
       .map((item, i) => ({date: dayjs().subtract(i, 'day').format(DATE_FORMAT), count: 0}))
+      .reverse()
 
     // 将图表 Item 放入 JobItem 中
     const jobList: TFullJob[] = dbJobList.map(dbJob => {
@@ -164,6 +163,32 @@ class JobsCtrlr {
     })
 
     return {count, jobList}
+  }
+
+  /**
+   * 补充处理图表数据
+   */
+  public static padChartItem(chartItemList: TChartItem[]): TChartItem[] {
+    let newChartItemList: TChartItem[] = []
+    let i = 0, j = 0
+    const nowDay = dayjs()
+
+    // 从后往前添加
+    while (i < 10 || j < chartItemList.length) {
+      const curtDay = nowDay.subtract(i, 'day').format(DATE_FORMAT)
+      if (chartItemList[j] && chartItemList[j].date === curtDay) { // 如果有数据，则使用原来的数据
+        newChartItemList.push(chartItemList[j])
+        j += 1
+      } else { // 不存在则补一个空数据
+        newChartItemList.push({
+          date: dayjs().subtract(i, 'day').format(DATE_FORMAT),
+          count: 0
+        })
+      }
+      i += 1
+    }
+
+    return newChartItemList
   }
 }
 

@@ -5,6 +5,9 @@ import app from '../../../app'
 import {generateJWT} from '../../../utils/auth'
 import JobModel from '../../../models/JobModel'
 import dayjs = require('dayjs')
+import {DATE_FORMAT} from '../../../constants/format'
+import JobsCtrlr from '../../../controllers/JobsCtrlr'
+import {TChartItem} from '../../../@types/jobs'
 
 const jobListRoute = '/api/jobs'
 
@@ -184,6 +187,59 @@ describe('JobsCtrlr', () => {
 
       expect(status).toEqual(403)
       expect(body.message).toEqual('无权限修改该内推职位')
+    })
+  })
+
+  describe('padChartItem', () => {
+    it('成功补全数据', () => {
+      const nowDay = dayjs()
+      const list = [
+        {date: nowDay.format(DATE_FORMAT), count: 2},
+        {date: nowDay.subtract(4, 'day').format(DATE_FORMAT), count: 4},
+        {date: nowDay.subtract(5, 'day').format(DATE_FORMAT), count: 7},
+      ]
+
+      const newList = JobsCtrlr.padChartItem(list)
+
+      expect(newList.length).toEqual(10)
+      // 原来数据存在
+      expect(newList[0]).toStrictEqual(list[0])
+      // 补充新数据
+      expect(newList[1]).toStrictEqual({
+        date: nowDay.subtract(1, 'day').format(DATE_FORMAT),
+        count: 0
+      })
+      expect(newList[newList.length - 1]).toStrictEqual({
+        date: nowDay.subtract(9, 'day').format(DATE_FORMAT),
+        count: 0
+      })
+    })
+    it('补全所有数据', () => {
+      const list: TChartItem[] = []
+
+      const newList = JobsCtrlr.padChartItem(list)
+
+      expect(newList.length).toEqual(10)
+      expect(newList[0]).toStrictEqual({
+        date: dayjs().format(DATE_FORMAT),
+        count: 0
+      })
+      expect(newList[newList.length - 1]).toStrictEqual(newList[newList.length - 1])
+    })
+    it('当数据存在时，不需要补全', () => {
+      const list: TChartItem[] = []
+      for (let i = 0; i < 10; i++) {
+        list.push({
+          date: dayjs().subtract(i, 'day').format(DATE_FORMAT),
+          count: 4
+        })
+      }
+
+      const newList = JobsCtrlr.padChartItem(list)
+
+      expect(newList.length).toEqual(10)
+      expect(newList[0]).toStrictEqual(list[0])
+      expect(newList[newList.length - 1]).toStrictEqual(list[list.length - 1])
     })
   })
 })
