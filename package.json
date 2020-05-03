@@ -5,6 +5,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon bin/www.ts --watch bin",
     "prod": "cross-env NODE_ENV=production ts-node -r tsconfig-paths/register --files bin/www.ts",
+    "pm2": "pm2 start ts-node -- -r tsconfig-paths/register --files bin/www.ts",
     "test": "jest --no-cache --maxWorkers=1",
     "coveralls": "coveralls < coverage/lcov.info"
   },
