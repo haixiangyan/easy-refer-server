@@ -27,7 +27,6 @@ export const createUserFolder = (userId: string) => {
   if (fs.existsSync(userFolderPath)) return
 
   fs.mkdirSync(path.resolve(userFolderPath))
-  fs.mkdirSync(path.resolve(userFolderPath, 'avatar'))
   fs.mkdirSync(path.resolve(userFolderPath, 'resumes'))
 }
 

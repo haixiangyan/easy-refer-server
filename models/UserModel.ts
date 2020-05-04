@@ -1,5 +1,5 @@
 import {DataTypes} from 'sequelize'
-import {AllowNull, Column, Default, HasMany, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
+import {AllowNull, Column, HasMany, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
 import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
@@ -39,10 +39,6 @@ class UserModel extends Model<UserModel> {
 
   @Column(DataTypes.STRING)
   public phone!: string | null
-
-  @Default('https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png')
-  @Column(DataTypes.STRING)
-  public avatarUrl!: string
 
   @Column(DataTypes.STRING)
   public refreshToken!: string | null

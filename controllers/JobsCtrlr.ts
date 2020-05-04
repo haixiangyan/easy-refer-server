@@ -96,7 +96,7 @@ class JobsCtrlr {
         ...jobIdCondition, // 是否需要用 jobId 过滤
         deadline: {[Op.gte]: dayjs().toDate()} // 获取在 deadline 之前的内推职位
       } as any,
-      include: [{model: UserModel, as: 'referer', attributes: ['name', 'avatarUrl']}],
+      include: [{model: UserModel, as: 'referer', attributes: ['name']}],
       offset: page - 1,
       limit,
       order: [['createdAt', 'DESC']]
