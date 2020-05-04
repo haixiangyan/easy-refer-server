@@ -6,6 +6,4 @@ const UploadRouter = express.Router()
 
 UploadRouter.post('/resume', UploadCtrlr.uploadResume, UsersCtrlr.createResume)
 
-UploadRouter.post('/avatar', UploadCtrlr.uploadAvatar, UsersCtrlr.createAvatar)
-
 export default UploadRouter
