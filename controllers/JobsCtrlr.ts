@@ -5,7 +5,7 @@ import {col, fn, Op} from 'sequelize'
 import dayjs from 'dayjs'
 import UserModel from '../models/UserModel'
 import ReferModel from '../models/ReferModel'
-import {DATE_FORMAT} from '@/constants/format'
+import {DB_DATE_FORMAT} from '@/constants/format'
 import {generateJobId} from '@/utils/auth'
 
 class JobsCtrlr {
@@ -154,7 +154,7 @@ class JobsCtrlr {
         j += 1
       } else { // 不存在则补一个空数据
         logs.push({
-          date: dayjs().subtract(i, 'day').format(DATE_FORMAT),
+          date: dayjs().subtract(i, 'day').format(DB_DATE_FORMAT),
           count: 0
         })
       }

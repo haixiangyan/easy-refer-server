@@ -4,10 +4,10 @@ import request from 'supertest'
 import app from '../../../app'
 import {generateJWT} from '../../../utils/auth'
 import JobModel from '../../../models/JobModel'
-import dayjs = require('dayjs')
-import {DATE_FORMAT, DB_DATE_FORMAT} from '../../../constants/format'
+import {DB_DATE_FORMAT} from '../../../constants/format'
 import JobsCtrlr from '../../../controllers/JobsCtrlr'
 import {TLog} from '../../../@types/jobs'
+import dayjs = require('dayjs')
 
 const jobListRoute = '/api/jobs'
 
@@ -206,11 +206,11 @@ describe('JobsCtrlr', () => {
       expect(newList[0]).toStrictEqual(list[0])
       // 补充新数据
       expect(newList[1]).toStrictEqual({
-        date: nowDay.subtract(1, 'day').format(DATE_FORMAT),
+        date: nowDay.subtract(1, 'day').format(DB_DATE_FORMAT),
         count: 0
       })
       expect(newList[newList.length - 1]).toStrictEqual({
-        date: nowDay.subtract(9, 'day').format(DATE_FORMAT),
+        date: nowDay.subtract(9, 'day').format(DB_DATE_FORMAT),
         count: 0
       })
     })
@@ -221,7 +221,7 @@ describe('JobsCtrlr', () => {
 
       expect(newList.length).toEqual(10)
       expect(newList[0]).toStrictEqual({
-        date: dayjs().format(DATE_FORMAT),
+        date: dayjs().format(DB_DATE_FORMAT),
         count: 0
       })
       expect(newList[newList.length - 1]).toStrictEqual(newList[newList.length - 1])
