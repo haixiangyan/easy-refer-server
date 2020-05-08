@@ -173,3 +173,9 @@ $RECYCLE.BIN/
 .idea
 
 upload
+
+# 前端打包文件，注：等 AWS 机器允许后在 AWS 上打包，不需要上传该目录
+# fe
+
+# keys
+keys

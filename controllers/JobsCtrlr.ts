@@ -1,5 +1,5 @@
 import {Request, Response} from 'express'
-import {TFullJob, TGetFullJob, TGetFullJobList, TGetJob} from '@/@types/jobs'
+import {TChartItem, TFullJob, TGetFullJob, TGetFullJobList, TGetJob} from '@/@types/jobs'
 import JobModel from '../models/JobModel'
 import {col, fn, Op} from 'sequelize'
 import dayjs from 'dayjs'
@@ -96,7 +96,7 @@ class JobsCtrlr {
         ...jobIdCondition, // 是否需要用 jobId 过滤
         deadline: {[Op.gte]: dayjs().toDate()} // 获取在 deadline 之前的内推职位
       } as any,
-      include: [{model: UserModel, as: 'referer', attributes: ['name', 'avatarUrl']}],
+      include: [{model: UserModel, as: 'referer', attributes: ['name']}],
       offset: page - 1,
       limit,
       order: [['createdAt', 'DESC']]
@@ -131,39 +131,67 @@ class JobsCtrlr {
         updatedOn: {[Op.gte]: dayjs().subtract(10, 'day').toDate()} // 查 10 天内的数据
       },
       limit: 10,
-      group: ['jobId', 'updatedOn']
+      group: ['jobId', 'updatedOn'],
+      order: [['updatedOn', 'DESC']]
     })
 
     // 提取 jobId，将数组变成对象
     const chartItemObject = extractField(dbChartItemList.map(dbChartItem => {
-      const chartItem =  dbChartItem.toJSON() as {date: Date | string, count: number}
+      const chartItem = dbChartItem.toJSON() as { date: Date | string, count: number }
       chartItem.date = dayjs(chartItem.date).format(DATE_FORMAT)
       return chartItem
     }), 'jobId')
-    // 不够 10 个数据就追加上
-    Object.values(chartItemObject).forEach(chartItemList => {
-      const diff = 10 - chartItemList.length
-      for (let i = 1; i <= diff; i++) {
-        chartItemList.unshift({date: dayjs().subtract(i, 'day').format(DATE_FORMAT), count: 0})
-      }
+    // 不够 10 个数据就追加上，且反转，让最近的在最后
+    Object.entries(chartItemObject).forEach(([key, chartItemList]) => {
+      chartItemObject[key] = [...JobsCtrlr.padChartItem(chartItemList)].reverse()
     })
+    // 默认图表数据
     const defaultChart = Array
       .from(Array(10))
       .map((item, i) => ({date: dayjs().subtract(i, 'day').format(DATE_FORMAT), count: 0}))
+      .reverse()
 
     // 将图表 Item 放入 JobItem 中
-    const jobList: TFullJob[] = dbJobList.map(dbJob => {
-      const {jobId} = dbJob
-      const countItem = dbReferredCount.find(i => i.jobId === jobId)
-      const referredCount: number = countItem ? (countItem.toJSON() as any).referredCount : 0
+    const jobList: TFullJob[] = dbJobList
+      .map(dbJob => { // 添加 referredCount 和 processedChart
+        const {jobId} = dbJob
+        const countItem = dbReferredCount.find(i => i.jobId === jobId)
+        const referredCount: number = countItem ? (countItem.toJSON() as any).referredCount : 0
 
-      return Object.assign({}, dbJob.toJSON() as TFullJob, {
-        referredCount,
-        processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : defaultChart,
+        return Object.assign({}, dbJob.toJSON() as TFullJob, {
+          referredCount,
+          processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : defaultChart,
+        })
       })
-    })
+      .filter(dbJob => dbJob.referredCount < dbJob.referTotal) // 过滤掉推满的 Job
 
     return {count, jobList}
+  }
+
+  /**
+   * 补充处理图表数据
+   */
+  public static padChartItem(chartItemList: TChartItem[]): TChartItem[] {
+    let newChartItemList: TChartItem[] = []
+    let i = 0, j = 0
+    const nowDay = dayjs()
+
+    // 从后往前添加
+    while (i < 10 || j < chartItemList.length) {
+      const curtDay = nowDay.subtract(i, 'day').format(DATE_FORMAT)
+      if (chartItemList[j] && chartItemList[j].date === curtDay) { // 如果有数据，则使用原来的数据
+        newChartItemList.push(chartItemList[j])
+        j += 1
+      } else { // 不存在则补一个空数据
+        newChartItemList.push({
+          date: dayjs().subtract(i, 'day').format(DATE_FORMAT),
+          count: 0
+        })
+      }
+      i += 1
+    }
+
+    return newChartItemList
   }
 }
 

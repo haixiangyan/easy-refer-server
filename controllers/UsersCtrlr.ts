@@ -4,7 +4,7 @@ import {Op} from 'sequelize'
 import dayjs from 'dayjs'
 import ResumeModel from '@/models/ResumeModel'
 import {Request, Response} from 'express'
-import {TGetAvatar, TGetFullUser, TGetUser} from '@/@types/users'
+import {TGetFullUser, TGetUser} from '@/@types/users'
 import JobsCtrlr from '@/controllers/JobsCtrlr'
 import {TGetResume} from '@/@types/resume'
 import {generateResumeId} from '@/utils/auth'
@@ -66,19 +66,6 @@ class UsersCtrlr {
     })
 
     return res.status(201).json(dbResume)
-  }
-
-  public static async createAvatar(req: Request, res: Response<TGetAvatar>) {
-    const {filename} = req.file
-    const {userId} = req.user as TJWTUser
-
-    const dbUser = await UserModel.findByPk(userId) as UserModel
-
-    dbUser.avatarUrl = `${req.protocol}://${req.hostname}:4000/${userId}/avatar/${filename}`
-
-    await dbUser.save()
-
-    return res.status(201).json({avatarUrl: dbUser.avatarUrl})
   }
 }
 

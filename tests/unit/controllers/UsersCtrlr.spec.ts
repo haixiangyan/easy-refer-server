@@ -26,7 +26,6 @@ describe('UsersCtrlr', () => {
       phone: '949123456',
       leetCodeUrl: 'http://leetcode/zhangshan',
       thirdPersonIntro: '修改后的第三人称',
-      avatarUrl: 'http://avatar/zhangsan'
     }
 
     it('成功修改 user-1 信息', async () => {
@@ -44,7 +43,6 @@ describe('UsersCtrlr', () => {
       expect(body.phone).toEqual(userForm.phone)
       expect(body.leetCodeUrl).toEqual(userForm.leetCodeUrl)
       expect(body.thirdPersonIntro).toEqual(userForm.thirdPersonIntro)
-      expect(body.avatarUrl).toEqual(userForm.avatarUrl)
 
       expect(body.job).toBeUndefined()
     })

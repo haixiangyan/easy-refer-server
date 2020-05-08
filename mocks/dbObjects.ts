@@ -5,9 +5,6 @@ import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
 import {encryptPassword, generateUserId} from '@/utils/auth'
-import {parseEnv} from '@/utils/config'
-
-parseEnv()
 
 export const users = [
   {
@@ -20,7 +17,6 @@ export const users = [
     leetCodeUrl: 'https://leetcode.com',
     thirdPersonIntro: '这是张三，很完美的第三人称介绍',
     phone: '94934567',
-    avatarUrl: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
     jobId: 'job-1'
   },
   {
@@ -33,7 +29,6 @@ export const users = [
     leetCodeUrl: 'https://leetcode.com',
     thirdPersonIntro: '这是李四，很完美的第三人称介绍',
     phone: '94934567',
-    avatarUrl: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
     jobId: null
   },
   {
@@ -46,7 +41,6 @@ export const users = [
     leetCodeUrl: 'https://leetcode.com',
     thirdPersonIntro: '这是王五，很完美的第三人称介绍',
     phone: '94934567',
-    avatarUrl: 'https://cube.elemecdn.com/9/c2/f0ee8a3c7c9638a54940382568c9dpng.png',
     jobId: null
   },
   {
