@@ -69,6 +69,7 @@ export const jobs = [
     requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().add(3, 'month'),
     autoRejectDay: 5,
+    appliedCount: 2,
     applyTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
     refererId: user1.userId
