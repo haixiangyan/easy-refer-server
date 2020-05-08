@@ -1,5 +1,16 @@
 import {DataTypes} from 'sequelize'
-import {AllowNull, BelongsTo, Column, ForeignKey, HasMany, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
+import {
+  AllowNull,
+  BelongsTo,
+  Column,
+  Default,
+  ForeignKey,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+  Unique
+} from 'sequelize-typescript'
 import UserModel from '@/models/UserModel'
 import ReferModel from '@/models/ReferModel'
 
@@ -26,8 +37,12 @@ class JobModel extends Model<JobModel> {
   @Column(DataTypes.INTEGER)
   public autoRejectDay!: number
 
+  @Default(0)
   @Column(DataTypes.INTEGER)
-  public referTotal!: number
+  public appliedCount!: number
+
+  @Column(DataTypes.INTEGER)
+  public applyTotal!: number
 
   @Column(DataTypes.STRING)
   public source!: string | null

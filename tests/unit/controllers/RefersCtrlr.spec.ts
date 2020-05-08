@@ -1,14 +1,16 @@
 import db from '../../../models/db'
-import {initMockDB, users} from '../../../mocks/dbObjects'
+import {initMockDB, jobs, users} from '../../../mocks/dbObjects'
 import {generateJWT} from '../../../utils/auth'
 import request from 'supertest'
 import app from '../../../app'
 import ReferModel from '../../../models/ReferModel'
 import ResumeModel from '../../../models/ResumeModel'
 import UserModel from '../../../models/UserModel'
+import JobModel from '../../../models/JobModel'
 
 const refersRoute = '/api/refers'
 const [user1, user2, user3] = users
+const [expiredJob1, job1, job2] = jobs
 
 const agent = request(app)
 
@@ -116,9 +118,11 @@ describe('RefersCtrlr', () => {
         phone: user1.phone,
         experience: user1.experience
       }
+      const prevDbJob = await JobModel.findByPk(job2.jobId)
+      const prevAppliedCount = prevDbJob!.appliedCount
 
       const {status, body: refer} = await agent
-        .post(`${refersRoute}/job-2`)
+        .post(`${refersRoute}/${job2.jobId}`)
         .send(referForm)
         .set('Authorization', jwtToken)
 
@@ -131,6 +135,9 @@ describe('RefersCtrlr', () => {
       expect(dbRefer!.refereeId).toEqual(user1.userId)
       expect(dbRefer!.refererId).toEqual(user2.userId)
       expect(dbRefer!.jobId).toEqual('job-2')
+
+      const nowDbJob = await JobModel.findByPk(job2.jobId)
+      expect(nowDbJob!.appliedCount).toEqual(prevAppliedCount + 1)
     })
     it('申请不存在的内推职位', async () => {
       const {status, body} = await agent

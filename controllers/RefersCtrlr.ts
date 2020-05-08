@@ -95,6 +95,9 @@ class RefersCtrlr {
       expiration: dayjs().add(dbJob.autoRejectDay, 'day')
     })
 
+    // 申请 +1
+    dbJob.increment('appliedCount')
+
     return res.status(201).json(dbRefer)
   }
 
