@@ -94,7 +94,8 @@ class JobsCtrlr {
     const {count, rows: dbJobList} = await JobModel.findAndCountAll({
       where: {
         ...jobIdCondition, // 是否需要用 jobId 过滤
-        deadline: {[Op.gte]: dayjs().toDate()} // 获取在 deadline 之前的内推职位
+        deadline: {[Op.gte]: dayjs().toDate()}, // 获取在 deadline 之前的内推职位
+        appliedCount: {[Op.lt]: col('applyTotal')}
       } as any,
       include: [{model: UserModel, as: 'referer', attributes: ['name']}],
       offset: page - 1,
@@ -145,7 +146,6 @@ class JobsCtrlr {
           processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : defaultChart,
         })
       })
-      .filter(dbJob => dbJob.appliedCount < dbJob.applyTotal) // 过滤掉推满的 Job
 
     return {count, jobList}
   }
