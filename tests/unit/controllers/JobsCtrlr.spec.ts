@@ -34,7 +34,7 @@ describe('JobsCtrlr', () => {
       expect(jobList.length).toBeLessThanOrEqual(10)
       expect(total).toEqual(2)
 
-      expect(jobList[0]).toHaveProperty('referredCount')
+      expect(jobList[0]).toHaveProperty('appliedCount')
       expect(jobList[0]).toHaveProperty('processedChart')
       expect(jobList[0].processedChart).not.toBeNull()
       expect(jobList[0].processedChart.length).toEqual(10)
@@ -61,7 +61,7 @@ describe('JobsCtrlr', () => {
         .get(`${jobListRoute}/job-1`)
 
       expect(status).toEqual(200)
-      expect(job).toHaveProperty('referredCount')
+      expect(job).toHaveProperty('appliedCount')
       expect(job).toHaveProperty('processedChart')
       expect(job.processedChart).not.toBeNull()
       expect(job.processedChart.length).toEqual(10)

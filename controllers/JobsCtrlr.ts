@@ -105,19 +105,6 @@ class JobsCtrlr {
     // 获取所有 Id
     const jobIds = dbJobList.map(job => job.jobId)
 
-    // 获取已内推数目
-    const dbReferredCount = await ReferModel.findAll({
-      attributes: [
-        'jobId',
-        [fn('COUNT', col('referId')), 'referredCount'],
-      ],
-      where: {
-        jobId: {[Op.in]: jobIds},
-        status: {[Op.not]: 'referred'}, // 已经 approve 的数据
-      },
-      group: ['jobId']
-    })
-
     // 获取内推图表的 Item
     const dbChartItemList = await ReferModel.findAll({
       attributes: [
@@ -153,17 +140,12 @@ class JobsCtrlr {
 
     // 将图表 Item 放入 JobItem 中
     const jobList: TFullJob[] = dbJobList
-      .map(dbJob => { // 添加 referredCount 和 processedChart
-        const {jobId} = dbJob
-        const countItem = dbReferredCount.find(i => i.jobId === jobId)
-        const referredCount: number = countItem ? (countItem.toJSON() as any).referredCount : 0
-
+      .map(dbJob => { // 添加 processedChart
         return Object.assign({}, dbJob.toJSON() as TFullJob, {
-          referredCount,
           processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : defaultChart,
         })
       })
-      .filter(dbJob => dbJob.referredCount < dbJob.applyTotal) // 过滤掉推满的 Job
+      .filter(dbJob => dbJob.appliedCount < dbJob.applyTotal) // 过滤掉推满的 Job
 
     return {count, jobList}
   }
