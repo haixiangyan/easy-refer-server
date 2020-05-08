@@ -5,9 +5,9 @@ import app from '../../../app'
 import {generateJWT} from '../../../utils/auth'
 import JobModel from '../../../models/JobModel'
 import dayjs = require('dayjs')
-import {DATE_FORMAT} from '../../../constants/format'
+import {DATE_FORMAT, DB_DATE_FORMAT} from '../../../constants/format'
 import JobsCtrlr from '../../../controllers/JobsCtrlr'
-import {TChartItem} from '../../../@types/jobs'
+import {TLog} from '../../../@types/jobs'
 
 const jobListRoute = '/api/jobs'
 
@@ -35,9 +35,9 @@ describe('JobsCtrlr', () => {
       expect(total).toEqual(2)
 
       expect(jobList[0]).toHaveProperty('appliedCount')
-      expect(jobList[0]).toHaveProperty('processedChart')
-      expect(jobList[0].processedChart).not.toBeNull()
-      expect(jobList[0].processedChart.length).toEqual(10)
+      expect(jobList[0]).toHaveProperty('logs')
+      expect(jobList[0].logs).not.toBeNull()
+      expect(jobList[0].logs.length).toEqual(10)
     })
     it('传错 page 和 limit 参数', async () => {
       const {status, body} = await agent
@@ -62,9 +62,9 @@ describe('JobsCtrlr', () => {
 
       expect(status).toEqual(200)
       expect(job).toHaveProperty('appliedCount')
-      expect(job).toHaveProperty('processedChart')
-      expect(job.processedChart).not.toBeNull()
-      expect(job.processedChart.length).toEqual(10)
+      expect(job).toHaveProperty('logs')
+      expect(job.logs).not.toBeNull()
+      expect(job.logs.length).toEqual(10)
       expect(job.referer).not.toBeNull()
     })
     it('不存在 Job', async () => {
@@ -194,12 +194,12 @@ describe('JobsCtrlr', () => {
     it('成功补全数据', () => {
       const nowDay = dayjs()
       const list = [
-        {date: nowDay.format(DATE_FORMAT), count: 2},
-        {date: nowDay.subtract(4, 'day').format(DATE_FORMAT), count: 4},
-        {date: nowDay.subtract(5, 'day').format(DATE_FORMAT), count: 7},
+        {date: nowDay.format(DB_DATE_FORMAT), count: 2},
+        {date: nowDay.subtract(4, 'day').format(DB_DATE_FORMAT), count: 4},
+        {date: nowDay.subtract(5, 'day').format(DB_DATE_FORMAT), count: 7},
       ]
 
-      const newList = JobsCtrlr.padChartItem(list)
+      const newList = JobsCtrlr.padLogs(list)
 
       expect(newList.length).toEqual(10)
       // 原来数据存在
@@ -215,9 +215,9 @@ describe('JobsCtrlr', () => {
       })
     })
     it('补全所有数据', () => {
-      const list: TChartItem[] = []
+      const list: TLog[] = []
 
-      const newList = JobsCtrlr.padChartItem(list)
+      const newList = JobsCtrlr.padLogs(list)
 
       expect(newList.length).toEqual(10)
       expect(newList[0]).toStrictEqual({
@@ -227,15 +227,15 @@ describe('JobsCtrlr', () => {
       expect(newList[newList.length - 1]).toStrictEqual(newList[newList.length - 1])
     })
     it('当数据存在时，不需要补全', () => {
-      const list: TChartItem[] = []
+      const list: TLog[] = []
       for (let i = 0; i < 10; i++) {
         list.push({
-          date: dayjs().subtract(i, 'day').format(DATE_FORMAT),
+          date: dayjs().subtract(i, 'day').format(DB_DATE_FORMAT),
           count: 4
         })
       }
 
-      const newList = JobsCtrlr.padChartItem(list)
+      const newList = JobsCtrlr.padLogs(list)
 
       expect(newList.length).toEqual(10)
       expect(newList[0]).toStrictEqual(list[0])

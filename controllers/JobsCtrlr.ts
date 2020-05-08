@@ -1,11 +1,10 @@
 import {Request, Response} from 'express'
-import {TChartItem, TFullJob, TGetFullJob, TGetFullJobList, TGetJob} from '@/@types/jobs'
+import {TFullJob, TGetFullJob, TGetFullJobList, TGetJob, TLog} from '@/@types/jobs'
 import JobModel from '../models/JobModel'
 import {col, fn, Op} from 'sequelize'
 import dayjs from 'dayjs'
 import UserModel from '../models/UserModel'
 import ReferModel from '../models/ReferModel'
-import {extractField} from '@/utils/tool'
 import {DATE_FORMAT} from '@/constants/format'
 import {generateJobId} from '@/utils/auth'
 
@@ -103,69 +102,58 @@ class JobsCtrlr {
       order: [['createdAt', 'DESC']]
     })
 
-    // 获取所有 Id
-    const jobIds = dbJobList.map(job => job.jobId)
-
-    // 获取内推图表的 Item
-    const dbChartItemList = await ReferModel.findAll({
-      attributes: [
-        'jobId',
-        ['updatedOn', 'date'],
-        [fn('COUNT', col('referId')), 'count'],
-      ],
-      where: {
-        jobId: {[Op.in]: jobIds},
-        status: {[Op.not]: 'processing'}, // 已经 process 的数据
-        updatedOn: {[Op.gte]: dayjs().subtract(10, 'day').toDate()} // 查 10 天内的数据
-      },
-      limit: 10,
-      group: ['jobId', 'updatedOn'],
-      order: [['updatedOn', 'DESC']]
-    })
-
-    // 提取 jobId，将数组变成对象
-    const chartItemObject = extractField(dbChartItemList.map(dbChartItem => {
-      const chartItem = dbChartItem.toJSON() as { date: Date | string, count: number }
-      chartItem.date = dayjs(chartItem.date).format(DATE_FORMAT)
-      return chartItem
-    }), 'jobId')
-    // 不够 10 个数据就追加上，且反转，让最近的在最后
-    Object.entries(chartItemObject).forEach(([key, chartItemList]) => {
-      chartItemObject[key] = [...JobsCtrlr.padChartItem(chartItemList)].reverse()
-    })
-    // 默认图表数据
-    const defaultChart = Array
-      .from(Array(10))
-      .map((item, i) => ({date: dayjs().subtract(i, 'day').format(DATE_FORMAT), count: 0}))
-      .reverse()
-
     // 将图表 Item 放入 JobItem 中
-    const jobList: TFullJob[] = dbJobList
-      .map(dbJob => { // 添加 processedChart
-        return Object.assign({}, dbJob.toJSON() as TFullJob, {
-          processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : defaultChart,
-        })
-      })
+    const jobList = await Promise.all(dbJobList.map(async (dbJob) => {
+      const job = dbJob.toJSON() as TFullJob
+      return {
+        ...job,
+        logs: await JobsCtrlr.getLogs(job.jobId)
+      } as TFullJob
+    }))
 
     return {count, jobList}
   }
 
   /**
-   * 补充处理图表数据
+   * 获取 log
    */
-  public static padChartItem(chartItemList: TChartItem[]): TChartItem[] {
-    let newChartItemList: TChartItem[] = []
+  public static async getLogs(jobId: string): Promise<TLog[]> {
+    // 获取内推图表的 Item
+    const dbLogs = await ReferModel.findAll({
+      attributes: [
+        ['updatedOn', 'date'],
+        [fn('COUNT', col('referId')), 'count'],
+      ],
+      where: {
+        jobId,
+        status: {[Op.not]: 'processing'}, // 已经 process 的数据
+        updatedOn: {[Op.gte]: dayjs().subtract(10, 'day').toDate()} // 查 10 天内的数据
+      },
+      group: ['updatedOn'],
+      order: [['updatedOn', 'DESC']]
+    })
+
+    // Pad
+    return JobsCtrlr.padLogs(
+      dbLogs.map(dbLog => dbLog.toJSON() as TLog)
+    ).reverse()
+  }
+
+  /**
+   * 补充处理图表数据，原始数据 新 -> 旧
+   */
+  public static padLogs(rawLogs: TLog[]): TLog[] {
+    let logs: TLog[] = []
     let i = 0, j = 0
     const nowDay = dayjs()
 
-    // 从后往前添加
-    while (i < 10 || j < chartItemList.length) {
-      const curtDay = nowDay.subtract(i, 'day').format(DATE_FORMAT)
-      if (chartItemList[j] && chartItemList[j].date === curtDay) { // 如果有数据，则使用原来的数据
-        newChartItemList.push(chartItemList[j])
+    while (i < 10 || j < rawLogs.length) {
+      const curtDay = nowDay.subtract(i, 'day')
+      if (rawLogs[j] && dayjs(rawLogs[j].date).isSame(curtDay, 'day')) { // 如果有数据，则使用原来的数据
+        logs.push(rawLogs[j])
         j += 1
       } else { // 不存在则补一个空数据
-        newChartItemList.push({
+        logs.push({
           date: dayjs().subtract(i, 'day').format(DATE_FORMAT),
           count: 0
         })
@@ -173,7 +161,7 @@ class JobsCtrlr {
       i += 1
     }
 
-    return newChartItemList
+    return logs
   }
 }
 
