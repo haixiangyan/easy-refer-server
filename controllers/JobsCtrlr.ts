@@ -152,16 +152,18 @@ class JobsCtrlr {
       .reverse()
 
     // 将图表 Item 放入 JobItem 中
-    const jobList: TFullJob[] = dbJobList.map(dbJob => {
-      const {jobId} = dbJob
-      const countItem = dbReferredCount.find(i => i.jobId === jobId)
-      const referredCount: number = countItem ? (countItem.toJSON() as any).referredCount : 0
+    const jobList: TFullJob[] = dbJobList
+      .map(dbJob => { // 添加 referredCount 和 processedChart
+        const {jobId} = dbJob
+        const countItem = dbReferredCount.find(i => i.jobId === jobId)
+        const referredCount: number = countItem ? (countItem.toJSON() as any).referredCount : 0
 
-      return Object.assign({}, dbJob.toJSON() as TFullJob, {
-        referredCount,
-        processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : defaultChart,
+        return Object.assign({}, dbJob.toJSON() as TFullJob, {
+          referredCount,
+          processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : defaultChart,
+        })
       })
-    })
+      .filter(dbJob => dbJob.referredCount < dbJob.referTotal) // 过滤掉推满的 Job
 
     return {count, jobList}
   }
