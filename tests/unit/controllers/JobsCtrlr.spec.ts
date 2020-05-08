@@ -84,7 +84,7 @@ describe('JobsCtrlr', () => {
         requiredFields: ['name', 'email', 'phone', 'experience'],
         deadline: dayjs().add(10, 'month').toISOString(),
         autoRejectDay: 5,
-        referTotal: 100,
+        applyTotal: 100,
         source: ''
       }
 
@@ -113,7 +113,7 @@ describe('JobsCtrlr', () => {
         requiredFields: ['name', 'email', 'phone', 'experience'],
         deadline: dayjs().add(10, 'month').toISOString(),
         autoRejectDay: 5,
-        referTotal: 100,
+        applyTotal: 100,
         source: ''
       }
       const jwtToken = generateJWT(user1.userId)
@@ -133,7 +133,7 @@ describe('JobsCtrlr', () => {
         requiredFields: ['name', 'email', 'phone', 'experience'],
         deadline: dayjs().subtract(10, 'day').toDate(),
         expiration: 5,
-        referTotal: 100,
+        applyTotal: 100,
         source: ''
       }
 

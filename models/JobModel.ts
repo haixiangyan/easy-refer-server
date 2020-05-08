@@ -27,7 +27,7 @@ class JobModel extends Model<JobModel> {
   public autoRejectDay!: number
 
   @Column(DataTypes.INTEGER)
-  public referTotal!: number
+  public applyTotal!: number
 
   @Column(DataTypes.STRING)
   public source!: string | null

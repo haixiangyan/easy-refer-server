@@ -163,7 +163,7 @@ class JobsCtrlr {
           processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : defaultChart,
         })
       })
-      .filter(dbJob => dbJob.referredCount < dbJob.referTotal) // 过滤掉推满的 Job
+      .filter(dbJob => dbJob.referredCount < dbJob.applyTotal) // 过滤掉推满的 Job
 
     return {count, jobList}
   }
