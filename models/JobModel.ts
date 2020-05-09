@@ -31,7 +31,7 @@ class JobModel extends Model<JobModel> {
   @Column(DataTypes.JSON)
   public requiredFields!: string
 
-  @Column(DataTypes.DATE)
+  @Column(DataTypes.DATEONLY)
   public deadline!: Date
 
   @Column(DataTypes.INTEGER)

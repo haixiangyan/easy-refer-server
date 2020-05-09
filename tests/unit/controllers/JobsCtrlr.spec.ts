@@ -100,7 +100,7 @@ describe('JobsCtrlr', () => {
           return expect(job[key]).toStrictEqual(jobForm.requiredFields)
         }
         if (key === 'deadline') {
-          return expect(job[key]).toEqual(jobForm.deadline)
+          return expect(job[key]).toEqual(dayjs(jobForm.deadline).format(DB_DATE_FORMAT))
         }
         expect(job[key]).toEqual(value)
       })
