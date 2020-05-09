@@ -12,7 +12,7 @@ import dayjs = require('dayjs')
 const jobListRoute = '/api/jobs'
 
 const [user1, user2, user3] = users
-const [expiredJob1, job1] = jobs
+const [expiredJob1, job1, job2] = jobs
 
 const agent = request(app)
 
@@ -59,7 +59,7 @@ describe('JobsCtrlr', () => {
   describe('getJob', () => {
     it('成功获取 Job', async () => {
       const {status, body: job} = await agent
-        .get(`${jobListRoute}/job-1`)
+        .get(`${jobListRoute}/${job1.jobId}`)
 
       expect(status).toEqual(200)
       expect(job).toHaveProperty('appliedCount')
@@ -154,7 +154,7 @@ describe('JobsCtrlr', () => {
       const jobForm = {company: 'New Company',}
 
       const {status, body: job} = await agent
-        .put(`${jobListRoute}/job-1`)
+        .put(`${jobListRoute}/${job1.jobId}`)
         .send(jobForm)
         .set('Authorization', jwtToken)
 
@@ -182,7 +182,7 @@ describe('JobsCtrlr', () => {
       const jobForm = {company: 'New Company',}
 
       const {status, body} = await agent
-        .put(`${jobListRoute}/job-2`)
+        .put(`${jobListRoute}/${job2.jobId}`)
         .send(jobForm)
         .set('Authorization', jwtToken)
 

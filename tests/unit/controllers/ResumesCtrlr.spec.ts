@@ -21,7 +21,7 @@ describe('ResumesCtrlr', () => {
     it('成功获取 resume-2 简历', async () => {
       const jwtToken = generateJWT(user1.userId)
       const {status, body: responseResume} = await agent
-        .get(`${resumeRoute}/resume-2`)
+        .get(`${resumeRoute}/${resume2.resumeId}`)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(200)
@@ -46,7 +46,7 @@ describe('ResumesCtrlr', () => {
     it('user-3 无法访问 user-2 的简历', async () => {
       const jwtToken = generateJWT(user3.userId)
       const {status, body} = await agent
-        .get(`${resumeRoute}/resume-2`)
+        .get(`${resumeRoute}/${resume2.resumeId}`)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(403)

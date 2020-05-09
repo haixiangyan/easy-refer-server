@@ -2,13 +2,14 @@ import request from 'supertest'
 import app from '../../../app'
 import {generateJWT} from '../../../utils/auth'
 import db from '../../../models/db'
-import {initMockDB, users} from '../../../mocks/dbObjects'
+import {initMockDB, jobs, users} from '../../../mocks/dbObjects'
 import dayjs = require('dayjs')
 
 const userRoute = '/api/users'
 
 const agent = request(app)
 
+const [expiredJob1, job1] = jobs
 const [user1, user2] = users
 
 describe('UsersCtrlr', () => {
@@ -59,7 +60,7 @@ describe('UsersCtrlr', () => {
       expect(info.userId).toEqual(user1.userId)
       expect(info.email).toEqual(user1.email)
 
-      expect(job.jobId).toEqual('job-1')
+      expect(job.jobId).toEqual(job1.jobId)
       expect(dayjs(job.deadline).isAfter(dayjs())).toBe(true)
     })
     it ('成功获取 user-2', async () => {
