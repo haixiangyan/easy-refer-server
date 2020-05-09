@@ -73,7 +73,7 @@ class JobsCtrlr {
 
     // 是否存在
     if (!dbJob) {
-      return res.status(404).json({message: '该内推职不存在'})
+      return res.status(404).json({message: '该内推职位不存在'})
     }
 
     // 是否有权访问该 Job
@@ -82,6 +82,26 @@ class JobsCtrlr {
     }
 
     await dbJob.update(jobForm)
+
+    return res.json(dbJob)
+  }
+
+  public static async deleteJob(req: Request, res: Response) {
+    const {userId} = req.user as TJWTUser
+    const {jobId} = req.params
+
+    const dbJob = await JobModel.findOne({
+      where: {
+        jobId,
+        refererId: userId
+      }
+    })
+
+    if (!dbJob) {
+      return res.status(404).json({message: '该内推职位不存在'})
+    }
+
+    await dbJob.destroy()
 
     return res.json(dbJob)
   }

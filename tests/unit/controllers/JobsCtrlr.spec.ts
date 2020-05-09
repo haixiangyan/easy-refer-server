@@ -1,5 +1,5 @@
 import db from '../../../models/db'
-import {initMockDB, users} from '../../../mocks/dbObjects'
+import {initMockDB, jobs, users} from '../../../mocks/dbObjects'
 import request from 'supertest'
 import app from '../../../app'
 import {generateJWT} from '../../../utils/auth'
@@ -12,6 +12,7 @@ import dayjs = require('dayjs')
 const jobListRoute = '/api/jobs'
 
 const [user1, user2, user3] = users
+const [expiredJob1, job1] = jobs
 
 const agent = request(app)
 
@@ -174,7 +175,7 @@ describe('JobsCtrlr', () => {
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(404)
-      expect(body.message).toEqual('该内推职不存在')
+      expect(body.message).toEqual('该内推职位不存在')
     })
     it('无权限修改 Job', async () => {
       const jwtToken = generateJWT(user1.userId)
@@ -240,6 +241,20 @@ describe('JobsCtrlr', () => {
       expect(newList.length).toEqual(10)
       expect(newList[0]).toStrictEqual(list[0])
       expect(newList[newList.length - 1]).toStrictEqual(list[list.length - 1])
+    })
+  })
+
+  describe('deleteJob', () => {
+    it('成功删除 Job', async () => {
+      const jwtToken = generateJWT(user1.userId)
+      const {status} = await agent
+        .delete(`${jobListRoute}/${job1.jobId}`)
+        .set('Authorization', jwtToken)
+
+      const dbJob = await JobModel.findByPk(job1.jobId)
+
+      expect(status).toEqual(200)
+      expect(dbJob).toBeNull()
     })
   })
 })

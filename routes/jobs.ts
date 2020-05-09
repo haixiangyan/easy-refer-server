@@ -17,4 +17,7 @@ JobsRouter.post('/', JWTMW.authenticate, JobsCtrlr.createJob)
 // 修改一个 Job
 JobsRouter.put('/:jobId', JWTMW.authenticate, JobsCtrlr.editJob)
 
+// 删除一个 Job
+JobsRouter.delete('/:jobId', JWTMW.authenticate, JobsCtrlr.deleteJob)
+
 export default JobsRouter
