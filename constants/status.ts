@@ -1,4 +1,6 @@
-export const REFER_STATES = {
+import {TStatus} from '@/@types/refers'
+
+export const REFER_STATES: {[key: string]: TStatus} = {
   processing: 'processing',
   rejected: 'rejected',
   referred: 'referred'
