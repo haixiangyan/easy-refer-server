@@ -34,6 +34,14 @@ RefersRouter.patch(
   RefersCtrlr.editRefer
 )
 
+// 修改 Refer 状态
+RefersRouter.patch(
+  '/status/:referId',
+  JWTMW.authenticate,
+  RefersMW.existRefer,
+  RefersCtrlr.updateReferStatus
+)
+
 // 删除 Refer
 RefersRouter.delete(
   '/:referId',

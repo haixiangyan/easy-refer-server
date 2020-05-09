@@ -1,5 +1,5 @@
 import db from '../../../models/db'
-import {initMockDB, jobs, users} from '../../../mocks/dbObjects'
+import {initMockDB, jobs, refers, users} from '../../../mocks/dbObjects'
 import {generateJWT} from '../../../utils/auth'
 import request from 'supertest'
 import app from '../../../app'
@@ -7,10 +7,13 @@ import ReferModel from '../../../models/ReferModel'
 import ResumeModel from '../../../models/ResumeModel'
 import UserModel from '../../../models/UserModel'
 import JobModel from '../../../models/JobModel'
+import {REFER_STATES} from '../../../constants/status'
 
 const refersRoute = '/api/refers'
+const refersStatusRoute = '/api/refers/status'
 const [user1, user2, user3] = users
 const [expiredJob1, job1, job2] = jobs
+const [refer2] = refers
 
 const agent = request(app)
 
@@ -198,25 +201,67 @@ describe('RefersCtrlr', () => {
       const jwtToken = generateJWT('user-2')
       const patchReferForm = {phone: '12345678'}
 
-      const {status, body: refer} = await agent
+      const {status, body} = await agent
         .patch(`${refersRoute}/refer-99`)
         .send(patchReferForm)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(404)
-      expect(refer.message).toEqual('该内推不存在')
+      expect(body.message).toEqual('该内推不存在')
     })
     it('修改别人的 Refer', async () => {
       const jwtToken = generateJWT('user-2')
       const patchReferForm = {phone: '12345678'}
 
-      const {status, body: refer} = await agent
+      const {status, body} = await agent
         .patch(`${refersRoute}/refer-3`)
         .send(patchReferForm)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(403)
-      expect(refer.message).toEqual('无权限访问该内推')
+      expect(body.message).toEqual('无权限访问该内推')
+    })
+  })
+
+  describe('updateReferStatus', () => {
+    it('成功更新 Refer 状态', async () => {
+      const prevStatus = refer2.status
+      expect(prevStatus).toEqual(REFER_STATES.processing)
+
+      const jwtToken = generateJWT(user1.userId)
+      const {status, body: refer} = await agent
+        .patch(`${refersStatusRoute}/${refer2.referId}`)
+        .send({status: REFER_STATES.rejected})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(200)
+      expect(refer.status).toEqual(REFER_STATES.rejected)
+
+      const dbRefer = await ReferModel.findByPk(refer2.referId)
+      expect(dbRefer!.status).toEqual(REFER_STATES.rejected)
+      // 恢复
+      dbRefer!.status = REFER_STATES.processing
+      await dbRefer!.save()
+    })
+    it('参数要有 status 字段', async () => {
+      const jwtToken = generateJWT(user1.userId)
+      const {status, body} = await agent
+        .patch(`${refersStatusRoute}/${refer2.referId}`)
+        .send({phone: '12345678'})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(422)
+      expect(body.message).toEqual('参数不正确')
+    })
+    it('非内推人不能修改状态', async () => {
+      const jwtToken = generateJWT(user2.userId)
+      const {status, body} = await agent
+        .patch(`${refersStatusRoute}/${refer2.referId}`)
+        .send({status: 'rejected'})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(403)
+      expect(body.message).toEqual('无权限访问该内推')
     })
   })
 
