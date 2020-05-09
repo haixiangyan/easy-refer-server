@@ -47,6 +47,10 @@ class JobModel extends Model<JobModel> {
   @Column(DataTypes.STRING)
   public source!: string | null
 
+  @Default('active')
+  @Column(DataTypes.STRING)
+  public status!: string
+
   // 外键
   @ForeignKey(() => UserModel)
   @Column(DataTypes.STRING)

@@ -7,6 +7,7 @@ import UserModel from '../models/UserModel'
 import ReferModel from '../models/ReferModel'
 import {DB_DATE_FORMAT} from '@/constants/format'
 import {generateJobId} from '@/utils/auth'
+import {JOB_STATES} from '@/constants/status'
 
 class JobsCtrlr {
   public static async getJobList(req: Request, res: Response<TGetFullJobList>) {
@@ -45,7 +46,7 @@ class JobsCtrlr {
     const hasJob = await JobModel.findOne({
       where: {
         refererId: userId,
-        deadline: {[Op.gte]: dayjs().toDate()}
+        status: JOB_STATES.active
       }
     })
 
@@ -67,7 +68,11 @@ class JobsCtrlr {
     const {jobId} = req.params
     const jobForm: JobModel = req.body
 
-    const dbJob = await JobModel.findByPk(jobId, {
+    const dbJob = await JobModel.findOne({
+      where: {
+        jobId,
+        status: JOB_STATES.active
+      },
       include: [{model: UserModel, as: 'referer'}]
     })
 
@@ -93,7 +98,8 @@ class JobsCtrlr {
     const dbJob = await JobModel.findOne({
       where: {
         jobId,
-        refererId: userId
+        refererId: userId,
+        status: JOB_STATES.active
       }
     })
 
@@ -113,8 +119,7 @@ class JobsCtrlr {
     const {count, rows: dbJobList} = await JobModel.findAndCountAll({
       where: {
         ...jobIdCondition, // 是否需要用 jobId 过滤
-        deadline: {[Op.gte]: dayjs().toDate()}, // 获取在 deadline 之前的内推职位
-        appliedCount: {[Op.lt]: col('applyTotal')}
+        status: JOB_STATES.active
       } as any,
       include: [{model: UserModel, as: 'referer', attributes: ['name']}],
       offset: page - 1,

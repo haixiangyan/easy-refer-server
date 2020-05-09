@@ -61,7 +61,8 @@ export const jobs = [
     autoRejectDay: 5,
     applyTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
-    refererId: user1.userId
+    refererId: user1.userId,
+    status: 'expired'
   },
   {
     jobId: 'job-1',
