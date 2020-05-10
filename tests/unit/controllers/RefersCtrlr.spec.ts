@@ -199,18 +199,6 @@ describe('RefersCtrlr', () => {
       const dbRefer = await ReferModel.findByPk(refer2.referId)
       expect(dbRefer!.phone).toEqual('12345678')
     })
-    it('修改不存在的 Refer', async () => {
-      const jwtToken = generateJWT(user2.userId)
-      const patchReferForm = {phone: '12345678'}
-
-      const {status, body} = await agent
-        .patch(`${refersRoute}/refer-99`)
-        .send(patchReferForm)
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(404)
-      expect(body.message).toEqual('该内推不存在')
-    })
     it('修改别人的 Refer', async () => {
       const jwtToken = generateJWT(user2.userId)
       const patchReferForm = {phone: '12345678'}
@@ -282,16 +270,6 @@ describe('RefersCtrlr', () => {
 
       const dbDeletedResume = await ResumeModel.findByPk(resume2.resumeId)
       expect(dbDeletedResume).toBeNull()
-    })
-    it('删除不存在的 Refer', async () => {
-      const jwtToken = generateJWT(user2.userId)
-
-      const {status, body} = await agent
-        .delete(`${refersRoute}/refer-99`)
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(404)
-      expect(body.message).toEqual('该内推不存在')
     })
     it('无权限删除 Refer', async () => {
       const jwtToken = generateJWT(user2.userId)

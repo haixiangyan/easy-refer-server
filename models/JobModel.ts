@@ -13,6 +13,7 @@ import {
 } from 'sequelize-typescript'
 import UserModel from '@/models/UserModel'
 import ReferModel from '@/models/ReferModel'
+import {JOB_STATES} from '@/constants/status'
 
 @Table({tableName: 'jobs'})
 class JobModel extends Model<JobModel> {
@@ -47,7 +48,7 @@ class JobModel extends Model<JobModel> {
   @Column(DataTypes.STRING)
   public source!: string | null
 
-  @Default('active')
+  @Default(JOB_STATES.active)
   @Column(DataTypes.STRING)
   public status!: string
 

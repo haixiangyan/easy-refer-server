@@ -10,6 +10,9 @@ import {generateJobId} from '@/utils/auth'
 import {JOB_STATES} from '@/constants/status'
 
 class JobsCtrlr {
+  /**
+   * 获取 Job 列表
+   */
   public static async getJobList(req: Request, res: Response<TGetFullJobList>) {
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
@@ -23,6 +26,9 @@ class JobsCtrlr {
     res.json({jobList, total})
   }
 
+  /**
+   * 获取一个 Job
+   */
   public static async getJob(req: Request, res: Response<TGetFullJob>) {
     const {jobId} = req.params
     const {count, jobList} = await JobsCtrlr.parseJobList(1, 1, jobId)
@@ -34,15 +40,19 @@ class JobsCtrlr {
     res.json(jobList[0])
   }
 
+  /**
+   * 创建一个 Job
+   */
   public static async createJob(req: Request, res: Response<TGetJob>) {
     const {userId} = req.user as TJWTUser
     const jobForm: JobModel = req.body
 
-    // deadline 在今天之前
+    // JobForm 是否合法
     if (dayjs(jobForm.deadline).isBefore(dayjs())) {
       return res.status(412).json({message: '截止日期应该在今天之后'})
     }
 
+    // Job 是否存在
     const hasJob = await JobModel.findOne({
       where: {
         refererId: userId,
@@ -63,26 +73,18 @@ class JobsCtrlr {
     return res.status(201).json(dbJob)
   }
 
+  /**
+   * 修改一个 Job
+   */
   public static async editJob(req: Request, res: Response<TGetJob>) {
     const {userId} = req.user as TJWTUser
-    const {jobId} = req.params
+    const {dbJob} = res.locals
     const jobForm: JobModel = req.body
 
-    const dbJob = await JobModel.findOne({
-      where: {
-        jobId,
-        status: JOB_STATES.active
-      },
-      include: [{model: UserModel, as: 'referer'}]
-    })
-
-    // 是否存在
-    if (!dbJob) {
-      return res.status(404).json({message: '该内推职位不存在'})
-    }
+    const referer = await dbJob.$get('referer')
 
     // 是否有权访问该 Job
-    if (!dbJob.referer || dbJob.referer.userId !== userId) {
+    if (!referer || referer.userId !== userId) {
       return res.status(403).json({message: '无权限修改该内推职位'})
     }
 
@@ -91,21 +93,9 @@ class JobsCtrlr {
     return res.json(dbJob)
   }
 
+  // 删除一个 Job
   public static async deleteJob(req: Request, res: Response) {
-    const {userId} = req.user as TJWTUser
-    const {jobId} = req.params
-
-    const dbJob = await JobModel.findOne({
-      where: {
-        jobId,
-        refererId: userId,
-        status: JOB_STATES.active
-      }
-    })
-
-    if (!dbJob) {
-      return res.status(404).json({message: '该内推职位不存在'})
-    }
+    const {dbJob} = res.locals
 
     await dbJob.destroy()
 
@@ -119,7 +109,7 @@ class JobsCtrlr {
     const {count, rows: dbJobList} = await JobModel.findAndCountAll({
       where: {
         ...jobIdCondition, // 是否需要用 jobId 过滤
-        status: JOB_STATES.active
+        status: JOB_STATES.active // Job 是 active
       } as any,
       include: [{model: UserModel, as: 'referer', attributes: ['name']}],
       offset: page - 1,

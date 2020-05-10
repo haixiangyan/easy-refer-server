@@ -8,11 +8,22 @@ import dayjs from 'dayjs'
 import {generateReferId, generateUserId} from '@/utils/auth'
 
 class RefersCtrlr {
+  private static roleIdMapper: TMapper = {
+    my: 'refereeId', // 查看自己的 Refer
+    other: 'refererId' // 查看 candidate 的 Refer
+  }
+
   public static async getReferList(req: Request, res: Response<TGetReferList>) {
     const {userId} = req.user as TJWTUser
-    const {roleId} = res.locals
+
+    // 默认查看自己的 Refer
+    if (!req.query.role) {
+      req.query.role = 'my'
+    }
+    const roleId = RefersCtrlr.roleIdMapper[req.query.role as string]
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
+
 
     if (Number.isNaN(page) || Number.isNaN(limit) || page < 0 || limit < 1) {
       return res.status(422).json({message: '参数不正确'})
