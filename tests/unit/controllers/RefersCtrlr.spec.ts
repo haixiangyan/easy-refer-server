@@ -7,7 +7,7 @@ import ReferModel from '../../../models/ReferModel'
 import ResumeModel from '../../../models/ResumeModel'
 import UserModel from '../../../models/UserModel'
 import JobModel from '../../../models/JobModel'
-import {REFER_STATES} from '../../../constants/status'
+import {JOB_STATES, REFER_STATES} from '../../../constants/status'
 import {ROLES} from '../../../constants/roles'
 
 const refersRoute = '/api/refers'
@@ -126,6 +126,10 @@ describe('RefersCtrlr', () => {
       const prevDbJob = await JobModel.findByPk(job2.jobId)
       const prevAppliedCount = prevDbJob!.appliedCount
 
+      // 更新 appliedCount
+      prevDbJob!.appliedCount = prevDbJob!.applyTotal - 1
+      await prevDbJob!.save()
+
       const {status, body: refer} = await agent
         .post(`${refersRoute}/${job2.jobId}`)
         .send(referForm)
@@ -142,7 +146,12 @@ describe('RefersCtrlr', () => {
       expect(dbRefer!.jobId).toEqual(job2.jobId)
 
       const nowDbJob = await JobModel.findByPk(job2.jobId)
-      expect(nowDbJob!.appliedCount).toEqual(prevAppliedCount + 1)
+      expect(nowDbJob!.appliedCount).toEqual(nowDbJob!.applyTotal)
+      expect(nowDbJob!.status).toEqual(JOB_STATES.expired)
+
+      // 恢复
+      nowDbJob!.appliedCount = prevAppliedCount
+      await nowDbJob!.save()
     })
     it('申请不存在的内推职位', async () => {
       const {status, body} = await agent
