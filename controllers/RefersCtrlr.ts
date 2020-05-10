@@ -6,6 +6,7 @@ import JobModel from '../models/JobModel'
 import UserModel from '../models/UserModel'
 import dayjs from 'dayjs'
 import {generateReferId, generateUserId} from '@/utils/auth'
+import {JOB_STATES} from '@/constants/status'
 
 class RefersCtrlr {
   private static roleIdMapper: TMapper = {
@@ -107,7 +108,11 @@ class RefersCtrlr {
     })
 
     // 申请 +1
-    dbJob.increment('appliedCount')
+    dbJob.appliedCount += 1
+    if (dbJob.appliedCount === dbJob.applyTotal) {
+      dbJob.status = JOB_STATES.expired
+    }
+    await dbJob.save()
 
     return res.status(201).json(dbRefer)
   }
