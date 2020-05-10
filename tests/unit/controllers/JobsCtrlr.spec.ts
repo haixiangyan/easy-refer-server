@@ -175,7 +175,6 @@ describe('JobsCtrlr', () => {
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(404)
-      expect(body.message).toEqual('该内推职位不存在')
     })
     it('无权限修改 Job', async () => {
       const jwtToken = generateJWT(user1.userId)
@@ -187,7 +186,6 @@ describe('JobsCtrlr', () => {
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(403)
-      expect(body.message).toEqual('无权限修改该内推职位')
     })
   })
 
