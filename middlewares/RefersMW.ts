@@ -43,8 +43,7 @@ class RefersMW {
     const dbRefer = await ReferModel.findByPk(referId)
 
     if (!dbRefer) {
-      res.status(404)
-      return res.json({message: '该内推不存在'})
+      return res.status(404).json({message: '该内推不存在'})
     }
 
     // 传递数据库中的 Refer
