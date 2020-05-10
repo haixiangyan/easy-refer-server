@@ -10,7 +10,6 @@ const RefersRouter = express.Router()
 RefersRouter.get(
   '/',
   JWTMW.authenticate,
-  RefersMW.updateReferStatus,
   RefersCtrlr.getReferList
 )
 
@@ -19,7 +18,6 @@ RefersRouter.get(
   '/:referId',
   JWTMW.authenticate,
   RefersMW.existRefer,
-  RefersMW.updateReferStatus,
   RefersCtrlr.getRefer
 )
 
