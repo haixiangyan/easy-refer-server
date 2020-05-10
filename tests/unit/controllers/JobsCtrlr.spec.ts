@@ -12,7 +12,7 @@ import dayjs = require('dayjs')
 const jobListRoute = '/api/jobs'
 
 const [user1, user2, user3] = users
-const [expiredJob1, job1, job2] = jobs
+const [expiredJob1, job1] = jobs
 
 const agent = request(app)
 
@@ -164,28 +164,6 @@ describe('JobsCtrlr', () => {
       const dbJob = await JobModel.findByPk('job-1')
       expect(dbJob).not.toBeNull()
       expect(dbJob!.company).toEqual(jobForm.company)
-    })
-    it('修改不存在的 Job', async () => {
-      const jwtToken = generateJWT(user1.userId)
-      const jobForm = {company: 'New Company',}
-
-      const {status, body} = await agent
-        .put(`${jobListRoute}/job-99`)
-        .send(jobForm)
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(404)
-    })
-    it('无权限修改 Job', async () => {
-      const jwtToken = generateJWT(user1.userId)
-      const jobForm = {company: 'New Company',}
-
-      const {status, body} = await agent
-        .put(`${jobListRoute}/${job2.jobId}`)
-        .send(jobForm)
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(403)
     })
   })
 
