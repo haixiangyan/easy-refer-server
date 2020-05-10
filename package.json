@@ -5,9 +5,9 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon bin/www.ts --watch bin",
     "prod": "cross-env NODE_ENV=production ts-node -r tsconfig-paths/register --files bin/www.ts",
-    "pm2": "pm2 start ts-node -- -r tsconfig-paths/register --files bin/www.ts",
+    "pm2": "pm2 start --name=app ts-node -- -r tsconfig-paths/register --files bin/www.ts",
     "test": "jest --no-cache --maxWorkers=1",
-    "automation": "pm2 start ts-node -- -r tsconfig-paths/register --files scripts/automation.ts",
+    "automation": "pm2 start --name=auto ts-node -- -r tsconfig-paths/register --files scripts/automation.ts",
     "coveralls": "coveralls < coverage/lcov.info"
   },
   "dependencies": {
