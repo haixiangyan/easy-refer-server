@@ -56,7 +56,7 @@ export const jobs = [
   {
     jobId: 'expired-job-1',
     company: 'Expired Google',
-    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeId', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().subtract(3, 'month').toDate(),
     autoRejectDay: 5,
     applyTotal: 400,
@@ -67,7 +67,7 @@ export const jobs = [
   {
     jobId: 'job-1',
     company: 'Google',
-    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeId', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().add(3, 'month').toDate(),
     autoRejectDay: 5,
     appliedCount: 2,
@@ -78,7 +78,7 @@ export const jobs = [
   {
     jobId: 'job-2',
     company: 'Facebook',
-    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
+    requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeId', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
     deadline: dayjs().add(3, 'month').toDate(),
     autoRejectDay: 3,
     applyTotal: 300,
