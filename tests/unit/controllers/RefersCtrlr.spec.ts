@@ -1,14 +1,21 @@
 import db from '../../../models/db'
-import {initMockDB, users} from '../../../mocks/dbObjects'
+import {initMockDB, jobs, refers, resumes, users} from '../../../mocks/dbObjects'
 import {generateJWT} from '../../../utils/auth'
 import request from 'supertest'
 import app from '../../../app'
 import ReferModel from '../../../models/ReferModel'
 import ResumeModel from '../../../models/ResumeModel'
 import UserModel from '../../../models/UserModel'
+import JobModel from '../../../models/JobModel'
+import {JOB_STATES, REFER_STATES} from '../../../constants/status'
+import {ROLES} from '../../../constants/roles'
 
 const refersRoute = '/api/refers'
+const refersStatusRoute = '/api/refers/status'
 const [user1, user2, user3] = users
+const [expiredJob1, job1, job2] = jobs
+const [refer2, refer3] = refers
+const [resume2] = resumes
 
 const agent = request(app)
 
@@ -24,7 +31,7 @@ describe('RefersCtrlr', () => {
       const jwtToken = generateJWT(user2.userId)
       const {status, body} = await agent
         .get(refersRoute)
-        .query({role: 'my', page: 1, limit: 10})
+        .query({role: ROLES.my, page: 1, limit: 10})
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(200)
@@ -37,7 +44,7 @@ describe('RefersCtrlr', () => {
       const jwtToken = generateJWT(user1.userId)
       const {status, body} = await agent
         .get(refersRoute)
-        .query({role: 'other', page: 1, limit: 10})
+        .query({role: ROLES.other, page: 1, limit: 10})
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(200)
@@ -69,11 +76,11 @@ describe('RefersCtrlr', () => {
     it('查看自己的 Refer', async () => {
       const jwtToken = generateJWT(user2.userId)
       const {status, body: refer} = await agent
-        .get(`${refersRoute}/refer-2`)
+        .get(`${refersRoute}/${refer2.referId}`)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(200)
-      expect(refer.referId).toEqual('refer-2')
+      expect(refer.referId).toEqual(refer2.referId)
       expect(refer.resume).not.toBeUndefined()
       expect(refer.job).not.toBeUndefined()
       expect(refer.referer).not.toBeUndefined()
@@ -91,16 +98,16 @@ describe('RefersCtrlr', () => {
     it('有权限查看别人的 Refer', async () => {
       const jwtToken = generateJWT(user1.userId)
       const {status, body: refer} = await agent
-        .get(`${refersRoute}/refer-2`)
+        .get(`${refersRoute}/${refer2.referId}`)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(200)
-      expect(refer.referId).toEqual('refer-2')
+      expect(refer.referId).toEqual(refer2.referId)
     })
     it('无权限查看别人的 Refer', async () => {
       const jwtToken = generateJWT(user3.userId)
       const {status, body} = await agent
-        .get(`${refersRoute}/refer-2`)
+        .get(`${refersRoute}/${refer2.referId}`)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(403)
@@ -116,9 +123,15 @@ describe('RefersCtrlr', () => {
         phone: user1.phone,
         experience: user1.experience
       }
+      const prevDbJob = await JobModel.findByPk(job2.jobId)
+      const prevAppliedCount = prevDbJob!.appliedCount
+
+      // 更新 appliedCount
+      prevDbJob!.appliedCount = prevDbJob!.applyTotal - 1
+      await prevDbJob!.save()
 
       const {status, body: refer} = await agent
-        .post(`${refersRoute}/job-2`)
+        .post(`${refersRoute}/${job2.jobId}`)
         .send(referForm)
         .set('Authorization', jwtToken)
 
@@ -130,7 +143,15 @@ describe('RefersCtrlr', () => {
       // 外键
       expect(dbRefer!.refereeId).toEqual(user1.userId)
       expect(dbRefer!.refererId).toEqual(user2.userId)
-      expect(dbRefer!.jobId).toEqual('job-2')
+      expect(dbRefer!.jobId).toEqual(job2.jobId)
+
+      const nowDbJob = await JobModel.findByPk(job2.jobId)
+      expect(nowDbJob!.appliedCount).toEqual(nowDbJob!.applyTotal)
+      expect(nowDbJob!.status).toEqual(JOB_STATES.expired)
+
+      // 恢复
+      nowDbJob!.appliedCount = prevAppliedCount
+      await nowDbJob!.save()
     })
     it('申请不存在的内推职位', async () => {
       const {status, body} = await agent
@@ -142,7 +163,7 @@ describe('RefersCtrlr', () => {
     })
     it('申请已申请过的内推职位', async () => {
       const {status, body} = await agent
-        .post(`${refersRoute}/job-1`)
+        .post(`${refersRoute}/${job1.jobId}`)
         .send({email: user2.email})
 
       expect(status).toEqual(403)
@@ -150,7 +171,7 @@ describe('RefersCtrlr', () => {
     })
     it('申请自己创建的内推职位', async () => {
       const {status, body} = await agent
-        .post(`${refersRoute}/job-1`)
+        .post(`${refersRoute}/${job1.jobId}`)
         .send({email: user1.email})
 
       expect(status).toEqual(403)
@@ -158,7 +179,7 @@ describe('RefersCtrlr', () => {
     })
     it('不存在用户申请内推', async () => {
       const {status, body: refer} = await agent
-        .post(`${refersRoute}/job-1`)
+        .post(`${refersRoute}/${job1.jobId}`)
         .send({email: 'user99@mail.com'})
 
       expect(status).toEqual(201)
@@ -177,39 +198,69 @@ describe('RefersCtrlr', () => {
       const patchReferForm = {phone: '12345678'}
 
       const {status, body: refer} = await agent
-        .patch(`${refersRoute}/refer-2`)
+        .patch(`${refersRoute}/${refer2.referId}`)
         .send(patchReferForm)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(200)
       expect(refer.phone).toEqual('12345678')
 
-      const dbRefer = await ReferModel.findByPk('refer-2')
+      const dbRefer = await ReferModel.findByPk(refer2.referId)
       expect(dbRefer!.phone).toEqual('12345678')
     })
-    it('修改不存在的 Refer', async () => {
-      const jwtToken = generateJWT('user-2')
-      const patchReferForm = {phone: '12345678'}
-
-      const {status, body: refer} = await agent
-        .patch(`${refersRoute}/refer-99`)
-        .send(patchReferForm)
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(404)
-      expect(refer.message).toEqual('该内推不存在')
-    })
     it('修改别人的 Refer', async () => {
-      const jwtToken = generateJWT('user-2')
+      const jwtToken = generateJWT(user2.userId)
       const patchReferForm = {phone: '12345678'}
 
-      const {status, body: refer} = await agent
-        .patch(`${refersRoute}/refer-3`)
+      const {status, body} = await agent
+        .patch(`${refersRoute}/${refer3.referId}`)
         .send(patchReferForm)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(403)
-      expect(refer.message).toEqual('无权限访问该内推')
+      expect(body.message).toEqual('无权限访问该内推')
+    })
+  })
+
+  describe('updateReferStatus', () => {
+    it('成功更新 Refer 状态', async () => {
+      const prevStatus = refer2.status
+      expect(prevStatus).toEqual(REFER_STATES.processing)
+
+      const jwtToken = generateJWT(user1.userId)
+      const {status, body: refer} = await agent
+        .patch(`${refersStatusRoute}/${refer2.referId}`)
+        .send({status: REFER_STATES.rejected})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(200)
+      expect(refer.status).toEqual(REFER_STATES.rejected)
+
+      const dbRefer = await ReferModel.findByPk(refer2.referId)
+      expect(dbRefer!.status).toEqual(REFER_STATES.rejected)
+      // 恢复
+      dbRefer!.status = REFER_STATES.processing
+      await dbRefer!.save()
+    })
+    it('参数要有 status 字段', async () => {
+      const jwtToken = generateJWT(user1.userId)
+      const {status, body} = await agent
+        .patch(`${refersStatusRoute}/${refer2.referId}`)
+        .send({phone: '12345678'})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(422)
+      expect(body.message).toEqual('参数不正确')
+    })
+    it('非内推人不能修改状态', async () => {
+      const jwtToken = generateJWT(user2.userId)
+      const {status, body} = await agent
+        .patch(`${refersStatusRoute}/${refer2.referId}`)
+        .send({status: REFER_STATES.rejected})
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(403)
+      expect(body.message).toEqual('无权限访问该内推')
     })
   })
 
@@ -218,32 +269,22 @@ describe('RefersCtrlr', () => {
       const jwtToken = generateJWT(user2.userId)
 
       const {status} = await agent
-        .delete(`${refersRoute}/refer-2`)
+        .delete(`${refersRoute}/${refer2.referId}`)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(200)
 
-      const dbDeletedRefer = await ReferModel.findByPk('refer-2')
+      const dbDeletedRefer = await ReferModel.findByPk(refer2.referId)
       expect(dbDeletedRefer).toBeNull()
 
-      const dbDeletedResume = await ResumeModel.findByPk('resume-2')
+      const dbDeletedResume = await ResumeModel.findByPk(resume2.resumeId)
       expect(dbDeletedResume).toBeNull()
-    })
-    it('删除不存在的 Refer', async () => {
-      const jwtToken = generateJWT(user2.userId)
-
-      const {status, body} = await agent
-        .delete(`${refersRoute}/refer-99`)
-        .set('Authorization', jwtToken)
-
-      expect(status).toEqual(404)
-      expect(body.message).toEqual('该内推不存在')
     })
     it('无权限删除 Refer', async () => {
       const jwtToken = generateJWT(user2.userId)
 
       const {status, body} = await agent
-        .delete(`${refersRoute}/refer-3`)
+        .delete(`${refersRoute}/${refer3.referId}`)
         .set('Authorization', jwtToken)
 
       expect(status).toEqual(403)

@@ -6,13 +6,25 @@ import JobModel from '../models/JobModel'
 import UserModel from '../models/UserModel'
 import dayjs from 'dayjs'
 import {generateReferId, generateUserId} from '@/utils/auth'
+import {JOB_STATES} from '@/constants/status'
 
 class RefersCtrlr {
+  private static roleIdMapper: TMapper = {
+    my: 'refereeId', // 查看自己的 Refer
+    other: 'refererId' // 查看 candidate 的 Refer
+  }
+
   public static async getReferList(req: Request, res: Response<TGetReferList>) {
     const {userId} = req.user as TJWTUser
-    const {roleId} = res.locals
+
+    // 默认查看自己的 Refer
+    if (!req.query.role) {
+      req.query.role = 'my'
+    }
+    const roleId = RefersCtrlr.roleIdMapper[req.query.role as string]
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
+
 
     if (Number.isNaN(page) || Number.isNaN(limit) || page < 0 || limit < 1) {
       return res.status(422).json({message: '参数不正确'})
@@ -95,6 +107,13 @@ class RefersCtrlr {
       expiration: dayjs().add(dbJob.autoRejectDay, 'day')
     })
 
+    // 申请 +1
+    dbJob.appliedCount += 1
+    if (dbJob.appliedCount === dbJob.applyTotal) {
+      dbJob.status = JOB_STATES.expired
+    }
+    await dbJob.save()
+
     return res.status(201).json(dbRefer)
   }
 
@@ -103,13 +122,36 @@ class RefersCtrlr {
     const {dbRefer} = res.locals
     const referForm: ReferModel = req.body
 
-    // 只有 Referer 和 Referee 才能修改
-    if (dbRefer.refereeId !== userId && dbRefer.refererId !== userId) {
+    // Referee 才能修改自己的 Refer
+    if (dbRefer.refereeId !== userId) {
       return res.status(403).json({message: '无权限访问该内推'})
     }
 
     await dbRefer.update({
       ...referForm,
+      updatedOn: dayjs().toDate()
+    })
+
+    return res.json(dbRefer)
+  }
+
+  public static async updateReferStatus(req: Request, res: Response<TGetRefer>) {
+    const {userId} = req.user as TJWTUser
+    const {dbRefer} = res.locals
+    const {status} = req.body
+
+    // Referer 才能修改 Refer 状态
+    if (dbRefer.refererId !== userId) {
+      return res.status(403).json({message: '无权限访问该内推'})
+    }
+
+    // 判断 referForm 是否存在 status
+    if (!status) {
+      return res.status(422).json({message: '参数不正确'})
+    }
+
+    await dbRefer.update({
+      status,
       updatedOn: dayjs().toDate()
     })
 

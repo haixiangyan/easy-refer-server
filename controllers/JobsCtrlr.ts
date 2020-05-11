@@ -1,15 +1,18 @@
 import {Request, Response} from 'express'
-import {TChartItem, TFullJob, TGetFullJob, TGetFullJobList, TGetJob} from '@/@types/jobs'
+import {TFullJob, TGetFullJob, TGetFullJobList, TGetJob, TLog} from '@/@types/jobs'
 import JobModel from '../models/JobModel'
 import {col, fn, Op} from 'sequelize'
 import dayjs from 'dayjs'
 import UserModel from '../models/UserModel'
 import ReferModel from '../models/ReferModel'
-import {extractField} from '@/utils/tool'
-import {DATE_FORMAT} from '@/constants/format'
+import {DB_DATE_FORMAT} from '@/constants/format'
 import {generateJobId} from '@/utils/auth'
+import {JOB_STATES} from '@/constants/status'
 
 class JobsCtrlr {
+  /**
+   * 获取 Job 列表
+   */
   public static async getJobList(req: Request, res: Response<TGetFullJobList>) {
     const page = parseInt(req.query.page as string)
     const limit = parseInt(req.query.limit as string)
@@ -23,6 +26,9 @@ class JobsCtrlr {
     res.json({jobList, total})
   }
 
+  /**
+   * 获取一个 Job
+   */
   public static async getJob(req: Request, res: Response<TGetFullJob>) {
     const {jobId} = req.params
     const {count, jobList} = await JobsCtrlr.parseJobList(1, 1, jobId)
@@ -34,19 +40,23 @@ class JobsCtrlr {
     res.json(jobList[0])
   }
 
+  /**
+   * 创建一个 Job
+   */
   public static async createJob(req: Request, res: Response<TGetJob>) {
     const {userId} = req.user as TJWTUser
     const jobForm: JobModel = req.body
 
-    // deadline 在今天之前
+    // JobForm 是否合法
     if (dayjs(jobForm.deadline).isBefore(dayjs())) {
       return res.status(412).json({message: '截止日期应该在今天之后'})
     }
 
+    // Job 是否存在
     const hasJob = await JobModel.findOne({
       where: {
         refererId: userId,
-        deadline: {[Op.gte]: dayjs().toDate()}
+        status: JOB_STATES.active
       }
     })
 
@@ -63,26 +73,31 @@ class JobsCtrlr {
     return res.status(201).json(dbJob)
   }
 
+  /**
+   * 修改一个 Job
+   */
   public static async editJob(req: Request, res: Response<TGetJob>) {
     const {userId} = req.user as TJWTUser
-    const {jobId} = req.params
+    const {dbJob} = res.locals
     const jobForm: JobModel = req.body
 
-    const dbJob = await JobModel.findByPk(jobId, {
-      include: [{model: UserModel, as: 'referer'}]
-    })
-
-    // 是否存在
-    if (!dbJob) {
-      return res.status(404).json({message: '该内推职不存在'})
-    }
+    const referer = await dbJob.$get('referer')
 
     // 是否有权访问该 Job
-    if (!dbJob.referer || dbJob.referer.userId !== userId) {
+    if (!referer || referer.userId !== userId) {
       return res.status(403).json({message: '无权限修改该内推职位'})
     }
 
     await dbJob.update(jobForm)
+
+    return res.json(dbJob)
+  }
+
+  // 删除一个 Job
+  public static async deleteJob(req: Request, res: Response) {
+    const {dbJob} = res.locals
+
+    await dbJob.destroy()
 
     return res.json(dbJob)
   }
@@ -94,7 +109,7 @@ class JobsCtrlr {
     const {count, rows: dbJobList} = await JobModel.findAndCountAll({
       where: {
         ...jobIdCondition, // 是否需要用 jobId 过滤
-        deadline: {[Op.gte]: dayjs().toDate()} // 获取在 deadline 之前的内推职位
+        status: JOB_STATES.active // Job 是 active
       } as any,
       include: [{model: UserModel, as: 'referer', attributes: ['name']}],
       offset: page - 1,
@@ -102,96 +117,66 @@ class JobsCtrlr {
       order: [['createdAt', 'DESC']]
     })
 
-    // 获取所有 Id
-    const jobIds = dbJobList.map(job => job.jobId)
-
-    // 获取已内推数目
-    const dbReferredCount = await ReferModel.findAll({
-      attributes: [
-        'jobId',
-        [fn('COUNT', col('referId')), 'referredCount'],
-      ],
-      where: {
-        jobId: {[Op.in]: jobIds},
-        status: {[Op.not]: 'referred'}, // 已经 approve 的数据
-      },
-      group: ['jobId']
-    })
-
-    // 获取内推图表的 Item
-    const dbChartItemList = await ReferModel.findAll({
-      attributes: [
-        'jobId',
-        ['updatedOn', 'date'],
-        [fn('COUNT', col('referId')), 'count'],
-      ],
-      where: {
-        jobId: {[Op.in]: jobIds},
-        status: {[Op.not]: 'processing'}, // 已经 process 的数据
-        updatedOn: {[Op.gte]: dayjs().subtract(10, 'day').toDate()} // 查 10 天内的数据
-      },
-      limit: 10,
-      group: ['jobId', 'updatedOn'],
-      order: [['updatedOn', 'DESC']]
-    })
-
-    // 提取 jobId，将数组变成对象
-    const chartItemObject = extractField(dbChartItemList.map(dbChartItem => {
-      const chartItem = dbChartItem.toJSON() as { date: Date | string, count: number }
-      chartItem.date = dayjs(chartItem.date).format(DATE_FORMAT)
-      return chartItem
-    }), 'jobId')
-    // 不够 10 个数据就追加上，且反转，让最近的在最后
-    Object.entries(chartItemObject).forEach(([key, chartItemList]) => {
-      chartItemObject[key] = [...JobsCtrlr.padChartItem(chartItemList)].reverse()
-    })
-    // 默认图表数据
-    const defaultChart = Array
-      .from(Array(10))
-      .map((item, i) => ({date: dayjs().subtract(i, 'day').format(DATE_FORMAT), count: 0}))
-      .reverse()
-
     // 将图表 Item 放入 JobItem 中
-    const jobList: TFullJob[] = dbJobList
-      .map(dbJob => { // 添加 referredCount 和 processedChart
-        const {jobId} = dbJob
-        const countItem = dbReferredCount.find(i => i.jobId === jobId)
-        const referredCount: number = countItem ? (countItem.toJSON() as any).referredCount : 0
-
-        return Object.assign({}, dbJob.toJSON() as TFullJob, {
-          referredCount,
-          processedChart: dbJob.jobId in chartItemObject ? chartItemObject[dbJob.jobId] : defaultChart,
-        })
-      })
-      .filter(dbJob => dbJob.referredCount < dbJob.referTotal) // 过滤掉推满的 Job
+    const jobList = await Promise.all(dbJobList.map(async (dbJob) => {
+      const job = dbJob.toJSON() as TFullJob
+      return {
+        ...job,
+        logs: await JobsCtrlr.getLogs(job.jobId)
+      } as TFullJob
+    }))
 
     return {count, jobList}
   }
 
   /**
-   * 补充处理图表数据
+   * 获取 log
    */
-  public static padChartItem(chartItemList: TChartItem[]): TChartItem[] {
-    let newChartItemList: TChartItem[] = []
+  public static async getLogs(jobId: string): Promise<TLog[]> {
+    // 获取内推图表的 Item
+    const dbLogs = await ReferModel.findAll({
+      attributes: [
+        ['updatedOn', 'date'],
+        [fn('COUNT', col('referId')), 'count'],
+      ],
+      where: {
+        jobId,
+        status: {[Op.not]: 'processing'}, // 已经 process 的数据
+        updatedOn: {[Op.gte]: dayjs().subtract(10, 'day').toDate()} // 查 10 天内的数据
+      },
+      group: ['updatedOn'],
+      order: [['updatedOn', 'DESC']]
+    })
+
+    // Pad
+    return JobsCtrlr.padLogs(
+      dbLogs.map(dbLog => dbLog.toJSON() as TLog)
+    ).reverse()
+  }
+
+  /**
+   * 补充处理图表数据，原始数据 新 -> 旧
+   */
+  public static padLogs(rawLogs: TLog[]): TLog[] {
+    let logs: TLog[] = []
     let i = 0, j = 0
     const nowDay = dayjs()
 
-    // 从后往前添加
-    while (i < 10 || j < chartItemList.length) {
-      const curtDay = nowDay.subtract(i, 'day').format(DATE_FORMAT)
-      if (chartItemList[j] && chartItemList[j].date === curtDay) { // 如果有数据，则使用原来的数据
-        newChartItemList.push(chartItemList[j])
+    while (i < 10 || j < rawLogs.length) {
+      const curtDay = nowDay.subtract(i, 'day')
+      if (rawLogs[j] && dayjs(rawLogs[j].date).isSame(curtDay, 'day')) { // 如果有数据，则使用原来的数据
+        logs.push(rawLogs[j])
         j += 1
       } else { // 不存在则补一个空数据
-        newChartItemList.push({
-          date: dayjs().subtract(i, 'day').format(DATE_FORMAT),
+        logs.push({
+          date: dayjs().subtract(i, 'day').format(DB_DATE_FORMAT),
           count: 0
         })
       }
       i += 1
     }
 
-    return newChartItemList
+    return logs
   }
 }
 

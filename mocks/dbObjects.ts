@@ -57,19 +57,21 @@ export const jobs = [
     jobId: 'expired-job-1',
     company: 'Expired Google',
     requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
-    deadline: dayjs().subtract(3, 'month'),
+    deadline: dayjs().subtract(3, 'month').toDate(),
     autoRejectDay: 5,
-    referTotal: 400,
+    applyTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
-    refererId: user1.userId
+    refererId: user1.userId,
+    status: 'expired'
   },
   {
     jobId: 'job-1',
     company: 'Google',
     requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
-    deadline: dayjs().add(3, 'month'),
+    deadline: dayjs().add(3, 'month').toDate(),
     autoRejectDay: 5,
-    referTotal: 400,
+    appliedCount: 2,
+    applyTotal: 400,
     source: 'https://www.1point3acres.com/bbs/',
     refererId: user1.userId
   },
@@ -77,9 +79,9 @@ export const jobs = [
     jobId: 'job-2',
     company: 'Facebook',
     requiredFields: ['name', 'email', 'phone', 'experience', 'referLinks', 'resumeUrl', 'intro', 'thirdPersonIntro', 'leetCodeUrl'],
-    deadline: dayjs().add(3, 'month'),
+    deadline: dayjs().add(3, 'month').toDate(),
     autoRejectDay: 3,
-    referTotal: 300,
+    applyTotal: 300,
     source: 'https://www.1point3acres.com/bbs/',
     refererId: user2.userId
   }

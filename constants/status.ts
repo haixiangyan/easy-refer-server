@@ -1,5 +1,12 @@
-export const STATUS_NAMES_MAPPER: TStringMapper = {
-  processing: '处理中',
-  rejected: '不内推',
-  referred: '已内推'
+import {TStatus} from '@/@types/refers'
+
+export const REFER_STATES: {[key: string]: TStatus} = {
+  processing: 'processing',
+  rejected: 'rejected',
+  referred: 'referred'
+}
+
+export const JOB_STATES = {
+  active: 'active',
+  expired: 'expired'
 }

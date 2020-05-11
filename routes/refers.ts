@@ -10,7 +10,6 @@ const RefersRouter = express.Router()
 RefersRouter.get(
   '/',
   JWTMW.authenticate,
-  RefersMW.updateReferStatus,
   RefersCtrlr.getReferList
 )
 
@@ -19,7 +18,6 @@ RefersRouter.get(
   '/:referId',
   JWTMW.authenticate,
   RefersMW.existRefer,
-  RefersMW.updateReferStatus,
   RefersCtrlr.getRefer
 )
 
@@ -32,6 +30,14 @@ RefersRouter.patch(
   JWTMW.authenticate,
   RefersMW.existRefer,
   RefersCtrlr.editRefer
+)
+
+// 修改 Refer 状态
+RefersRouter.patch(
+  '/status/:referId',
+  JWTMW.authenticate,
+  RefersMW.existRefer,
+  RefersCtrlr.updateReferStatus
 )
 
 // 删除 Refer

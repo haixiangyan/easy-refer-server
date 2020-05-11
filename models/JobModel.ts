@@ -1,7 +1,19 @@
 import {DataTypes} from 'sequelize'
-import {AllowNull, BelongsTo, Column, ForeignKey, HasMany, Model, PrimaryKey, Table, Unique} from 'sequelize-typescript'
+import {
+  AllowNull,
+  BelongsTo,
+  Column,
+  Default,
+  ForeignKey,
+  HasMany,
+  Model,
+  PrimaryKey,
+  Table,
+  Unique
+} from 'sequelize-typescript'
 import UserModel from '@/models/UserModel'
 import ReferModel from '@/models/ReferModel'
+import {JOB_STATES} from '@/constants/status'
 
 @Table({tableName: 'jobs'})
 class JobModel extends Model<JobModel> {
@@ -20,17 +32,25 @@ class JobModel extends Model<JobModel> {
   @Column(DataTypes.JSON)
   public requiredFields!: string
 
-  @Column(DataTypes.DATE)
+  @Column(DataTypes.DATEONLY)
   public deadline!: Date
 
   @Column(DataTypes.INTEGER)
   public autoRejectDay!: number
 
+  @Default(0)
   @Column(DataTypes.INTEGER)
-  public referTotal!: number
+  public appliedCount!: number
+
+  @Column(DataTypes.INTEGER)
+  public applyTotal!: number
 
   @Column(DataTypes.STRING)
   public source!: string | null
+
+  @Default(JOB_STATES.active)
+  @Column(DataTypes.STRING)
+  public status!: string
 
   // 外键
   @ForeignKey(() => UserModel)
