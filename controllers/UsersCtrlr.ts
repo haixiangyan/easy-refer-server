@@ -8,6 +8,7 @@ import {TGetFullUser, TGetUser} from '@/@types/users'
 import JobsCtrlr from '@/controllers/JobsCtrlr'
 import {TGetResume} from '@/@types/resume'
 import {generateResumeId} from '@/utils/auth'
+import {deleteResume} from '@/utils/upload'
 
 class UsersCtrlr {
   public static async getUser(req: Request, res: Response<TGetFullUser>) {
@@ -56,6 +57,16 @@ class UsersCtrlr {
       return res.status(404).json({message: '该用户不存在'})
     }
 
+    // 先清理没有使用过的 Resume
+    const dbUnusedResumeList = await dbUser.$get('resumeList', {
+      where: {referId: null}
+    })
+    for (const dbUnusedResume of dbUnusedResumeList){
+      deleteResume(userId, dbUnusedResume.name)
+      await dbUnusedResume.destroy()
+    }
+
+    // 生成新简历信息
     const url = `${req.protocol}://${req.hostname}:4000/${userId}/resumes/${filename}`
 
     const dbResume = await ResumeModel.create({

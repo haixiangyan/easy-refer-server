@@ -90,40 +90,40 @@ export const jobs = [
   }
 ]
 
-const [expiredJob1, job1, job2] = jobs
+const [expiredJob1, job1] = jobs
 
 export const resumes = [
   {
     resumeId: 'resume-2',
-    name: '李四的简历.pdf',
+    name: '李四的简历2.pdf',
     url: 'https://user-2.pdf',
     refereeId: user2.userId,
     referId: null
   },
   {
     resumeId: 'resume-21',
-    name: '李四的简历.pdf',
+    name: '李四的简历21.pdf',
     url: 'https://user-2.pdf',
     refereeId: user2.userId,
     referId: null
   },
   {
     resumeId: 'resume-22',
-    name: '李四的简历.pdf',
+    name: '李四的简历22.pdf',
     url: 'https://user-2.pdf',
     refereeId: user2.userId,
     referId: null
   },
   {
     resumeId: 'resume-23',
-    name: '李四的简历.pdf',
+    name: '李四的简历23.pdf',
     url: 'https://user-2.pdf',
     refereeId: user2.userId,
     referId: null
   },
   {
     resumeId: 'resume-3',
-    name: '李四的简历.pdf',
+    name: '王五的简历3.pdf',
     url: 'https://user-3.pdf',
     refereeId: user3.userId,
     referId: null
