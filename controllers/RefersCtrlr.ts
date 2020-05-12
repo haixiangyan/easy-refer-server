@@ -7,6 +7,7 @@ import UserModel from '../models/UserModel'
 import dayjs from 'dayjs'
 import {generateReferId, generateUserId} from '@/utils/auth'
 import {JOB_STATES} from '@/constants/status'
+import {deleteResume} from '@/utils/upload'
 
 class RefersCtrlr {
   private static roleIdMapper: TMapper = {
@@ -154,6 +155,12 @@ class RefersCtrlr {
       status,
       updatedOn: dayjs().toDate()
     })
+
+    // 如果 Refer 存在 Resume，则删除该 Resume
+    const dbResume = await dbRefer.$get('resume')
+    if (dbResume) {
+      deleteResume(userId, dbResume.name)
+    }
 
     return res.json(dbRefer)
   }

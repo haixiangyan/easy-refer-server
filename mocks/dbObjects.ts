@@ -5,6 +5,9 @@ import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
 import {encryptPassword, generateUserId} from '@/utils/auth'
+import fs from "fs"
+import path from 'path'
+import {getResumePath, UPLOAD_DIR} from '@/utils/upload'
 
 export const users = [
   {
@@ -167,6 +170,23 @@ export const refers = [
     expiration: dayjs().add(5, 'day')
   }
 ]
+
+export const mockResume = (userId: string, filename: string) => {
+  const resumePath = getResumePath(userId, filename)
+
+  fs.writeFileSync(resumePath, '123', 'utf8')
+}
+
+export const initUserDir = (userId: string) => {
+    if (!fs.existsSync(UPLOAD_DIR)) {
+      fs.mkdirSync(UPLOAD_DIR)
+    }
+
+    if (!fs.existsSync(path.resolve(UPLOAD_DIR, userId))) {
+      fs.mkdirSync(path.resolve(UPLOAD_DIR, userId))
+      fs.mkdirSync(path.resolve(UPLOAD_DIR, userId, 'resumes'))
+    }
+}
 
 export const initMockDB = async () => {
   await UserModel.bulkCreate(users)
