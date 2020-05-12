@@ -11,7 +11,7 @@ const uploadResumeRoute = '/api/upload/resume'
 
 const assetsPath = path.resolve(__dirname, '../../assets')
 
-const [user1, user2, user3] = users
+const [user1, user2] = users
 
 const agent = request(app)
 
@@ -43,6 +43,26 @@ describe('UploadCtrlr', () => {
 
       const dbResume = await ResumeModel.findByPk(body!.resumeId)
       expect(dbResume).not.toBeNull()
+    })
+    it('删除以前无用的简历', async () => {
+      const jwtToken = generateJWT(user2.userId)
+      const {status, body} = await agent
+        .post(uploadResumeRoute)
+        .attach('file', path.resolve(assetsPath, 'resume.pdf'))
+        .set('Authorization', jwtToken)
+
+      expect(status).toEqual(201)
+      expect(body).toHaveProperty('resumeId')
+      expect(body).toHaveProperty('url')
+      expect(body).toHaveProperty('name')
+
+      const dbResume = await ResumeModel.findByPk(body!.resumeId)
+      expect(dbResume).not.toBeNull()
+
+      const unusedCount = await ResumeModel.count({
+        where: {referId: null, refereeId: user2.userId}
+      })
+      expect(unusedCount).toEqual(1)
     })
   })
 })

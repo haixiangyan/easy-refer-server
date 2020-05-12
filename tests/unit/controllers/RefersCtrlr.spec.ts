@@ -1,5 +1,6 @@
+import fs from 'fs'
 import db from '../../../models/db'
-import {initMockDB, jobs, refers, resumes, users} from '../../../mocks/dbObjects'
+import {initMockDB, initUserDir, jobs, mockResume, refers, resumes, users} from '../../../mocks/dbObjects'
 import {generateJWT} from '../../../utils/auth'
 import request from 'supertest'
 import app from '../../../app'
@@ -9,6 +10,7 @@ import UserModel from '../../../models/UserModel'
 import JobModel from '../../../models/JobModel'
 import {JOB_STATES, REFER_STATES} from '../../../constants/status'
 import {ROLES} from '../../../constants/roles'
+import {clearUploadDir, getResumePath} from '../../../utils/upload'
 
 const refersRoute = '/api/refers'
 const refersStatusRoute = '/api/refers/status'
@@ -24,7 +26,10 @@ describe('RefersCtrlr', () => {
     await db.sync({force: true})
     await initMockDB()
   })
-  afterAll(async () => await db.close())
+  afterAll(async () => {
+    await db.close()
+    clearUploadDir()
+  })
 
   describe('getReferList', () => {
     it('查看自己所有的 Refer', async () => {
@@ -224,6 +229,11 @@ describe('RefersCtrlr', () => {
 
   describe('updateReferStatus', () => {
     it('成功更新 Refer 状态', async () => {
+      // 制作假简历
+      initUserDir(user1.userId)
+      mockResume(user1.userId, resume2.name)
+      expect(fs.existsSync(getResumePath(user1.userId, resume2.name))).toBe(true)
+
       const prevStatus = refer2.status
       expect(prevStatus).toEqual(REFER_STATES.processing)
 
@@ -238,6 +248,9 @@ describe('RefersCtrlr', () => {
 
       const dbRefer = await ReferModel.findByPk(refer2.referId)
       expect(dbRefer!.status).toEqual(REFER_STATES.rejected)
+
+      // 简历需要被删除
+      expect(fs.existsSync(getResumePath(user1.userId, resume2.name))).toBe(false)
       // 恢复
       dbRefer!.status = REFER_STATES.processing
       await dbRefer!.save()

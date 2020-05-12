@@ -1,6 +1,7 @@
 import path from 'path'
 import fs from 'fs'
 import rimraf from 'rimraf'
+import consola from 'consola'
 
 export const UPLOAD_DIR = path.resolve(__dirname, '../upload')
 
@@ -32,4 +33,20 @@ export const createUserFolder = (userId: string) => {
 
 export const clearUploadDir = () => {
   rimraf.sync(UPLOAD_DIR)
+}
+
+export const getResumePath = (userId: string, filename: string) => {
+  return path.resolve(UPLOAD_DIR, userId, 'resumes', filename)
+}
+
+
+export const deleteResume = (userId: string, filename: string) => {
+  const resumePath = getResumePath(userId, filename)
+
+  if (!fs.existsSync(resumePath)) {
+    return consola.warn(`简历 ${resumePath} 不存在`)
+  }
+
+  fs.unlinkSync(resumePath)
+  consola.success(`已删除简历 ${resumePath}`)
 }

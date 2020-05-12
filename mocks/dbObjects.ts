@@ -5,6 +5,9 @@ import JobModel from '@/models/JobModel'
 import ReferModel from '@/models/ReferModel'
 import ResumeModel from '@/models/ResumeModel'
 import {encryptPassword, generateUserId} from '@/utils/auth'
+import fs from "fs"
+import path from 'path'
+import {getResumePath, UPLOAD_DIR} from '@/utils/upload'
 
 export const users = [
   {
@@ -87,40 +90,40 @@ export const jobs = [
   }
 ]
 
-const [expiredJob1, job1, job2] = jobs
+const [expiredJob1, job1] = jobs
 
 export const resumes = [
   {
     resumeId: 'resume-2',
-    name: '李四的简历.pdf',
+    name: '李四的简历2.pdf',
     url: 'https://user-2.pdf',
     refereeId: user2.userId,
     referId: null
   },
   {
     resumeId: 'resume-21',
-    name: '李四的简历.pdf',
+    name: '李四的简历21.pdf',
     url: 'https://user-2.pdf',
     refereeId: user2.userId,
     referId: null
   },
   {
     resumeId: 'resume-22',
-    name: '李四的简历.pdf',
+    name: '李四的简历22.pdf',
     url: 'https://user-2.pdf',
     refereeId: user2.userId,
     referId: null
   },
   {
     resumeId: 'resume-23',
-    name: '李四的简历.pdf',
+    name: '李四的简历23.pdf',
     url: 'https://user-2.pdf',
     refereeId: user2.userId,
     referId: null
   },
   {
     resumeId: 'resume-3',
-    name: '李四的简历.pdf',
+    name: '王五的简历3.pdf',
     url: 'https://user-3.pdf',
     refereeId: user3.userId,
     referId: null
@@ -167,6 +170,23 @@ export const refers = [
     expiration: dayjs().add(5, 'day')
   }
 ]
+
+export const mockResume = (userId: string, filename: string) => {
+  const resumePath = getResumePath(userId, filename)
+
+  fs.writeFileSync(resumePath, '123', 'utf8')
+}
+
+export const initUserDir = (userId: string) => {
+    if (!fs.existsSync(UPLOAD_DIR)) {
+      fs.mkdirSync(UPLOAD_DIR)
+    }
+
+    if (!fs.existsSync(path.resolve(UPLOAD_DIR, userId))) {
+      fs.mkdirSync(path.resolve(UPLOAD_DIR, userId))
+      fs.mkdirSync(path.resolve(UPLOAD_DIR, userId, 'resumes'))
+    }
+}
 
 export const initMockDB = async () => {
   await UserModel.bulkCreate(users)
