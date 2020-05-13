@@ -2,6 +2,7 @@ import createError from 'http-errors'
 import express, {ErrorRequestHandler} from 'express'
 import path from 'path'
 import cookieParser from 'cookie-parser'
+import history from 'connect-history-api-fallback'
 import logger from 'morgan'
 
 // 路由
@@ -16,6 +17,7 @@ import JWTMW from '@/middlewares/JWTMW'
 
 const app = express()
 
+app.use(history())
 app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
